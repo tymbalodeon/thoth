@@ -1,12 +1,5 @@
 use clap::{Parser, Subcommand};
 
-#[derive(Parser)]
-#[command(about, long_about = None, version)]
-struct Cli {
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
-
 #[derive(Subcommand)]
 enum Commands {
     /// Remove pdf(s)
@@ -41,6 +34,13 @@ enum Commands {
 
     /// List template types
     Templates,
+}
+
+#[derive(Parser)]
+#[command(about, long_about = None, version)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Commands>,
 }
 
 fn main() {
