@@ -29,6 +29,18 @@ enum Commands {
         #[arg(long)]
         edit: bool,
     },
+
+    /// Open <score> in editor and pdf viewer, recompiling on file changes.
+    Edit { score: String },
+
+    /// List pdf(s).
+    List { scores: Vec<String> },
+
+    /// Open pdf(s)
+    Open { scores: Vec<String> },
+
+    /// List template types
+    Templates,
 }
 
 fn main() {
@@ -49,9 +61,35 @@ fn main() {
             title,
             edit: _,
         }) => {
+            println!("Creating ly file for \"{title}\" by {composer} of type {template}...")
+        }
+
+        Some(Commands::Edit { score }) => {
+            println!("Opening {}.pdf for editing...", score)
+        }
+
+        Some(Commands::List { scores }) => {
+            println!("Available scores...");
+            for score in scores {
+                println!("{score}")
+            }
+        }
+
+        Some(Commands::Open { scores }) => {
+            println!("Opening scores...");
+            for score in scores {
+                println!("{score}")
+            }
+        }
+
+        Some(Commands::Templates) => {
+            println!("Listing templates...");
             println!(
-                "Creating ly file for \"{}\" by {} of type {}...",
-                title, composer, template
+                "    form    # Form chart with separate sections \
+    and form summary at the bottom.
+    lead    # Lead sheet showing melody and chords.
+    piano    # Piano staff score.
+    single    # Score for a single staff instrument."
             )
         }
 
