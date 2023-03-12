@@ -37,7 +37,9 @@ enum Commands {
 }
 
 #[derive(Parser)]
-#[command(about, long_about = None, version)]
+#[command(about, long_about = None)]
+#[command(version)]
+#[command(arg_required_else_help(true))]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
