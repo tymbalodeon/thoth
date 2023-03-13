@@ -8,3 +8,4 @@ description = "CLI for working with LilyPond files"
 
 [dependencies]
 clap = { version = "4.1.8", features = ["derive"] }
+derivative = "2.2.0"

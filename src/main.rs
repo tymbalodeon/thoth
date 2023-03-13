@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use std::path::Path;
 
 #[derive(Subcommand)]
 enum Commands {
@@ -7,6 +8,9 @@ enum Commands {
 
     /// Create pdf(s)
     Compile { score: String },
+
+    /// Show config
+    Config,
 
     /// Create new score template
     Create {
@@ -45,6 +49,10 @@ struct Cli {
     command: Option<Commands>,
 }
 
+struct Config<'config> {
+    scores: &'config Path,
+}
+
 fn main() {
     let cli = Cli::parse();
 
@@ -52,9 +60,15 @@ fn main() {
         Some(Commands::Clean { score }) => {
             println!("Removing {}.pdf...", score)
         }
-
         Some(Commands::Compile { score }) => {
             println!("Creating {}.pdf...", score)
+        }
+
+        Some(Commands::Config) => {
+            let config = Config {
+                scores: Path::new("scores"),
+            };
+            println!("{}", config.scores.display())
         }
 
         Some(Commands::Create {
