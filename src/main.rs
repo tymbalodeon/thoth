@@ -1,5 +1,7 @@
+mod config;
+use config::Config;
+
 use clap::{Parser, Subcommand};
-use std::path::PathBuf;
 
 #[derive(Subcommand)]
 enum Commands {
@@ -49,10 +51,6 @@ struct Cli {
     command: Option<Commands>,
 }
 
-struct Config {
-    scores_directory: PathBuf,
-}
-
 fn main() {
     let cli = Cli::parse();
 
@@ -65,10 +63,8 @@ fn main() {
         }
 
         Some(Commands::Config) => {
-            let config = Config {
-                scores_directory: PathBuf::from("scores"),
-            };
-            println!("{}", config.scores_directory.display())
+            let config: Config = Config::new();
+            println!("{:#?}", config)
         }
 
         Some(Commands::Create {
