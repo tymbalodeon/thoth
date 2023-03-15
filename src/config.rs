@@ -1,16 +1,15 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::io::Error as IoError;
 use std::path::PathBuf;
 use toml;
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ConfigToml {
-    thoth: Option<ConfigTomlThoth>,
+struct ConfigFile {
+    thoth: Option<Thoth>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ConfigTomlThoth {
+struct Thoth {
     scores_directory: Option<String>,
 }
 
@@ -19,46 +18,41 @@ pub struct Config {
     pub scores_directory: String,
 }
 
+fn read_config_file(mut config_path: PathBuf) -> ConfigFile {
+    config_path.push(".config/thoth/config.toml");
+
+    let content = if let Ok(result) = fs::read_to_string(config_path) {
+        result
+    } else {
+        "".to_owned()
+    };
+
+    if let Ok(config_file) = toml::from_str(&content) {
+        config_file
+    } else {
+        ConfigFile { thoth: None }
+    }
+}
+
 impl Config {
     pub fn new() -> Self {
-        let mut path = match home::home_dir() {
-            Some(path) => path,
-            None => PathBuf::from(""),
-        };
+        let scores_directory: String = if let Some(path) = home::home_dir() {
+            let config_file = read_config_file(path);
 
-        path.push("config.toml");
-
-        let config_filepaths = [path];
-
-        let mut content: String = "".to_owned();
-
-        for filepath in config_filepaths {
-            let result: Result<String, IoError> = fs::read_to_string(filepath);
-
-            if result.is_ok() {
-                content = result.unwrap();
-                break;
-            }
-        }
-
-        let config_toml: ConfigToml = toml::from_str(&content).unwrap_or_else(|_| {
-            println!("Failed to create ConfigToml Object out of config file.");
-            ConfigToml { thoth: None }
-        });
-
-        let scores_directory: String = match config_toml.thoth {
-            Some(thoth) => {
-                let thoth_scores_directory: String = thoth.scores_directory.unwrap_or_else(|| {
-                    println!("Missing field username in table thoth.");
+            if let Some(thoth) = config_file.thoth {
+                if let Some(scores_directory) = thoth.scores_directory {
+                    scores_directory
+                } else {
+                    println!("WARNING: Missing scores directory value.");
                     "unknown".to_owned()
-                });
-
-                thoth_scores_directory
-            }
-            None => {
-                println!("Missing table thoth.");
+                }
+            } else {
+                println!("WARNING: Missing table thoth.");
                 "unknown".to_owned()
             }
+        } else {
+            println!("WARNING: Missing config file.");
+            "unknown".to_owned()
         };
 
         Config { scores_directory }
