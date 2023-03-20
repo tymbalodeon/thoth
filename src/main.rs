@@ -66,7 +66,7 @@ fn main() {
         Some(Commands::Config) => {
             let config: Config = Config::new();
             let scores_directory = tilde(&config.scores_directory);
-            println!("{:?}", scores_directory);
+            println!("{scores_directory}");
         }
 
         Some(Commands::Create {
