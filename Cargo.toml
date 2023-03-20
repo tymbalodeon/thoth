@@ -9,7 +9,6 @@ description = "CLI for working with LilyPond files"
 [dependencies]
 clap = { version = "4.1.8", features = ["derive"] }
 derivative = "2.2.0"
-home = "0.5.4"
 serde = { version = "1.0.156", features = ["derive"] }
 shellexpand = "3.0.0"
 toml = "0.7.3"
