@@ -3,6 +3,8 @@ mod config;
 use clap::{Parser, Subcommand};
 use config::Config;
 use shellexpand::tilde;
+use std::borrow::Cow;
+use walkdir::{DirEntry, WalkDir};
 
 #[derive(Subcommand)]
 enum Commands {
@@ -52,6 +54,24 @@ struct Cli {
     command: Option<Commands>,
 }
 
+fn is_hidden(entry: &DirEntry) -> bool {
+    entry
+        .file_name()
+        .to_str()
+        .map(|name| name.starts_with('.'))
+        .unwrap_or(false)
+}
+
+fn print_contents(directory: Cow<str>) {
+    println!("Default scores directory: {directory}");
+
+    let directory_walker = WalkDir::new(directory.as_ref()).into_iter();
+
+    for entry in directory_walker.filter_entry(|entry| !is_hidden(entry)) {
+        println!("\t{}", entry.unwrap().path().display());
+    }
+}
+
 fn main() {
     let cli = Cli::parse();
 
@@ -66,7 +86,8 @@ fn main() {
         Some(Commands::Config) => {
             let config: Config = Config::new();
             let scores_directory = tilde(&config.scores_directory);
-            println!("{scores_directory}");
+
+            print_contents(scores_directory);
         }
 
         Some(Commands::Create {
