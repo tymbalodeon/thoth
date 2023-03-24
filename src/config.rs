@@ -3,13 +3,13 @@ use shellexpand::tilde;
 use std::fs;
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ConfigFile {
-    thoth: Option<Thoth>,
+struct Thoth {
+    scores_directory: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Thoth {
-    scores_directory: Option<String>,
+struct ConfigFile {
+    thoth: Option<Thoth>,
 }
 
 #[derive(Debug)]
@@ -17,7 +17,11 @@ pub struct Config {
     pub scores_directory: String,
 }
 
-fn load_config_file() -> Result<ConfigFile, &'static str> {
+fn get_default_scores_directory() -> String {
+    "scores".to_owned()
+}
+
+fn load_config_file() -> ConfigFile {
     let config_path = tilde("~/.config/thoth/config.toml");
 
     let contents = if let Ok(result) = fs::read_to_string(config_path.as_ref()) {
@@ -27,30 +31,33 @@ fn load_config_file() -> Result<ConfigFile, &'static str> {
     };
 
     if let Ok(config_file) = toml::from_str(&contents) {
-        Ok(config_file)
+        config_file
     } else {
-        Err("WARNING: Missing config file.")
+        println!("WARNING: Missing config file. Using default.");
+        let default_scores_directory = get_default_scores_directory();
+
+        ConfigFile {
+            thoth: Some(Thoth {
+                scores_directory: Some(default_scores_directory),
+            }),
+        }
     }
 }
 
 impl Config {
     pub fn new() -> Self {
         let default_scores_directory = "scores".to_owned();
+        let config_file = load_config_file();
 
-        let scores_directory: String = if let Ok(config_file) = load_config_file() {
-            if let Some(thoth) = config_file.thoth {
-                if let Some(scores_directory) = thoth.scores_directory {
-                    scores_directory
-                } else {
-                    println!("WARNING: Missing scores directory value.");
-                    default_scores_directory
-                }
+        let scores_directory = if let Some(thoth) = config_file.thoth {
+            if let Some(scores_directory) = thoth.scores_directory {
+                scores_directory
             } else {
-                println!("WARNING: Missing table thoth.");
+                println!("WARNING: Missing scores directory value.");
                 default_scores_directory
             }
         } else {
-            println!("WARNING: Missing config file.");
+            println!("WARNING: Missing table thoth.");
             default_scores_directory
         };
 
