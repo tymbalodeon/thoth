@@ -1,9 +1,9 @@
+mod commands;
 mod config;
-mod config_command;
 
+use crate::commands::config::print_contents;
 use clap::{Parser, Subcommand};
 use config::Config;
-use config_command::print_contents;
 use shellexpand::tilde;
 
 #[derive(Subcommand)]
