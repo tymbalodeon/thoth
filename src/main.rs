@@ -34,11 +34,17 @@ enum Commands {
         #[arg(long, default_value_t = COMPOSER.to_string())]
         composer: String,
 
+        #[arg(long)]
+        arranger: Option<String>,
+
         #[arg(long, default_value_t = Template::Single, value_enum)]
         template: Template,
 
         #[arg(long)]
         title: String,
+
+        #[arg(long)]
+        subtitle: Option<String>,
 
         #[arg(long)]
         edit: bool,
@@ -85,8 +91,10 @@ fn main() {
 
         Some(Commands::Create {
             composer,
+            arranger: _,
             template,
             title,
+            subtitle: _,
             edit: _,
         }) => {
             println!(

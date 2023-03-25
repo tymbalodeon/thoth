@@ -13,6 +13,7 @@ fn get_template(template: &Template, composer: &String, title: &String) -> Strin
         Piano => get_piano_template,
         Single => get_piano_template,
     };
+
     get_template(title, composer)
 }
 
