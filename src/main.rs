@@ -2,12 +2,10 @@ mod commands;
 mod config;
 
 use clap::{Parser, Subcommand, ValueEnum};
-use commands::config::list_scores_directory;
 use commands::create::create_score;
 use commands::list::list_pdfs;
 use config::{get_composer, Config};
 use once_cell::sync::Lazy;
-use shellexpand::tilde;
 
 static COMPOSER: Lazy<String> = Lazy::new(get_composer);
 
@@ -86,8 +84,7 @@ fn main() {
 
         Some(Commands::Config) => {
             let config: Config = Config::new();
-            let scores_directory = tilde(&config.scores_directory);
-            list_scores_directory(scores_directory);
+            println!("{:?}", config);
         }
 
         Some(Commands::Create {
