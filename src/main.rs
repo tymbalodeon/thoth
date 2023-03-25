@@ -4,6 +4,7 @@ mod config;
 use clap::{Parser, Subcommand, ValueEnum};
 use commands::config::list_scores_directory;
 use commands::create::create_score;
+use commands::list::list_pdfs;
 use config::{get_composer, Config};
 use once_cell::sync::Lazy;
 use shellexpand::tilde;
@@ -54,7 +55,7 @@ enum Commands {
     Edit { score: String },
 
     /// List pdf(s).
-    List { scores: Vec<String> },
+    List,
 
     /// Open pdf(s)
     Open { scores: Vec<String> },
@@ -108,12 +109,7 @@ fn main() {
             println!("Opening {}.pdf for editing...", score)
         }
 
-        Some(Commands::List { scores }) => {
-            println!("Available scores...");
-            for score in scores {
-                println!("{score}")
-            }
-        }
+        Some(Commands::List) => list_pdfs(),
 
         Some(Commands::Open { scores }) => {
             println!("Opening scores...");
