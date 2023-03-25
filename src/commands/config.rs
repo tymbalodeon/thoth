@@ -9,7 +9,7 @@ fn is_hidden(entry: &DirEntry) -> bool {
         .unwrap_or(false)
 }
 
-pub fn print_contents(directory: Cow<str>) {
+pub fn list_scores_directory(directory: Cow<str>) {
     println!("Default scores directory: {directory}");
     let directory_walker = WalkDir::new(directory.as_ref()).into_iter();
 

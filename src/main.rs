@@ -1,7 +1,8 @@
 mod commands;
 mod config;
 
-use crate::commands::config::print_contents;
+use crate::commands::config::list_scores_directory;
+use crate::commands::create::create_score;
 use clap::{Parser, Subcommand};
 use config::Config;
 use shellexpand::tilde;
@@ -68,7 +69,7 @@ fn main() {
         Some(Commands::Config) => {
             let config: Config = Config::new();
             let scores_directory = tilde(&config.scores_directory);
-            print_contents(scores_directory);
+            list_scores_directory(scores_directory);
         }
 
         Some(Commands::Create {
@@ -77,7 +78,8 @@ fn main() {
             title,
             edit: _,
         }) => {
-            println!("Creating ly file for \"{title}\" by {composer} of type {template}...")
+            println!("Creating ly file for \"{title}\" by {composer} of type {template}...");
+            create_score(title);
         }
 
         Some(Commands::Edit { score }) => {

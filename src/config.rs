@@ -64,3 +64,8 @@ impl Config {
         Config { scores_directory }
     }
 }
+
+pub fn get_scores_directory() -> String {
+    let config: Config = Config::new();
+    tilde(&config.scores_directory).into_owned()
+}
