@@ -1,11 +1,14 @@
 mod commands;
 mod config;
 
-use crate::commands::config::list_scores_directory;
-use crate::commands::create::create_score;
 use clap::{Parser, Subcommand};
-use config::Config;
+use commands::config::list_scores_directory;
+use commands::create::create_score;
+use config::{get_composer, Config};
+use once_cell::sync::Lazy;
 use shellexpand::tilde;
+
+static COMPOSER: Lazy<String> = Lazy::new(get_composer);
 
 #[derive(Subcommand)]
 enum Commands {
@@ -20,7 +23,7 @@ enum Commands {
 
     /// Create new score template
     Create {
-        #[arg(long)]
+        #[arg(long, default_value_t = COMPOSER.to_string())]
         composer: String,
 
         #[arg(long)]
@@ -79,7 +82,7 @@ fn main() {
             edit: _,
         }) => {
             println!("Creating ly file for \"{title}\" by {composer} of type {template}...");
-            create_score(title);
+            create_score(title, composer);
         }
 
         Some(Commands::Edit { score }) => {

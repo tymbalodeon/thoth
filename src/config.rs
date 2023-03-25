@@ -4,6 +4,7 @@ use std::fs;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Thoth {
+    composer: Option<String>,
     scores_directory: Option<String>,
 }
 
@@ -14,6 +15,7 @@ struct ConfigFile {
 
 #[derive(Debug)]
 pub struct Config {
+    pub composer: String,
     pub scores_directory: String,
 }
 
@@ -38,6 +40,7 @@ fn load_config_file() -> ConfigFile {
 
         ConfigFile {
             thoth: Some(Thoth {
+                composer: Some("".to_owned()),
                 scores_directory: Some(default_scores_directory),
             }),
         }
@@ -46,23 +49,42 @@ fn load_config_file() -> ConfigFile {
 
 impl Config {
     pub fn new() -> Self {
-        let default_scores_directory = "scores".to_owned();
+        let default_scores_directory = get_default_scores_directory();
         let config_file = load_config_file();
 
-        let scores_directory = if let Some(thoth) = config_file.thoth {
-            if let Some(scores_directory) = thoth.scores_directory {
+        if let Some(thoth) = config_file.thoth {
+            let composer = if let Some(composer) = thoth.composer {
+                composer
+            } else {
+                println!("WARNING: Missing scores directory value.");
+                "".to_owned()
+            };
+
+            let scores_directory = if let Some(scores_directory) = thoth.scores_directory {
                 scores_directory
             } else {
                 println!("WARNING: Missing scores directory value.");
                 default_scores_directory
+            };
+
+            Config {
+                composer,
+                scores_directory,
             }
         } else {
             println!("WARNING: Missing table thoth.");
-            default_scores_directory
-        };
 
-        Config { scores_directory }
+            Config {
+                composer: "".to_owned(),
+                scores_directory: default_scores_directory,
+            }
+        }
     }
+}
+
+pub fn get_composer() -> String {
+    let config: Config = Config::new();
+    tilde(&config.composer).into_owned()
 }
 
 pub fn get_scores_directory() -> String {
