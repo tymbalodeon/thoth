@@ -1,6 +1,7 @@
 pub fn get_form_template(title: &String, composer: &String) -> String {
     format!(
-        "\\version \"2.24.0\"
+        "\
+\\version \"2.24.0\"
 
 \\include \"settings.ily\"
 \\include \"style.ily\"
@@ -41,14 +42,14 @@ lower_staff = \relative c {{
     \\new Staff = \"upper\" \\upper_staff
     \\new Staff = \"lower\" \\lower_staff
   >>
-}}
-"
+}}"
     )
 }
 
 pub fn get_piano_template(title: &String, composer: &String) -> String {
     format!(
-        "\\version \"2.24.0\"
+        "\
+\\version \"2.24.0\"
 
 \\include \"settings.ily\"
 \\include \"style.ily\"
@@ -89,7 +90,36 @@ lower_staff = \relative c {{
     \\new Staff = \"upper\" \\upper_staff
     \\new Staff = \"lower\" \\lower_staff
   >>
+}}"
+    )
+}
+
+pub fn get_single_template(title: &String, composer: &String) -> String {
+    format!(
+        "\
+\\version \"2.24.0\"
+
+\\include \"settings.ily\"
+
+\\header {{
+    title = \"{title}\"
+    composer = \"{composer}\"
 }}
-"
+
+music = \\relative c'' {{
+    \\key c \\major
+    \\time 4/4
+    | c1
+}}
+
+\\score {{
+    \\new Staff \\with {{
+        instrumentName = \"Instrument\"
+        \\numericTimeSignature
+    }} {{
+        \\compressMMRests
+        \\music
+    }}
+}}"
     )
 }

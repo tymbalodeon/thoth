@@ -1,4 +1,4 @@
-use super::templates::{get_form_template, get_piano_template};
+use super::templates::{get_form_template, get_piano_template, get_single_template};
 use crate::config::get_scores_directory;
 use crate::Template;
 use crate::Template::{Form, Lead, Piano, Single};
@@ -11,7 +11,7 @@ fn get_template(template: &Template, composer: &String, title: &String) -> Strin
         Form => get_piano_template,
         Lead => get_form_template,
         Piano => get_piano_template,
-        Single => get_piano_template,
+        Single => get_single_template,
     };
 
     get_template(title, composer)
