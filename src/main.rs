@@ -1,7 +1,7 @@
 mod commands;
 mod config;
 
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use commands::config::list_scores_directory;
 use commands::create::create_score;
 use config::{get_composer, Config};
@@ -9,6 +9,14 @@ use once_cell::sync::Lazy;
 use shellexpand::tilde;
 
 static COMPOSER: Lazy<String> = Lazy::new(get_composer);
+
+#[derive(Debug, ValueEnum, Clone)]
+pub enum Template {
+    Form,
+    Lead,
+    Piano,
+    Single,
+}
 
 #[derive(Subcommand)]
 enum Commands {
@@ -26,8 +34,8 @@ enum Commands {
         #[arg(long, default_value_t = COMPOSER.to_string())]
         composer: String,
 
-        #[arg(long)]
-        template: String,
+        #[arg(long, default_value_t = Template::Single, value_enum)]
+        template: Template,
 
         #[arg(long)]
         title: String,
@@ -81,8 +89,11 @@ fn main() {
             title,
             edit: _,
         }) => {
-            println!("Creating ly file for \"{title}\" by {composer} of type {template}...");
-            create_score(title, composer);
+            println!(
+                "Creating ly file for \"{title}\" by {composer} of type {:?}...",
+                template
+            );
+            create_score(template, composer, title);
         }
 
         Some(Commands::Edit { score }) => {

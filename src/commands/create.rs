@@ -1,57 +1,22 @@
+use super::templates::{get_form_template, get_piano_template};
 use crate::config::get_scores_directory;
+use crate::Template;
+use crate::Template::{Form, Lead, Piano, Single};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-fn get_template(title: &String, composer: &String) -> String {
-    format!(
-        "\\version \"2.24.0\"
-
-\\include \"settings.ily\"
-\\include \"style.ily\"
-
-\\header {{
-  title = \"{title}\"
-  composer = \"{composer}\"
-}}
-
-key_and_time = {{
-  \\key c \\major
-  \\time 4/4
-}}
-
-upper_staff = \relative c'' {{
-  \\key_and_time
-  | c1
-}}
-
-lower_staff = \relative c {{
-  \\clef bass
-  \\key_and_time
-  | c1
-}}
-
-\\layout {{
-  \\context {{
-    \\Score \\consists
-    #(set-bars-per-line '(4))
-  }}
-}}
-
-\\score {{
-  \\new PianoStaff \\with {{
-    instrumentName = \"Piano\"
-  }}
-  <<
-    \\new Staff = \"upper\" \\upper_staff
-    \\new Staff = \"lower\" \\lower_staff
-  >>
-}}
-"
-    )
+fn get_template(template: &Template, composer: &String, title: &String) -> String {
+    let get_template = match template {
+        Form => get_piano_template,
+        Lead => get_form_template,
+        Piano => get_piano_template,
+        Single => get_piano_template,
+    };
+    get_template(title, composer)
 }
 
-pub fn create_score(title: &String, composer: &String) {
+pub fn create_score(template: &Template, composer: &String, title: &String) {
     let scores_directory = get_scores_directory();
     let filename = format!("{scores_directory}/{title}.ly");
     let path = Path::new(&filename);
@@ -62,7 +27,7 @@ pub fn create_score(title: &String, composer: &String) {
         Ok(file) => file,
     };
 
-    let template = get_template(title, composer);
+    let template = get_template(template, composer, title);
 
     if let Err(message) = file.write_all(template.as_bytes()) {
         panic!("couldn't write to {file_display}: {message}")
