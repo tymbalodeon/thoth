@@ -1,4 +1,4 @@
-use super::templates::{get_form_template, get_piano_template, get_single_template};
+use super::templates::{get_piano_template, get_single_template};
 use crate::config::get_scores_directory;
 use crate::Template;
 use crate::Template::{Form, Lead, Piano, Single};
@@ -7,14 +7,12 @@ use std::io::prelude::*;
 use std::path::Path;
 
 fn get_template(template: &Template, composer: &String, title: &String) -> String {
-    let get_template = match template {
-        Form => get_piano_template,
-        Lead => get_form_template,
-        Piano => get_piano_template,
-        Single => get_single_template,
-    };
-
-    get_template(title, composer)
+    match template {
+        Form => get_piano_template(title, composer),
+        Lead => get_piano_template(title, composer),
+        Piano => get_piano_template(title, composer),
+        Single => get_single_template(title, composer),
+    }
 }
 
 pub fn create_score(template: &Template, composer: &String, title: &String) -> String {

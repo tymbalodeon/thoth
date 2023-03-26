@@ -117,14 +117,19 @@ fn main() {
         }
 
         Some(Commands::Templates) => {
-            println!("Listing templates...");
             println!(
-                "    form    # Form chart with separate sections \
-    and form summary at the bottom.
-    lead    # Lead sheet showing melody and chords.
-    piano    # Piano staff score.
-    single    # Score for a single staff instrument."
-            )
+                "{: >6} {: <2} Form chart with separate sections and form summary at the bottom.",
+                "form", ""
+            );
+            println!(
+                "{: >6} {: <2} Lead sheet showing melody and chords.",
+                "lead", ""
+            );
+            println!("{: >6} {: <2} Piano staff score.", "piano", "");
+            println!(
+                "{: >6} {: <2} Score for a single staff instrument.",
+                "single", ""
+            );
         }
 
         _ => {
