@@ -20,7 +20,7 @@ fn get_template(template: &Template, composer: &String, title: &String) -> Strin
 pub fn create_score(template: &Template, composer: &String, title: &String) -> String {
     let scores_directory = get_scores_directory();
     let composer_directory = composer.replace(' ', "-").to_lowercase();
-    let parent_directory_name = format!("{scores_directory}/{composer_directory}/{title}");
+    let parent_directory_name = format!("{scores_directory}/scores/{composer_directory}/{title}");
     create_dir_all(&parent_directory_name).unwrap();
     let filename = format!("{parent_directory_name}/{title}.ly");
     let path = Path::new(&filename);
