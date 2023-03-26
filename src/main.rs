@@ -95,11 +95,12 @@ fn main() {
             subtitle: _,
             edit: _,
         }) => {
+            let filename = create_score(template, composer, title);
             println!(
-                "Creating ly file for \"{title}\" by {composer} of type {:?}...",
+                "Created score for \"{title}\" by {composer} using template {:?}: \n\
+                \t{filename}",
                 template
             );
-            create_score(template, composer, title);
         }
 
         Some(Commands::Edit { score }) => {
