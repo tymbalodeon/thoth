@@ -95,12 +95,14 @@ fn main() {
             subtitle: _,
             edit: _,
         }) => {
-            let filename = create_score(template, composer, title);
+            let filenames = create_score(template, composer, title);
             println!(
-                "Created score for \"{title}\" by {composer} using template {:?}: \n\
-                \t{filename}",
+                "Created score for \"{title}\" by {composer} using template {:?}:",
                 template
             );
+            for filename in filenames {
+                println!("{filename}")
+            }
         }
 
         Some(Commands::Edit { score }) => {
