@@ -56,7 +56,7 @@ impl Config {
             let composer = if let Some(composer) = thoth.composer {
                 composer
             } else {
-                println!("WARNING: Missing scores directory value.");
+                println!("WARNING: Missing composer value.");
                 "".to_owned()
             };
 
