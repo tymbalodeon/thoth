@@ -1,8 +1,39 @@
-pub fn get_piano_template(title: &String, composer: &String) -> String {
-    format!(
-        "\
-\\version \"2.24.0\"
+use regex::Regex;
+use std::process::Command;
 
+fn get_lilypond_version() -> String {
+    let output = String::from_utf8(
+        Command::new("lilypond")
+            .arg("--version")
+            .output()
+            .unwrap()
+            .stdout,
+    )
+    .unwrap();
+
+    let pattern = Regex::new(r"\d\.\d{2}\.\d").unwrap();
+
+    let found = pattern
+        .captures_iter(&output)
+        .next()
+        .unwrap()
+        .get(0)
+        .unwrap()
+        .as_str()
+        .to_owned();
+
+    format!("\\version {found}\n\n")
+}
+
+fn add_version_number(content: &str) -> String {
+    let mut template = get_lilypond_version();
+    template.push_str(content);
+    template
+}
+
+pub fn get_piano_template(title: &String, composer: &String) -> String {
+    let content = format!(
+        "\
 \\include \"settings.ily\"
 \\include \"style.ily\"
 
@@ -16,12 +47,12 @@ key_and_time = {{
   \\time 4/4
 }}
 
-upper_staff = \relative c'' {{
+upper_staff = \\relative c'' {{
   \\key_and_time
   | c1
 }}
 
-lower_staff = \relative c {{
+lower_staff = \\relative c {{
   \\clef bass
   \\key_and_time
   | c1
@@ -43,14 +74,14 @@ lower_staff = \relative c {{
     \\new Staff = \"lower\" \\lower_staff
   >>
 }}"
-    )
+    );
+
+    add_version_number(&content)
 }
 
 pub fn get_single_template(title: &String, composer: &String) -> String {
-    format!(
+    let content = format!(
         "\
-\\version \"2.24.0\"
-
 \\include \"settings.ily\"
 
 \\header {{
@@ -73,5 +104,7 @@ music = \\relative c'' {{
         \\music
     }}
 }}"
-    )
+    );
+
+    add_version_number(&content)
 }
