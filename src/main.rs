@@ -120,16 +120,16 @@ fn main() {
 
         Some(Commands::Templates) => {
             println!(
-                "{: >6} {: <2} Form chart with separate sections and form summary at the bottom.",
+                "{: >6} {: <1} Form chart with separate sections and form summary at the bottom.",
                 "form", ""
             );
             println!(
-                "{: >6} {: <2} Lead sheet showing melody and chords.",
+                "{: >6} {: <1} Lead sheet showing melody and chords.",
                 "lead", ""
             );
-            println!("{: >6} {: <2} Piano staff score.", "piano", "");
+            println!("{: >6} {: <1} Piano staff score.", "piano", "");
             println!(
-                "{: >6} {: <2} Score for a single staff instrument.",
+                "{: >6} {: <1} Score for a single staff instrument.",
                 "single", ""
             );
         }
