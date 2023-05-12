@@ -6,7 +6,11 @@ use std::fs::{create_dir_all, File};
 use std::io::prelude::*;
 use std::path::Path;
 
-fn get_templates(template: &Template, composer: &String, title: &String) -> Vec<String> {
+fn get_templates(
+    template: &Template,
+    composer: &String,
+    title: &String,
+) -> Vec<String> {
     match template {
         Form => vec![get_piano_template(title, composer)],
         Lead => vec![get_piano_template(title, composer)],
@@ -32,10 +36,15 @@ fn create_file(template: String, parent: &String, title: &String) -> String {
     filename
 }
 
-pub fn create_score(template: &Template, composer: &String, title: &String) -> Vec<String> {
+pub fn create_score(
+    template: &Template,
+    composer: &String,
+    title: &String,
+) -> Vec<String> {
     let scores_directory = get_scores_directory();
     let composer_directory = composer.replace(' ', "-").to_lowercase();
-    let parent = format!("{scores_directory}/scores/{composer_directory}/{title}");
+    let parent =
+        format!("{scores_directory}/scores/{composer_directory}/{title}");
     create_dir_all(&parent).unwrap();
     let templates = get_templates(template, composer, title);
     let mut filenames = Vec::new();

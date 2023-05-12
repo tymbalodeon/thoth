@@ -26,7 +26,8 @@ fn get_default_scores_directory() -> String {
 fn load_config_file() -> ConfigFile {
     let config_path = tilde("~/.config/thoth/config.toml");
 
-    let contents = if let Ok(result) = fs::read_to_string(config_path.as_ref()) {
+    let contents = if let Ok(result) = fs::read_to_string(config_path.as_ref())
+    {
         result
     } else {
         "".to_owned()
@@ -60,12 +61,13 @@ impl Config {
                 "".to_owned()
             };
 
-            let scores_directory = if let Some(scores_directory) = thoth.scores_directory {
-                scores_directory
-            } else {
-                println!("WARNING: Missing scores directory value.");
-                default_scores_directory
-            };
+            let scores_directory =
+                if let Some(scores_directory) = thoth.scores_directory {
+                    scores_directory
+                } else {
+                    println!("WARNING: Missing scores directory value.");
+                    default_scores_directory
+                };
 
             Config {
                 composer,
