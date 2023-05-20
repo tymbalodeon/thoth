@@ -3,6 +3,7 @@ mod config;
 
 use clap::{Parser, Subcommand, ValueEnum};
 use commands::clean::clean_pdfs;
+use commands::compile::compile_pdfs;
 use commands::create::create_score;
 use commands::list::list_pdfs;
 use config::{get_composer, Config};
@@ -24,7 +25,7 @@ enum Commands {
     Clean { scores: Vec<String> },
 
     /// Create pdf(s)
-    Compile { score: String },
+    Compile { scores: Vec<String> },
 
     /// Show config
     Config,
@@ -77,9 +78,7 @@ fn main() {
 
     match &cli.command {
         Some(Commands::Clean { scores }) => clean_pdfs(scores),
-        Some(Commands::Compile { score }) => {
-            println!("Creating {}.pdf...", score)
-        }
+        Some(Commands::Compile { scores }) => compile_pdfs(scores),
 
         Some(Commands::Config) => {
             let config: Config = Config::new();
@@ -119,18 +118,12 @@ fn main() {
 
         Some(Commands::Templates) => {
             println!(
-                "{: >6} {: <1} Form chart with separate sections and form summary at the bottom.",
-                "form", ""
+                "{: >8}  Form chart with separate sections and form summary at the bottom.",
+                "form"
             );
-            println!(
-                "{: >6} {: <1} Lead sheet showing melody and chords.",
-                "lead", ""
-            );
-            println!("{: >6} {: <1} Piano staff score.", "piano", "");
-            println!(
-                "{: >6} {: <1} Score for a single staff instrument.",
-                "single", ""
-            );
+            println!("{: >8}  Lead sheet showing melody and chords.", "lead");
+            println!("{: >8}  Piano staff score.", "piano");
+            println!("{: >8}  Score for a single staff instrument.", "single");
         }
 
         _ => {
