@@ -4,9 +4,10 @@ mod config;
 use clap::{Parser, Subcommand, ValueEnum};
 use commands::clean::clean_pdfs;
 use commands::compile::compile_pdfs;
+use commands::config::display_config;
 use commands::create::create_score;
 use commands::list::list_pdfs;
-use config::{get_composer, Config};
+use config::get_composer;
 use once_cell::sync::Lazy;
 
 static COMPOSER: Lazy<String> = Lazy::new(get_composer);
@@ -80,10 +81,7 @@ fn main() {
         Some(Commands::Clean { scores }) => clean_pdfs(scores),
         Some(Commands::Compile { scores }) => compile_pdfs(scores),
 
-        Some(Commands::Config) => {
-            let config: Config = Config::new();
-            println!("{:?}", config);
-        }
+        Some(Commands::Config) => display_config(),
 
         Some(Commands::Create {
             composer,
