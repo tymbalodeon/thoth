@@ -1,30 +1,39 @@
 use glob::glob;
+use std::fs::create_dir_all;
 use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::Command;
 
-use crate::config::get_scores_directory;
+use crate::config::{get_pdfs_directory, get_scores_directory};
 
-pub fn compile(input_file: &PathBuf) -> bool {
+fn compile(input_file: &PathBuf) {
+    let pdfs_directory = get_pdfs_directory();
+
+    match create_dir_all(&pdfs_directory) {
+        Err(message) => println!("Error: {message}"),
+        Ok(_) => {}
+    }
+
     if let Some(file) = input_file.to_str() {
-        match Command::new("lilypond").arg(file).output() {
+        match Command::new("lilypond")
+            .args(["--include", &get_scores_directory()])
+            .args(["--output", &pdfs_directory])
+            .arg(file)
+            .output()
+        {
             Ok(output) => {
                 if output.status.success() {
-                    io::stdout().write_all(output.stdout.as_ref()).unwrap();
-                    println!("Compiled {file}");
-                    true
+                    let file_name =
+                        input_file.file_stem().unwrap().to_str().unwrap();
+                    println!("Compiled {pdfs_directory}/{}.pdf", file_name);
                 } else {
                     io::stdout().write_all(output.stderr.as_ref()).unwrap();
-                    false
                 }
             }
             Err(error) => {
                 println!("Error: {error}");
-                false
             }
         }
-    } else {
-        false
     }
 }
 
