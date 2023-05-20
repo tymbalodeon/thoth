@@ -2,6 +2,7 @@ mod commands;
 mod config;
 
 use clap::{Parser, Subcommand, ValueEnum};
+use commands::clean::clean_pdfs;
 use commands::create::create_score;
 use commands::list::list_pdfs;
 use config::{get_composer, Config};
@@ -20,7 +21,7 @@ pub enum Template {
 #[derive(Subcommand)]
 enum Commands {
     /// Remove pdf(s)
-    Clean { score: String },
+    Clean { scores: Vec<String> },
 
     /// Create pdf(s)
     Compile { score: String },
@@ -75,9 +76,7 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::Clean { score }) => {
-            println!("Removing {}.pdf...", score)
-        }
+        Some(Commands::Clean { scores }) => clean_pdfs(scores),
         Some(Commands::Compile { score }) => {
             println!("Creating {}.pdf...", score)
         }
