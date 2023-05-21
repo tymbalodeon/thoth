@@ -1,22 +1,17 @@
+use crate::config::Config;
 use glob::glob;
 use std::fs::create_dir_all;
 use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::Command;
 
-use crate::config::{get_pdfs_directory, get_scores_directory};
-
-fn compile(input_file: &PathBuf) {
-    let pdfs_directory = get_pdfs_directory();
-
-    match create_dir_all(&pdfs_directory) {
-        Err(message) => println!("Error: {message}"),
-        Ok(_) => {}
-    }
+fn compile(input_file: &PathBuf, config: &Config) {
+    let pdfs_directory = config.pdfs_directory();
+    create_dir_all(&pdfs_directory).unwrap();
 
     if let Some(file) = input_file.to_str() {
         match Command::new("lilypond")
-            .args(["--include", &get_scores_directory()])
+            .args(["--include", &config.scores_directory()])
             .args(["--output", &pdfs_directory])
             .arg(file)
             .output()
@@ -38,7 +33,8 @@ fn compile(input_file: &PathBuf) {
 }
 
 pub fn compile_pdfs(scores: &Vec<String>) {
-    let scores_directory = get_scores_directory();
+    let config: Config = Config::new();
+    let scores_directory = config.scores_directory();
     let base = format!("{scores_directory}/**/");
     let extension = ".ly";
 
@@ -55,7 +51,7 @@ pub fn compile_pdfs(scores: &Vec<String>) {
         for entry in glob(&pattern).expect("Failed to read glob pattern") {
             match entry {
                 Ok(path) => {
-                    compile(&path);
+                    compile(&path, &config);
                 }
                 Err(error) => println!("{error}"),
             }

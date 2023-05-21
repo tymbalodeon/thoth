@@ -1,5 +1,5 @@
 use super::templates::{get_piano_template, get_single_template};
-use crate::config::get_scores_directory;
+use crate::config::Config;
 use crate::Template;
 use crate::Template::{Form, Lead, Piano, Single};
 use std::fs::{create_dir_all, File};
@@ -41,7 +41,7 @@ pub fn create_score(
     composer: &String,
     title: &String,
 ) -> Vec<String> {
-    let scores_directory = get_scores_directory();
+    let scores_directory = Config::new().scores_directory();
     let composer_directory = composer.replace(' ', "-").to_lowercase();
     let parent =
         format!("{scores_directory}/scores/{composer_directory}/{title}");

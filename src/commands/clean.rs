@@ -1,10 +1,10 @@
 use glob::glob;
 use std::fs::remove_file;
 
-use crate::config::get_scores_directory;
+use crate::config::Config;
 
 pub fn clean_pdfs(scores: &Vec<String>) {
-    let scores_directory = get_scores_directory();
+    let scores_directory = Config::new().scores_directory();
     let base = format!("{scores_directory}/**/");
     let extension = ".pdf";
 

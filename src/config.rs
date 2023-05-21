@@ -22,7 +22,7 @@ pub struct Config {
 }
 
 fn get_default_scores_directory() -> String {
-    "scores".to_owned()
+    "~/scores".to_owned()
 }
 
 fn get_default_pdfs_directory() -> String {
@@ -42,8 +42,6 @@ fn load_config_file() -> ConfigFile {
     if let Ok(config_file) = toml::from_str(&contents) {
         config_file
     } else {
-        println!("WARNING: Missing config file. Using default.");
-
         ConfigFile {
             thoth: Some(Thoth {
                 composer: Some("".to_owned()),
@@ -64,7 +62,6 @@ impl Config {
             let composer = if let Some(composer) = thoth.composer {
                 composer
             } else {
-                println!("WARNING: Missing composer value.");
                 "".to_owned()
             };
 
@@ -72,7 +69,6 @@ impl Config {
                 if let Some(scores_directory) = thoth.scores_directory {
                     scores_directory
                 } else {
-                    println!("WARNING: Missing scores directory value.");
                     default_scores_directory
                 };
 
@@ -80,8 +76,7 @@ impl Config {
                 if let Some(pdfs_directory) = thoth.pdfs_directory {
                     pdfs_directory
                 } else {
-                    println!("WARNING: Missing pdfs directory value.");
-                    default_pdfs_directory
+                    format!("{scores_directory}/{default_pdfs_directory}")
                 };
 
             Config {
@@ -90,8 +85,6 @@ impl Config {
                 pdfs_directory,
             }
         } else {
-            println!("WARNING: Missing table thoth.");
-
             Config {
                 composer: "".to_owned(),
                 scores_directory: default_scores_directory,
@@ -99,19 +92,16 @@ impl Config {
             }
         }
     }
+
+    pub fn scores_directory(&self) -> String {
+        tilde(&self.scores_directory).into_owned()
+    }
+
+    pub fn pdfs_directory(&self) -> String {
+        tilde(&self.pdfs_directory).into_owned()
+    }
 }
 
 pub fn get_composer() -> String {
-    let config: Config = Config::new();
-    tilde(&config.composer).into_owned()
-}
-
-pub fn get_scores_directory() -> String {
-    let config: Config = Config::new();
-    tilde(&config.scores_directory).into_owned()
-}
-
-pub fn get_pdfs_directory() -> String {
-    let config: Config = Config::new();
-    tilde(&config.pdfs_directory).into_owned()
+    Config::new().composer
 }
