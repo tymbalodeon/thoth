@@ -95,6 +95,7 @@ fn main() {
                 "Created score for \"{title}\" by {composer} using template {:?}:",
                 template
             );
+
             for filename in filenames {
                 println!("{filename}")
             }
@@ -108,6 +109,7 @@ fn main() {
 
         Some(Commands::Open { scores }) => {
             println!("Opening scores...");
+
             for score in scores {
                 println!("{score}")
             }

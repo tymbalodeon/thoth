@@ -22,7 +22,7 @@ fn get_lilypond_version() -> String {
         .as_str()
         .to_owned();
 
-    format!("\\version {found}\n\n")
+    format!("\\version \"{found}\"\n\n")
 }
 
 fn add_version_number(content: &str) -> String {
@@ -35,7 +35,6 @@ pub fn get_piano_template(title: &String, composer: &String) -> String {
     let content = format!(
         "\
 \\include \"settings.ily\"
-\\include \"style.ily\"
 
 \\header {{
   title = \"{title}\"
@@ -56,13 +55,6 @@ lower_staff = \\relative c {{
   \\clef bass
   \\key_and_time
   | c1
-}}
-
-\\layout {{
-  \\context {{
-    \\Score \\consists
-    #(set-bars-per-line '(4))
-  }}
 }}
 
 \\score {{
