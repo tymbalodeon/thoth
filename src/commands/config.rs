@@ -9,5 +9,5 @@ pub fn display_config() {
 
     println!("Composer = {composer}");
     println!("Scores directory = {scores_directory}");
-    println!("PDFs directory =  {pdfs_directory}");
+    println!("pdfs directory =  {pdfs_directory}");
 }

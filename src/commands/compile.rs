@@ -5,7 +5,7 @@ use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::Command;
 
-fn compile(input_file: &PathBuf, config: &Config) {
+fn compile_input_file(input_file: &PathBuf, config: &Config) {
     let pdfs_directory = config.pdfs_directory();
     create_dir_all(&pdfs_directory).unwrap();
 
@@ -51,7 +51,7 @@ pub fn compile_pdfs(scores: &Vec<String>) {
         for entry in glob(&pattern).expect("Failed to read glob pattern") {
             match entry {
                 Ok(path) => {
-                    compile(&path, &config);
+                    compile_input_file(&path, &config);
                 }
                 Err(error) => println!("{error}"),
             }

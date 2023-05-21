@@ -33,7 +33,7 @@ enum Commands {
 
     /// Create new score template
     Create {
-        #[arg(long, default_value_t = COMPOSER.to_string())]
+        #[arg(long, default_value_t = COMPOSER.to_owned())]
         composer: String,
 
         #[arg(long)]
@@ -80,7 +80,6 @@ fn main() {
     match &cli.command {
         Some(Commands::Clean { scores }) => clean_pdfs(scores),
         Some(Commands::Compile { scores }) => compile_pdfs(scores),
-
         Some(Commands::Config) => display_config(),
 
         Some(Commands::Create {
