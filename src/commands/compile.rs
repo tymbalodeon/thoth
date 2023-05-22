@@ -5,6 +5,7 @@ use std::fs::create_dir_all;
 use std::fs::metadata;
 use std::io::{self, Write};
 use std::path::PathBuf;
+use std::println;
 use std::process::Command;
 use std::time::SystemTime;
 
@@ -28,13 +29,22 @@ fn compile_input_file(input_file: &PathBuf, config: &Config) {
     create_dir_all(&pdfs_directory).unwrap();
 
     if let Some(file) = input_file.to_str() {
-        let output_file = PathBuf::from(format!(
-            "{pdfs_directory}/{}.pdf",
+        let output_file_pattern = format!(
+            "{pdfs_directory}/*{}*.pdf",
             input_file.file_stem().unwrap().to_str().unwrap()
-        ));
+        );
 
-        if already_compiled(input_file, &output_file) {
-            return;
+        for entry in
+            glob(&output_file_pattern).expect("Failed to read glob pattern")
+        {
+            match entry {
+                Ok(path) => {
+                    if already_compiled(input_file, &path) {
+                        return;
+                    }
+                }
+                Err(_) => (),
+            }
         }
 
         match Command::new("lilypond")
