@@ -33,6 +33,8 @@ enum Commands {
 
     /// Create new score template
     Create {
+        title: String,
+
         #[arg(long, default_value_t = COMPOSER.to_owned())]
         composer: String,
 
@@ -41,9 +43,6 @@ enum Commands {
 
         #[arg(long, default_value_t = Template::Single, value_enum)]
         template: Template,
-
-        #[arg(long)]
-        title: String,
 
         #[arg(long)]
         subtitle: Option<String>,
