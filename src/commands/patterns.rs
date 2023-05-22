@@ -1,9 +1,13 @@
 use crate::config::Config;
 
-pub fn get_patterns(scores: &Vec<String>, extension: &str) -> Vec<String> {
+pub fn get_scores_directory_glob() -> String {
     let config: Config = Config::new();
     let scores_directory = config.scores_directory();
-    let base = format!("{scores_directory}/**/");
+    format!("{scores_directory}/**/")
+}
+
+pub fn get_patterns(scores: &Vec<String>, extension: &str) -> Vec<String> {
+    let base = get_scores_directory_glob();
 
     if scores.len() > 0 {
         scores

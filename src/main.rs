@@ -6,6 +6,7 @@ use commands::clean::clean_pdfs;
 use commands::compile::compile_pdfs;
 use commands::config::display_config;
 use commands::create::create_score;
+use commands::edit::edit_pdf;
 use commands::list::list_pdfs;
 use commands::open::open_pdf;
 use config::get_composer;
@@ -102,7 +103,7 @@ fn main() {
         }
 
         Some(Commands::Edit { score }) => {
-            println!("Opening {}.pdf for editing...", score)
+            edit_pdf(score);
         }
 
         Some(Commands::List { scores }) => list_pdfs(scores),
