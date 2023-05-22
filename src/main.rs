@@ -7,6 +7,7 @@ use commands::compile::compile_pdfs;
 use commands::config::display_config;
 use commands::create::create_score;
 use commands::list::list_pdfs;
+use commands::open::open_pdf;
 use config::get_composer;
 use once_cell::sync::Lazy;
 
@@ -107,11 +108,7 @@ fn main() {
         Some(Commands::List { scores }) => list_pdfs(scores),
 
         Some(Commands::Open { scores }) => {
-            println!("Opening scores...");
-
-            for score in scores {
-                println!("{score}")
-            }
+            open_pdf(scores);
         }
 
         Some(Commands::Templates) => {
