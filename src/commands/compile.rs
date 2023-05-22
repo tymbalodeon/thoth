@@ -1,3 +1,4 @@
+use crate::commands::patterns::get_patterns;
 use crate::config::Config;
 use glob::glob;
 use std::fs::create_dir_all;
@@ -60,18 +61,7 @@ fn compile_input_file(input_file: &PathBuf, config: &Config) {
 
 pub fn compile_pdfs(scores: &Vec<String>) {
     let config: Config = Config::new();
-    let scores_directory = config.scores_directory();
-    let base = format!("{scores_directory}/**/");
-    let extension = ".ly";
-
-    let patterns: Vec<String> = if scores.len() > 0 {
-        scores
-            .iter()
-            .map(|score| format!("{base}*{score}*{extension}"))
-            .collect()
-    } else {
-        vec![format!("{base}*{extension}")]
-    };
+    let patterns = get_patterns(scores, ".ly");
 
     for pattern in patterns {
         for entry in glob(&pattern).expect("Failed to read glob pattern") {

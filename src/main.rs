@@ -56,7 +56,7 @@ enum Commands {
     Edit { score: String },
 
     /// List pdf(s).
-    List,
+    List { scores: Vec<String> },
 
     /// Open pdf(s)
     Open { scores: Vec<String> },
@@ -105,7 +105,7 @@ fn main() {
             println!("Opening {}.pdf for editing...", score)
         }
 
-        Some(Commands::List) => list_pdfs(),
+        Some(Commands::List { scores }) => list_pdfs(scores),
 
         Some(Commands::Open { scores }) => {
             println!("Opening scores...");
