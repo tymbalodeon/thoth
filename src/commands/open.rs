@@ -10,7 +10,7 @@ pub fn open_pdf(scores: &Vec<String>) {
             match entry {
                 Ok(path) => {
                     println!("Opening {}...", path.display());
-                    Command::new("open").arg(path).output().unwrap().stdout;
+                    Command::new("open").arg(path).output().unwrap();
                 }
                 Err(message) => println!("{:?}", message),
             }

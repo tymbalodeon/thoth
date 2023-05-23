@@ -4,7 +4,7 @@ mod config;
 use clap::{Parser, Subcommand, ValueEnum};
 use commands::clean::clean_pdfs;
 use commands::compile::compile_pdfs;
-use commands::config::display_config;
+use commands::config::{display_config, display_config_path, edit_config};
 use commands::create::create_score;
 use commands::edit::edit_score;
 use commands::list::list_pdfs;
@@ -12,6 +12,7 @@ use commands::open::open_pdf;
 use config::get_composer;
 use once_cell::sync::Lazy;
 use std::path::PathBuf;
+use std::println;
 
 static COMPOSER: Lazy<String> = Lazy::new(get_composer);
 
@@ -32,7 +33,13 @@ enum Commands {
     Compile { scores: Vec<String> },
 
     /// Display config
-    Config,
+    Config {
+        #[arg(long)]
+        edit: bool,
+
+        #[arg(long)]
+        path: bool,
+    },
 
     /// Create new score template
     Create {
@@ -82,7 +89,15 @@ fn main() {
     match &cli.command {
         Some(Commands::Clean { scores }) => clean_pdfs(scores),
         Some(Commands::Compile { scores }) => compile_pdfs(scores),
-        Some(Commands::Config) => display_config(),
+        Some(Commands::Config { edit, path }) => {
+            if *edit {
+                edit_config();
+            } else if *path {
+                display_config_path();
+            } else {
+                display_config();
+            }
+        }
 
         Some(Commands::Create {
             composer,

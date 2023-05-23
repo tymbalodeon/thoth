@@ -14,7 +14,7 @@ pub fn edit_score(score: &String) {
         for entry in glob(&pattern).expect("Failed to read glob pattern") {
             match entry {
                 Ok(path) => {
-                    Command::new("open").arg(path).output().unwrap().stdout;
+                    Command::new("open").arg(path).output().unwrap();
                 }
                 Err(message) => println!("{:?}", message),
             }

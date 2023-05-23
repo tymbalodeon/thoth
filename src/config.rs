@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use shellexpand::tilde;
 use std::fs;
 
+pub static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
+
 #[derive(Serialize, Deserialize, Debug)]
 struct Thoth {
     composer: Option<String>,
@@ -30,7 +32,7 @@ fn get_default_pdfs_directory() -> String {
 }
 
 fn load_config_file() -> ConfigFile {
-    let config_path = tilde("~/.config/thoth/config.toml");
+    let config_path = tilde(CONFIG_PATH);
 
     let contents = if let Ok(result) = fs::read_to_string(config_path.as_ref())
     {

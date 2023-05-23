@@ -1,4 +1,18 @@
-use crate::config::Config;
+use shellexpand::tilde;
+use std::process::Command;
+
+use crate::config::{Config, CONFIG_PATH};
+
+pub fn edit_config() {
+    Command::new("open")
+        .arg(tilde(CONFIG_PATH).to_string())
+        .output()
+        .unwrap();
+}
+
+pub fn display_config_path() {
+    println!("{CONFIG_PATH}");
+}
 
 pub fn display_config() {
     let config: Config = Config::new();
