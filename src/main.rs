@@ -31,7 +31,7 @@ enum Commands {
     /// Create pdf(s)
     Compile { scores: Vec<String> },
 
-    /// Show config
+    /// Display config
     Config,
 
     /// Create new score template
