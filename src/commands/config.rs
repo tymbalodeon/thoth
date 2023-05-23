@@ -11,7 +11,7 @@ pub fn edit_config() {
 }
 
 pub fn display_config_path() {
-    println!("{CONFIG_PATH}");
+    println!("{}", tilde(CONFIG_PATH));
 }
 
 pub fn display_config() {
