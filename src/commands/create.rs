@@ -43,16 +43,18 @@ pub fn create_score(
 ) -> Vec<String> {
     let scores_directory = Config::new().scores_directory();
     let composer_directory = composer.replace(' ', "-").to_lowercase();
+
     let parent =
         format!("{scores_directory}/scores/{composer_directory}/{title}");
+
     create_dir_all(&parent).unwrap();
     let templates = get_templates(template, composer, title);
-    let mut filenames = Vec::new();
+    let mut files = Vec::new();
 
     for template in templates {
-        let filename = create_file(template, &parent, title);
-        filenames.push(filename)
+        let file = create_file(template, &parent, title);
+        files.push(file)
     }
 
-    filenames
+    files
 }

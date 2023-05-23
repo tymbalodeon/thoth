@@ -6,11 +6,12 @@ use commands::clean::clean_pdfs;
 use commands::compile::compile_pdfs;
 use commands::config::display_config;
 use commands::create::create_score;
-use commands::edit::edit_pdf;
+use commands::edit::edit_score;
 use commands::list::list_pdfs;
 use commands::open::open_pdf;
 use config::get_composer;
 use once_cell::sync::Lazy;
+use std::path::PathBuf;
 
 static COMPOSER: Lazy<String> = Lazy::new(get_composer);
 
@@ -89,21 +90,34 @@ fn main() {
             template,
             title,
             subtitle: _,
-            edit: _,
+            edit,
         }) => {
-            let filenames = create_score(template, composer, title);
+            let files = create_score(template, composer, title);
+
             println!(
                 "Created score for \"{title}\" by {composer} using template {:?}:",
                 template
             );
 
-            for filename in filenames {
-                println!("{filename}")
+            for file in files {
+                println!("{file}");
+
+                if *edit {
+                    let file_stem = PathBuf::from(&file)
+                        .file_stem()
+                        .unwrap()
+                        .to_str()
+                        .unwrap()
+                        .to_string();
+
+                    edit_score(&file_stem)
+                }
             }
         }
 
         Some(Commands::Edit { score }) => {
-            edit_pdf(score);
+            compile_pdfs(&vec![score.to_string()]);
+            edit_score(score);
         }
 
         Some(Commands::List { scores }) => list_pdfs(scores),

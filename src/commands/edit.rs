@@ -2,7 +2,7 @@ use crate::commands::patterns::get_scores_directory_glob;
 use glob::glob;
 use std::process::Command;
 
-pub fn edit_pdf(score: &String) {
+pub fn edit_score(score: &String) {
     let base = get_scores_directory_glob();
 
     let patterns: Vec<String> = vec![".ly", ".pdf"]
