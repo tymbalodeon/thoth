@@ -7,7 +7,7 @@ use commands::compile::compile_pdfs;
 use commands::config::{display_config, display_config_path, edit_config};
 use commands::create::create_score;
 use commands::edit::edit_score;
-use commands::list::list_pdfs;
+use commands::list::{list_pdfs, list_scores};
 use commands::open::open_pdf;
 use config::get_composer;
 use once_cell::sync::Lazy;
@@ -135,7 +135,7 @@ fn main() {
             edit_score(score);
         }
 
-        Some(Commands::List { scores }) => list_pdfs(scores),
+        Some(Commands::List { scores }) => list_scores(scores),
 
         Some(Commands::Open { scores }) => {
             open_pdf(scores);
