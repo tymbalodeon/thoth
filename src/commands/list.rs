@@ -1,29 +1,34 @@
+use crate::commands::patterns::get_patterns;
 use crate::config::Config;
-// use glob::glob;
+use glob::glob;
 use std::fs::{read_dir, DirEntry};
 use titlecase::titlecase;
 
-// pub fn list_pdfs(scores: &Vec<String>) {
-//     let patterns = get_patterns(scores, ".pdf");
+pub fn get_pdfs(scores: &Vec<String>) -> Vec<String> {
+    let patterns = get_patterns(scores, ".pdf");
+    let mut pdfs = vec![];
 
-//     for pattern in patterns {
-//         for entry in glob(&pattern).expect("Failed to read glob pattern") {
-//             match entry {
-//                 Ok(path) => println!("{}", path.display()),
-//                 Err(message) => println!("{:?}", message),
-//             }
-//         }
-//     }
-// }
+    for pattern in patterns {
+        for entry in glob(&pattern).expect("Failed to read glob pattern") {
+            match entry {
+                Ok(path) => pdfs.push(path.display().to_string()),
+                Err(message) => println!("{:?}", message),
+            }
+        }
+    }
+
+    pdfs
+}
 
 fn get_display(path: &DirEntry) -> String {
     let artist = String::from(path.file_name().to_str().unwrap());
-    artist.replace("-", " ")
+    artist.replace('-', " ")
 }
 
 struct Composition {
     artist: String,
     composition: String,
+    pdf: bool,
 }
 
 pub fn list_scores(search_terms: &Vec<String>) {
@@ -52,7 +57,7 @@ pub fn list_scores(search_terms: &Vec<String>) {
 
                     let mut is_match = true;
 
-                    if search_terms.len() > 0 {
+                    if !search_terms.is_empty() {
                         is_match = false;
 
                         for term in search_terms {
@@ -66,21 +71,19 @@ pub fn list_scores(search_terms: &Vec<String>) {
                     }
 
                     if is_match {
-                        // let path =
-                        //     String::from(entry.path().to_str().unwrap());
+                        let mut pdf = false;
+                        let path =
+                            String::from(entry.file_name().to_str().unwrap());
+                        let pdfs = get_pdfs(&vec![path]);
 
-                        // for file in glob(&format!("{path}/*.ly"))
-                        //     .expect("Failed to read glob pattern")
-                        // {
-                        //     match file {
-                        //         Ok(path) => println!("{}", path.display()),
-                        //         Err(message) => println!("{:?}", message),
-                        //     }
-                        // }
+                        if !pdfs.is_empty() {
+                            pdf = true;
+                        }
 
                         compositions.push(Composition {
                             artist: artist.clone(),
                             composition,
+                            pdf,
                         });
                     }
                 }
@@ -89,14 +92,18 @@ pub fn list_scores(search_terms: &Vec<String>) {
         }
     }
 
-    if compositions.len() > 0 {
-        println!("    {: <21}    {}", "Artist", "Composition");
-        println!("    {: <21}    {}", "----", "----");
+    if !compositions.is_empty() {
+        println!(
+            "    {: <21}    {: <22}    Compiled",
+            "Artist", "Composition"
+        );
+        println!("    {: <21}    {: <22}    ----", "----", "----");
     }
 
     for composition in compositions {
         let artist = titlecase(&composition.artist);
-        let composition = titlecase(&composition.composition);
-        println!("    {artist: <21}    {composition}");
+        let title = titlecase(&composition.composition);
+        let pdf = composition.pdf;
+        println!("    {artist: <21}    {title: <22}    {pdf}");
     }
 }

@@ -9,7 +9,7 @@ pub fn get_scores_directory_pattern() -> String {
 pub fn get_patterns(scores: &Vec<String>, extension: &str) -> Vec<String> {
     let base = get_scores_directory_pattern();
 
-    if scores.len() > 0 {
+    if !scores.is_empty() {
         scores
             .iter()
             .map(|score| format!("{base}*{score}*{extension}"))

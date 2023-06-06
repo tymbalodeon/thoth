@@ -12,17 +12,13 @@ fn confirmation_received() -> bool {
     stdin
         .read_line(&mut response)
         .expect("Failed to read input.");
-    response = response.replace("\n", "");
+    response = response.replace('\n', "");
 
-    if response.eq("y") || response.eq("Y") {
-        true
-    } else {
-        false
-    }
+    response.eq("y") || response.eq("Y")
 }
 
 pub fn clean_pdfs(scores: &Vec<String>) {
-    if scores.len() == 0 && !confirmation_received() {
+    if scores.is_empty() && !confirmation_received() {
         return;
     };
 
