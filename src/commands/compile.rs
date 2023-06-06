@@ -34,16 +34,12 @@ fn compile_input_file(input_file: &PathBuf, config: &Config) {
             input_file.file_stem().unwrap().to_str().unwrap()
         );
 
-        for entry in
-            glob(&output_file_pattern).expect("Failed to read glob pattern")
+        for entry in glob(&output_file_pattern)
+            .expect("Failed to read glob pattern")
+            .flatten()
         {
-            match entry {
-                Ok(path) => {
-                    if already_compiled(input_file, &path) {
-                        return;
-                    }
-                }
-                Err(_) => (),
+            if already_compiled(input_file, &entry) {
+                return;
             }
         }
 
