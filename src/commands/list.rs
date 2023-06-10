@@ -17,6 +17,11 @@ struct Composition {
     pdf: bool,
 }
 
+fn get_column_width(mut column_values: Vec<&String>) -> usize {
+    column_values.sort_by_key(|b| Reverse(b.len()));
+    column_values[0].len()
+}
+
 pub fn list_scores(search_terms: &Vec<String>) {
     let config = Config::new();
     let scores_directory = config.scores_directory();
@@ -84,22 +89,18 @@ pub fn list_scores(search_terms: &Vec<String>) {
         }
     }
 
-    let mut longest_artist_length = compositions
+    let artist_column = compositions
         .iter()
         .map(|composition| &composition.artist)
         .collect::<Vec<_>>();
 
-    longest_artist_length.sort_by_key(|b| Reverse(b.len()));
-
-    let mut longest_composition_length = compositions
+    let composition_column = compositions
         .iter()
         .map(|composition| &composition.composition)
         .collect::<Vec<_>>();
 
-    longest_composition_length.sort_by_key(|b| Reverse(b.len()));
-
-    let artist_width = longest_artist_length[0].len();
-    let composition_width = longest_composition_length[0].len();
+    let artist_width = get_column_width(artist_column);
+    let composition_width = get_column_width(composition_column);
 
     if !compositions.is_empty() {
         println!(
