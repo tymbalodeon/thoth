@@ -1,24 +1,7 @@
-use crate::commands::patterns::get_patterns;
 use crate::config::Config;
 use glob::glob;
 use std::fs::{read_dir, DirEntry};
 use titlecase::titlecase;
-
-pub fn get_pdfs(scores: &Vec<String>) -> Vec<String> {
-    let patterns = get_patterns(scores, ".pdf");
-    let mut pdfs = vec![];
-
-    for pattern in patterns {
-        for entry in glob(&pattern).expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => pdfs.push(path.display().to_string()),
-                Err(message) => println!("{:?}", message),
-            }
-        }
-    }
-
-    pdfs
-}
 
 fn get_display(path: &DirEntry) -> String {
     let artist = String::from(path.file_name().to_str().unwrap());
@@ -54,7 +37,6 @@ pub fn list_scores(search_terms: &Vec<String>) {
                     }
 
                     let composition = get_display(&entry);
-
                     let mut is_match = true;
 
                     if !search_terms.is_empty() {
@@ -74,10 +56,17 @@ pub fn list_scores(search_terms: &Vec<String>) {
                         let mut pdf = false;
                         let path =
                             String::from(entry.file_name().to_str().unwrap());
-                        let pdfs = get_pdfs(&vec![path]);
+                        let pdfs_directory = config.pdfs_directory();
+                        let pattern =
+                            format!("{pdfs_directory}/{}*.pdf", path);
 
-                        if !pdfs.is_empty() {
-                            pdf = true;
+                        for entry in glob(&pattern)
+                            .expect("Failed to read glob pattern")
+                        {
+                            if entry.is_ok() {
+                                pdf = true;
+                                break;
+                            }
                         }
 
                         compositions.push(Composition {
