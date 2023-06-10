@@ -1,6 +1,9 @@
 use crate::config::Config;
 use glob::glob;
-use std::fs::{read_dir, DirEntry};
+use std::{
+    cmp::Reverse,
+    fs::{read_dir, DirEntry},
+};
 use titlecase::titlecase;
 
 fn get_display(path: &DirEntry) -> String {
@@ -81,18 +84,38 @@ pub fn list_scores(search_terms: &Vec<String>) {
         }
     }
 
+    let mut longest_artist_length = compositions
+        .iter()
+        .map(|composition| &composition.artist)
+        .collect::<Vec<_>>();
+
+    longest_artist_length.sort_by_key(|b| Reverse(b.len()));
+
+    let mut longest_composition_length = compositions
+        .iter()
+        .map(|composition| &composition.composition)
+        .collect::<Vec<_>>();
+
+    longest_composition_length.sort_by_key(|b| Reverse(b.len()));
+
+    let artist_width = longest_artist_length[0].len();
+    let composition_width = longest_composition_length[0].len();
+
     if !compositions.is_empty() {
         println!(
-            "    {: <21}    {: <22}    Compiled",
+            "    {: <artist_width$}    {: <composition_width$}    Compiled",
             "Artist", "Composition"
         );
-        println!("    {: <21}    {: <22}    ----", "----", "----");
+        println!(
+            "    {: <artist_width$}    {: <composition_width$}    ----",
+            "----", "----"
+        );
     }
 
     for composition in compositions {
         let artist = titlecase(&composition.artist);
         let title = titlecase(&composition.composition);
         let pdf = composition.pdf;
-        println!("    {artist: <21}    {title: <22}    {pdf}");
+        println!("    {artist: <artist_width$}    {title: <composition_width$}    {pdf}");
     }
 }
