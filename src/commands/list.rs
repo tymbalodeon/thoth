@@ -1,5 +1,6 @@
 use crate::config::Config;
 use glob::glob;
+use std::cmp::Ordering;
 
 use prettytable::{format, Cell, Row, Table};
 use std::fs::{read_dir, DirEntry};
@@ -10,10 +11,38 @@ fn get_display(path: &DirEntry) -> String {
     artist.replace('-', " ")
 }
 
+#[derive(Eq)]
 struct Composition {
     artist: String,
     composition: String,
     pdf: bool,
+}
+
+impl Composition {
+    fn remove_leading_the(&self) -> String {
+        self.artist.replace("the ", "")
+    }
+}
+
+impl Ord for Composition {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let self_artist = self.remove_leading_the();
+        let other_artist = other.remove_leading_the();
+        dbg!(&self_artist);
+        self_artist.cmp(&other_artist)
+    }
+}
+
+impl PartialOrd for Composition {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for Composition {
+    fn eq(&self, other: &Self) -> bool {
+        self.artist == other.artist
+    }
 }
 
 pub fn list_scores(search_terms: &Vec<String>) {
@@ -88,6 +117,7 @@ pub fn list_scores(search_terms: &Vec<String>) {
 
     table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
     table.set_titles(row!["ARTIST", "COMPOSITION", "STATUS"]);
+    compositions.sort();
 
     for composition in compositions {
         let artist = titlecase(&composition.artist);
