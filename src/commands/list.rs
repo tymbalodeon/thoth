@@ -28,7 +28,6 @@ impl Ord for Composition {
     fn cmp(&self, other: &Self) -> Ordering {
         let self_artist = self.remove_leading_the();
         let other_artist = other.remove_leading_the();
-        dbg!(&self_artist);
         self_artist.cmp(&other_artist)
     }
 }
