@@ -1,9 +1,8 @@
 use crate::config::Config;
 use glob::glob;
-use std::{
-    cmp::Reverse,
-    fs::{read_dir, DirEntry},
-};
+
+use prettytable::{format, Cell, Row, Table};
+use std::fs::{read_dir, DirEntry};
 use titlecase::titlecase;
 
 fn get_display(path: &DirEntry) -> String {
@@ -15,11 +14,6 @@ struct Composition {
     artist: String,
     composition: String,
     pdf: bool,
-}
-
-fn get_column_width(mut column_values: Vec<&String>) -> usize {
-    column_values.sort_by_key(|b| Reverse(b.len()));
-    column_values[0].len()
 }
 
 pub fn list_scores(search_terms: &Vec<String>) {
@@ -89,34 +83,23 @@ pub fn list_scores(search_terms: &Vec<String>) {
         }
     }
 
-    let artist_column = compositions
-        .iter()
-        .map(|composition| &composition.artist)
-        .collect::<Vec<_>>();
+    println!();
+    let mut table = Table::new();
 
-    let composition_column = compositions
-        .iter()
-        .map(|composition| &composition.composition)
-        .collect::<Vec<_>>();
-
-    let artist_width = get_column_width(artist_column);
-    let composition_width = get_column_width(composition_column);
-
-    if !compositions.is_empty() {
-        println!(
-            "    {: <artist_width$}    {: <composition_width$}    Compiled",
-            "Artist", "Composition"
-        );
-        println!(
-            "    {: <artist_width$}    {: <composition_width$}    ----",
-            "----", "----"
-        );
-    }
+    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+    table.set_titles(row!["ARTIST", "COMPOSITION", "STATUS"]);
 
     for composition in compositions {
         let artist = titlecase(&composition.artist);
         let title = titlecase(&composition.composition);
         let pdf = composition.pdf;
-        println!("    {artist: <artist_width$}    {title: <composition_width$}    {pdf}");
+
+        table.add_row(Row::new(vec![
+            Cell::new(&artist),
+            Cell::new(&title),
+            Cell::new(&pdf.to_string()),
+        ]));
     }
+
+    table.printstd();
 }
