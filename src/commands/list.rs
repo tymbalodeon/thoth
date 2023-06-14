@@ -94,11 +94,12 @@ pub fn list_scores(search_terms: &Vec<String>) {
         let title = titlecase(&composition.composition);
         let pdf = composition.pdf;
 
-        table.add_row(Row::new(vec![
-            Cell::new(&artist),
-            Cell::new(&title),
-            Cell::new(&pdf.to_string()),
-        ]));
+        let cells: Vec<Cell> = [&artist, &title, &pdf.to_string()]
+            .iter()
+            .map(|item| Cell::new(item))
+            .collect();
+
+        table.add_row(Row::new(cells));
     }
 
     table.printstd();
