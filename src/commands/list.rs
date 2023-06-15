@@ -49,6 +49,11 @@ pub fn list_scores(search_terms: &Vec<String>) {
     let scores_directory = config.scores_directory();
     let score_files = format!("{scores_directory}/scores");
     let mut compositions: Vec<Composition> = vec![];
+    let scores = read_dir(&score_files);
+
+    if !scores.is_ok() {
+        return;
+    }
 
     for entry in read_dir(score_files).unwrap() {
         match entry {
