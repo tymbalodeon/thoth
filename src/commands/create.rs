@@ -41,6 +41,10 @@ fn create_file(template: String, parent: &String, title: &String) -> String {
     filename
 }
 
+fn get_file_system_name(text: &str) -> String {
+    text.replace(' ', "-").to_lowercase()
+}
+
 pub fn create_score(
     title: &String,
     subtitle: &Option<String>,
@@ -52,8 +56,8 @@ pub fn create_score(
 ) -> Vec<String> {
     let config = Config::from_config_file();
     let scores_directory = config.scores_directory;
-    let composer_directory = composer.replace(' ', "-").to_lowercase();
-    let file_system_title = title.replace(' ', "-").to_lowercase();
+    let composer_directory = get_file_system_name(composer);
+    let file_system_title = get_file_system_name(title);
     let parent = format!(
         "{scores_directory}/scores/{composer_directory}/{file_system_title}"
     );
@@ -72,7 +76,7 @@ pub fn create_score(
     let mut files = Vec::new();
 
     for template in templates {
-        let file = create_file(template, &parent, title);
+        let file = create_file(template, &parent, &file_system_title);
         files.push(file)
     }
 
