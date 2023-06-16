@@ -1,7 +1,7 @@
 use crate::config::Config;
 
 pub fn get_scores_directory_pattern() -> String {
-    let config: Config = Config::new();
+    let config: Config = Config::from_config_file();
     let scores_directory = config.scores_directory;
     format!("{scores_directory}/**/")
 }

@@ -79,7 +79,7 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn new() -> Self {
+    pub fn from_config_file() -> Self {
         let config_file = load_config_file();
 
         let composer = if let Some(composer) = config_file.composer {
@@ -127,7 +127,7 @@ impl Config {
     }
 
     pub fn display() {
-        let config = Config::new();
+        let config = Config::from_config_file();
 
         let mut items = vec![
             format!("Composer = {}", &config.composer),
@@ -157,16 +157,18 @@ impl Config {
 
     pub fn display_value(key: &str) {
         match key.replace('-', "_").to_lowercase().as_str() {
-            "composer" => println!("{}", Config::new().composer),
+            "composer" => println!("{}", Config::from_config_file().composer),
             "scores_directory" => {
-                println!("{}", Config::new().scores_directory)
+                println!("{}", Config::from_config_file().scores_directory)
             }
-            "pdfs_directory" => println!("{}", Config::new().pdfs_directory),
+            "pdfs_directory" => {
+                println!("{}", Config::from_config_file().pdfs_directory)
+            }
             _ => println!("\"{key}\" is not a recognized config key"),
         };
     }
 }
 
 pub fn get_composer() -> String {
-    Config::new().composer
+    Config::from_config_file().composer
 }
