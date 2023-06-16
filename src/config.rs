@@ -1,19 +1,22 @@
+use crate::Template;
 use serde::Deserialize;
 use shellexpand::tilde;
 use std::{fs::read_to_string, process::Command};
 use toml::from_str;
 use users::get_current_username;
 
-pub static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
+static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
 
 #[derive(Debug, Default, Deserialize)]
-pub struct ConfigFile {
-    pub composer: Option<String>,
-    pub scores_directory: Option<String>,
-    pub pdfs_directory: Option<String>,
+struct ConfigFile {
+    composer: Option<String>,
+    scores_directory: Option<String>,
+    pdfs_directory: Option<String>,
+    template: Option<Template>,
+    instrument: Option<String>,
 }
 
-pub fn get_config_path() -> String {
+fn get_config_path() -> String {
     tilde(CONFIG_PATH).to_string()
 }
 
@@ -40,11 +43,21 @@ fn get_default_pdfs_directory() -> String {
     "pdfs".to_string()
 }
 
+fn get_default_template() -> Template {
+    Template::Piano
+}
+
+fn get_default_instrument() -> String {
+    "Instrument".to_string()
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub composer: String,
     pub scores_directory: String,
     pub pdfs_directory: String,
+    pub template: Template,
+    pub instrument: String,
 }
 
 impl Default for Config {
@@ -59,6 +72,8 @@ impl Default for Config {
             composer: user_name,
             scores_directory: get_default_scores_directory(),
             pdfs_directory: get_default_pdfs_directory(),
+            template: get_default_template(),
+            instrument: get_default_instrument(),
         }
     }
 }
@@ -88,10 +103,24 @@ impl Config {
                 format!("{scores_directory}/{default_pdfs_directory}")
             };
 
+        let template = if let Some(template) = config_file.template {
+            template
+        } else {
+            get_default_template()
+        };
+
+        let instrument = if let Some(instrument) = config_file.instrument {
+            instrument
+        } else {
+            get_default_instrument()
+        };
+
         Config {
             composer,
             scores_directory,
             pdfs_directory,
+            template,
+            instrument,
         }
     }
 
@@ -102,12 +131,20 @@ impl Config {
 
     pub fn display() {
         let config = Config::new();
-        let composer = &config.composer;
-        let scores_directory = &config.scores_directory;
-        let pdfs_directory = &config.pdfs_directory;
-        println!("Composer = {composer}");
-        println!("Scores directory = {scores_directory}");
-        println!("PDFs directory = {pdfs_directory}");
+
+        let mut items = vec![
+            format!("Composer = {}", &config.composer),
+            format!("Scores directory = {}", &config.scores_directory),
+            format!("PDFs directory = {}", &config.pdfs_directory),
+            format!("Template = {:?}", &config.template),
+            format!("Instrument = {}", &config.instrument),
+        ];
+
+        items.sort();
+
+        for item in items {
+            println!("{item}");
+        }
     }
 
     pub fn display_path() {

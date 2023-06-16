@@ -14,12 +14,13 @@ use commands::open::open_pdf;
 use config::{get_composer, Config};
 use once_cell::sync::Lazy;
 use prettytable::{format, Cell, Row, Table};
+use serde::Deserialize;
 use std::path::PathBuf;
 use std::println;
 
 static COMPOSER: Lazy<String> = Lazy::new(get_composer);
 
-#[derive(Debug, ValueEnum, Clone)]
+#[derive(Clone, Debug, Deserialize, ValueEnum)]
 pub enum Template {
     Form,
     Lead,
