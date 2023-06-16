@@ -41,7 +41,7 @@ pub fn create_score(
     composer: &String,
     title: &String,
 ) -> Vec<String> {
-    let scores_directory = Config::new().scores_directory();
+    let scores_directory = Config::new().scores_directory;
     let composer_directory = composer.replace(' ', "-").to_lowercase();
 
     let parent =

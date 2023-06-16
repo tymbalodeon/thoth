@@ -46,7 +46,7 @@ impl PartialEq for Composition {
 
 pub fn list_scores(search_terms: &Vec<String>) {
     let config = Config::new();
-    let scores_directory = config.scores_directory();
+    let scores_directory = config.scores_directory;
     let score_files = format!("{scores_directory}/scores");
     let mut compositions: Vec<Composition> = vec![];
     let scores = read_dir(&score_files);
@@ -91,7 +91,7 @@ pub fn list_scores(search_terms: &Vec<String>) {
                         let mut pdf = false;
                         let path =
                             String::from(entry.file_name().to_str().unwrap());
-                        let pdfs_directory = config.pdfs_directory();
+                        let pdfs_directory = &config.pdfs_directory;
                         let pattern =
                             format!("{pdfs_directory}/{}*.pdf", path);
 

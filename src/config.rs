@@ -1,49 +1,19 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use shellexpand::tilde;
 use std::fs::read_to_string;
 use toml::from_str;
+use users::get_current_username;
 
 pub static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
 
-fn get_default_scores_directory() -> String {
-    "~/scores".to_string()
+#[derive(Debug, Default, Deserialize)]
+pub struct ConfigFile {
+    pub composer: Option<String>,
+    pub scores_directory: Option<String>,
+    pub pdfs_directory: Option<String>,
 }
 
-fn get_default_pdfs_directory() -> String {
-    "pdfs".to_string()
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Thoth {
-    composer: Option<String>,
-    scores_directory: Option<String>,
-    pdfs_directory: Option<String>,
-}
-
-impl Default for Thoth {
-    fn default() -> Self {
-        Thoth {
-            composer: Some("".to_string()),
-            scores_directory: Some(get_default_scores_directory()),
-            pdfs_directory: Some(get_default_pdfs_directory()),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct ConfigFile {
-    thoth: Option<Thoth>,
-}
-
-impl Default for ConfigFile {
-    fn default() -> Self {
-        ConfigFile {
-            thoth: Some(Thoth::default()),
-        }
-    }
-}
-
-fn load_config_file() -> ConfigFile {
+fn load_config() -> ConfigFile {
     let config_path =
         if let Ok(config_path) = read_to_string(tilde(CONFIG_PATH).as_ref()) {
             config_path
@@ -58,15 +28,15 @@ fn load_config_file() -> ConfigFile {
     }
 }
 
-fn get_composer_or_default(thoth: &Thoth) -> String {
-    if let Some(composer) = &thoth.composer {
-        composer.to_string()
-    } else {
-        "".to_string()
-    }
+fn get_default_scores_directory() -> String {
+    "~/scores".to_string()
 }
 
-#[derive(Debug)]
+fn get_default_pdfs_directory() -> String {
+    "pdfs".to_string()
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Config {
     pub composer: String,
     pub scores_directory: String,
@@ -75,8 +45,14 @@ pub struct Config {
 
 impl Default for Config {
     fn default() -> Self {
+        let user_name = if let Some(user_name) = get_current_username() {
+            user_name.to_str().unwrap().to_string()
+        } else {
+            "".to_string()
+        };
+
         Config {
-            composer: "".to_string(),
+            composer: user_name,
             scores_directory: get_default_scores_directory(),
             pdfs_directory: get_default_pdfs_directory(),
         }
@@ -84,42 +60,40 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn new() -> Self {
-        let config_file = load_config_file();
-
-        if let Some(thoth) = config_file.thoth {
-            let composer = get_composer_or_default(&thoth);
-            let scores_directory =
-                if let Some(scores_directory) = thoth.scores_directory {
-                    scores_directory
-                } else {
-                    get_default_scores_directory()
-                };
-
-            let pdfs_directory =
-                if let Some(pdfs_directory) = thoth.pdfs_directory {
-                    pdfs_directory
-                } else {
-                    let default_pdfs_directory = get_default_pdfs_directory();
-                    format!("{scores_directory}/{default_pdfs_directory}")
-                };
-
-            Config {
-                composer,
-                scores_directory,
-                pdfs_directory,
-            }
+    fn from_file(config_file: ConfigFile) -> Self {
+        let composer = if let Some(composer) = config_file.composer {
+            composer
+        } else if let Some(username) = get_current_username() {
+            username.to_str().unwrap().to_string()
         } else {
-            Config::default()
+            "".to_string()
+        };
+
+        let scores_directory =
+            if let Some(scores_directory) = config_file.scores_directory {
+                tilde(&scores_directory).into_owned()
+            } else {
+                get_default_scores_directory()
+            };
+
+        let pdfs_directory =
+            if let Some(pdfs_directory) = config_file.pdfs_directory {
+                tilde(&pdfs_directory).into_owned()
+            } else {
+                let default_pdfs_directory = get_default_pdfs_directory();
+                format!("{scores_directory}/{default_pdfs_directory}")
+            };
+
+        Config {
+            composer,
+            scores_directory,
+            pdfs_directory,
         }
     }
 
-    pub fn scores_directory(&self) -> String {
-        tilde(&self.scores_directory).into_owned()
-    }
-
-    pub fn pdfs_directory(&self) -> String {
-        tilde(&self.pdfs_directory).into_owned()
+    pub fn new() -> Self {
+        let config_file = load_config();
+        Config::from_file(config_file)
     }
 }
 

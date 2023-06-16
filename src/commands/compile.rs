@@ -25,8 +25,8 @@ fn already_compiled(input_file: &PathBuf, output_file: &PathBuf) -> bool {
 }
 
 fn compile_input_file(input_file: &PathBuf, config: &Config) {
-    let pdfs_directory = config.pdfs_directory();
-    create_dir_all(&pdfs_directory).unwrap();
+    let pdfs_directory = &config.pdfs_directory;
+    create_dir_all(pdfs_directory).unwrap();
 
     if let Some(file) = input_file.to_str() {
         let output_file_pattern = format!(
@@ -44,8 +44,8 @@ fn compile_input_file(input_file: &PathBuf, config: &Config) {
         }
 
         match Command::new("lilypond")
-            .args(["--include", &config.scores_directory()])
-            .args(["--output", &pdfs_directory])
+            .args(["--include", &config.scores_directory])
+            .args(["--output", pdfs_directory])
             .arg(file)
             .output()
         {

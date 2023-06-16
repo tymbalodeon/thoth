@@ -17,4 +17,5 @@ serde = { version = "1.0.156", features = ["derive"] }
 shellexpand = "3.0.0"
 titlecase = "2.2.1"
 toml = "0.7.3"
+users = "0.11.0"
 walkdir = "2.3.3"
