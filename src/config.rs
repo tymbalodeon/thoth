@@ -107,7 +107,7 @@ impl Config {
         let pdfs_directory = &config.pdfs_directory;
         println!("Composer = {composer}");
         println!("Scores directory = {scores_directory}");
-        println!("pdfs directory = {pdfs_directory}");
+        println!("PDFs directory = {pdfs_directory}");
     }
 
     pub fn display_path() {
