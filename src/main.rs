@@ -14,6 +14,7 @@ use commands::list::list_scores;
 use commands::open::open_pdf;
 use config::get_composer;
 use once_cell::sync::Lazy;
+use prettytable::{format, Cell, Row, Table};
 use std::path::PathBuf;
 use std::println;
 
@@ -145,19 +146,26 @@ fn main() {
         }
 
         Some(Commands::Templates) => {
-            println!(
-                "  {: <6}  Form chart with separate sections and form summary at the bottom.",
-                "form"
-            );
-            println!(
-                "  {: <6}  Lead sheet showing melody and chords.",
-                "lead"
-            );
-            println!("  {: <6}  Piano staff score.", "piano");
-            println!(
-                "  {: <6}  Score for a single staff instrument.",
-                "single"
-            );
+            let mut table = Table::new();
+
+            table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+            table.set_titles(row!["NAME", "DESCRIPTION"]);
+
+            let values = vec![
+                ["form", "Form chart with separate sections and form summary at the bottom."],
+                ["lead", "Lead sheet showing melody and chords."],
+                ["piano", "Piano staff score."],
+                ["single", "Score for a single staff instrument."],
+            ];
+
+            for value in values {
+                let cells: Vec<Cell> =
+                    value.iter().map(|item| Cell::new(item)).collect();
+                table.add_row(Row::new(cells));
+            }
+
+            println!();
+            table.printstd();
         }
 
         _ => {
