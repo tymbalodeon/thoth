@@ -31,15 +31,53 @@ fn add_version_number(content: &str) -> String {
     template
 }
 
-pub fn get_piano_template(title: &String, composer: &String) -> String {
+fn add_header_value_if_some(
+    mut header: String,
+    key: &str,
+    value: &Option<String>,
+) -> String {
+    if let Some(value) = value {
+        let line = format!("{key} = \"{value}\"\n");
+        header.push_str(&line);
+    };
+
+    header
+}
+
+fn get_header(
+    title: &String,
+    subtitle: &Option<String>,
+    composer: &String,
+    arranger: &Option<String>,
+) -> String {
+    let mut header = format!(
+        "\
+\\header {{
+  title = \"{title}\"
+"
+    );
+
+    header = add_header_value_if_some(header, "subtitle", subtitle);
+    header.push_str(format!("composer = \"{composer}\"\n").as_str());
+    header = add_header_value_if_some(header, "arranger", arranger);
+    header.push_str("}\n");
+
+    header
+}
+
+pub fn get_piano_template(
+    title: &String,
+    subtitle: &Option<String>,
+    composer: &String,
+    arranger: &Option<String>,
+) -> String {
+    let header = get_header(title, subtitle, composer, arranger);
+
     let content = format!(
         "\
 \\include \"settings.ily\"
 
-\\header {{
-  title = \"{title}\"
-  composer = \"{composer}\"
-}}
+{header}
 
 key_and_time = {{
   \\key c \\major
@@ -71,15 +109,20 @@ lower_staff = \\relative c {{
     add_version_number(&content)
 }
 
-pub fn get_single_template(title: &String, composer: &String) -> String {
+pub fn get_single_template(
+    title: &String,
+    subtitle: &Option<String>,
+    composer: &String,
+    arranger: &Option<String>,
+    instrument: &String,
+) -> String {
+    let header = get_header(title, subtitle, composer, arranger);
+
     let content = format!(
         "\
 \\include \"settings.ily\"
 
-\\header {{
-    title = \"{title}\"
-    composer = \"{composer}\"
-}}
+{header}
 
 music = \\relative c'' {{
     \\key c \\major
@@ -89,7 +132,7 @@ music = \\relative c'' {{
 
 \\score {{
     \\new Staff \\with {{
-        instrumentName = \"Instrument\"
+        instrumentName = \"{instrument}\"
         \\numericTimeSignature
     }} {{
         \\compressMMRests

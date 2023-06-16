@@ -53,17 +53,20 @@ enum Commands {
     Create {
         title: String,
 
+        #[arg(long)]
+        subtitle: Option<String>,
+
         #[arg(long, default_value_t = COMPOSER.to_owned())]
         composer: String,
 
         #[arg(long)]
         arranger: Option<String>,
 
-        #[arg(long, default_value_t = Template::Single, value_enum)]
-        template: Template,
+        #[arg(long, value_enum)]
+        template: Option<Template>,
 
         #[arg(long)]
-        subtitle: Option<String>,
+        instrument: Option<String>,
 
         /// Open for editing after creating
         #[arg(long)]
@@ -111,17 +114,29 @@ fn main() {
         }
 
         Some(Commands::Create {
-            composer,
-            arranger: _,
-            template,
             title,
-            subtitle: _,
+            subtitle,
+            composer,
+            arranger,
+            instrument,
+            template,
             edit,
         }) => {
-            let files = create_score(template, composer, title);
+            let config = Config::from_config_file();
+
+            let template = if let Some(template) = template {
+                template
+            } else {
+                &config.template
+            };
+
+            let files = create_score(
+                title, subtitle, composer, arranger, instrument, template,
+                edit,
+            );
 
             println!(
-                "Created score for \"{title}\" by {composer} using template {:?}:",
+                "Created score for \"{title}\" by {composer} using {:?} template:",
                 template
             );
 

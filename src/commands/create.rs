@@ -7,15 +7,20 @@ use std::io::prelude::*;
 use std::path::Path;
 
 fn get_templates(
-    template: &Template,
-    composer: &String,
     title: &String,
+    subtitle: &Option<String>,
+    composer: &String,
+    arranger: &Option<String>,
+    instrument: &String,
+    template: &Template,
 ) -> Vec<String> {
     match template {
-        Form => vec![get_piano_template(title, composer)],
-        Lead => vec![get_piano_template(title, composer)],
-        Piano => vec![get_piano_template(title, composer)],
-        Single => vec![get_single_template(title, composer)],
+        Form => vec![get_piano_template(title, subtitle, composer, arranger)],
+        Lead => vec![get_piano_template(title, subtitle, composer, arranger)],
+        Piano => vec![get_piano_template(title, subtitle, composer, arranger)],
+        Single => vec![get_single_template(
+            title, subtitle, composer, arranger, instrument,
+        )],
     }
 }
 
@@ -37,23 +42,42 @@ fn create_file(template: String, parent: &String, title: &String) -> String {
 }
 
 pub fn create_score(
-    template: &Template,
-    composer: &String,
     title: &String,
+    subtitle: &Option<String>,
+    composer: &String,
+    arranger: &Option<String>,
+    instrument: &Option<String>,
+    template: &Template,
+    edit: &bool,
 ) -> Vec<String> {
-    let scores_directory = Config::from_config_file().scores_directory;
+    let config = Config::from_config_file();
+    let scores_directory = config.scores_directory;
     let composer_directory = composer.replace(' ', "-").to_lowercase();
-
-    let parent =
-        format!("{scores_directory}/scores/{composer_directory}/{title}");
+    let file_system_title = title.replace(' ', "-").to_lowercase();
+    let parent = format!(
+        "{scores_directory}/scores/{composer_directory}/{file_system_title}"
+    );
 
     create_dir_all(&parent).unwrap();
-    let templates = get_templates(template, composer, title);
+
+    let instrument = if let Some(instrument) = instrument {
+        instrument
+    } else {
+        &config.instrument
+    };
+
+    let templates = get_templates(
+        title, subtitle, composer, arranger, instrument, template,
+    );
     let mut files = Vec::new();
 
     for template in templates {
         let file = create_file(template, &parent, title);
         files.push(file)
+    }
+
+    if *edit {
+        println!("Opening for editing...")
     }
 
     files
