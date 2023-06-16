@@ -125,8 +125,7 @@ impl Config {
     }
 
     pub fn new() -> Self {
-        let config_file = load_config();
-        Config::from_file(config_file)
+        Config::from_file(load_config())
     }
 
     pub fn display() {
