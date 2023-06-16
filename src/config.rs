@@ -120,6 +120,19 @@ impl Config {
             .output()
             .unwrap();
     }
+
+    pub fn display_value(key: &str) {
+        let key = key.replace('-', "_").to_lowercase();
+
+        match key.as_str() {
+            "composer" => println!("{}", Config::new().composer),
+            "scores_directory" => {
+                println!("{}", Config::new().scores_directory)
+            }
+            "pdfs_directory" => println!("{}", Config::new().pdfs_directory),
+            _ => println!("\"{key}\" is not a recognized config key"),
+        };
+    }
 }
 
 pub fn get_composer() -> String {

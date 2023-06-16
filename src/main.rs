@@ -37,6 +37,7 @@ enum Commands {
 
     /// Display config
     Config {
+        key: Option<String>,
         /// Open config file in editor
         #[arg(long)]
         edit: bool,
@@ -95,11 +96,13 @@ fn main() {
     match &cli.command {
         Some(Commands::Clean { scores }) => clean_pdfs(scores),
         Some(Commands::Compile { scores }) => compile_pdfs(scores),
-        Some(Commands::Config { edit, path }) => {
+        Some(Commands::Config { key, edit, path }) => {
             if *edit {
                 Config::edit();
             } else if *path {
                 Config::display_path();
+            } else if let Some(key) = key {
+                Config::display_value(key);
             } else {
                 Config::display();
             }
