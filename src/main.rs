@@ -38,6 +38,7 @@ enum Commands {
     /// Display config
     Config {
         key: Option<String>,
+
         /// Open config file in editor
         #[arg(long)]
         edit: bool,

@@ -122,9 +122,7 @@ impl Config {
     }
 
     pub fn display_value(key: &str) {
-        let key = key.replace('-', "_").to_lowercase();
-
-        match key.as_str() {
+        match key.replace('-', "_").to_lowercase().as_str() {
             "composer" => println!("{}", Config::new().composer),
             "scores_directory" => {
                 println!("{}", Config::new().scores_directory)
