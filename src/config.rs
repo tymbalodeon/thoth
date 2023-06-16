@@ -20,7 +20,7 @@ fn get_config_path() -> String {
     tilde(CONFIG_PATH).to_string()
 }
 
-fn load_config() -> ConfigFile {
+fn load_config_file() -> ConfigFile {
     let config_path =
         if let Ok(config_path) = read_to_string(get_config_path()) {
             config_path
@@ -79,7 +79,9 @@ impl Default for Config {
 }
 
 impl Config {
-    fn from_file(config_file: ConfigFile) -> Self {
+    pub fn new() -> Self {
+        let config_file = load_config_file();
+
         let composer = if let Some(composer) = config_file.composer {
             composer
         } else if let Some(username) = get_current_username() {
@@ -122,10 +124,6 @@ impl Config {
             template,
             instrument,
         }
-    }
-
-    pub fn new() -> Self {
-        Config::from_file(load_config())
     }
 
     pub fn display() {
