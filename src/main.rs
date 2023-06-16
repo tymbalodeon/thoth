@@ -7,12 +7,11 @@ mod config;
 use clap::{Parser, Subcommand, ValueEnum};
 use commands::clean::clean_pdfs;
 use commands::compile::compile_pdfs;
-use commands::config::{display_config, display_config_path, edit_config};
 use commands::create::create_score;
 use commands::edit::edit_score;
 use commands::list::list_scores;
 use commands::open::open_pdf;
-use config::get_composer;
+use config::{get_composer, Config};
 use once_cell::sync::Lazy;
 use prettytable::{format, Cell, Row, Table};
 use std::path::PathBuf;
@@ -38,9 +37,11 @@ enum Commands {
 
     /// Display config
     Config {
+        /// Open config file in editor
         #[arg(long)]
         edit: bool,
 
+        /// Display the config file path
         #[arg(long)]
         path: bool,
     },
@@ -61,14 +62,15 @@ enum Commands {
         #[arg(long)]
         subtitle: Option<String>,
 
+        /// Open for editing after creating
         #[arg(long)]
         edit: bool,
     },
 
-    /// Open <score> in editor and pdf viewer, recompiling on file changes.
+    /// Open <score> in editor and pdf viewer, recompiling on file changes
     Edit { score: String },
 
-    /// List pdf(s).
+    /// List pdf(s)
     List { scores: Vec<String> },
 
     /// Open pdf(s)
@@ -95,11 +97,11 @@ fn main() {
         Some(Commands::Compile { scores }) => compile_pdfs(scores),
         Some(Commands::Config { edit, path }) => {
             if *edit {
-                edit_config();
+                Config::edit();
             } else if *path {
-                display_config_path();
+                Config::display_path();
             } else {
-                display_config();
+                Config::display();
             }
         }
 

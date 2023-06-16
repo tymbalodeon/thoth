@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use shellexpand::tilde;
-use std::fs::read_to_string;
+use std::{fs::read_to_string, process::Command};
 use toml::from_str;
 use users::get_current_username;
 
@@ -13,9 +13,13 @@ pub struct ConfigFile {
     pub pdfs_directory: Option<String>,
 }
 
+pub fn get_config_path() -> String {
+    tilde(CONFIG_PATH).to_string()
+}
+
 fn load_config() -> ConfigFile {
     let config_path =
-        if let Ok(config_path) = read_to_string(tilde(CONFIG_PATH).as_ref()) {
+        if let Ok(config_path) = read_to_string(get_config_path()) {
             config_path
         } else {
             "".to_owned()
@@ -94,6 +98,27 @@ impl Config {
     pub fn new() -> Self {
         let config_file = load_config();
         Config::from_file(config_file)
+    }
+
+    pub fn display() {
+        let config = Config::new();
+        let composer = &config.composer;
+        let scores_directory = &config.scores_directory;
+        let pdfs_directory = &config.pdfs_directory;
+        println!("Composer = {composer}");
+        println!("Scores directory = {scores_directory}");
+        println!("pdfs directory = {pdfs_directory}");
+    }
+
+    pub fn display_path() {
+        println!("{}", get_config_path());
+    }
+
+    pub fn edit() {
+        Command::new("open")
+            .arg(get_config_path())
+            .output()
+            .unwrap();
     }
 }
 
