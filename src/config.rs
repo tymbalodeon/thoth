@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use shellexpand::tilde;
-use std::fs;
+use std::fs::read_to_string;
+use toml::from_str;
 
 pub static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
 
@@ -31,17 +32,20 @@ fn get_default_pdfs_directory() -> String {
     "pdfs".to_owned()
 }
 
-fn load_config_file() -> ConfigFile {
+fn get_config_path() -> String {
     let config_path = tilde(CONFIG_PATH);
 
-    let contents = if let Ok(result) = fs::read_to_string(config_path.as_ref())
-    {
+    if let Ok(result) = read_to_string(config_path.as_ref()) {
         result
     } else {
         "".to_owned()
-    };
+    }
+}
 
-    if let Ok(config_file) = toml::from_str(&contents) {
+fn load_config_file() -> ConfigFile {
+    let config_path = get_config_path();
+
+    if let Ok(config_file) = from_str(&config_path) {
         config_file
     } else {
         ConfigFile {

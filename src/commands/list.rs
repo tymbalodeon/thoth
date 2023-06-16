@@ -51,7 +51,7 @@ pub fn list_scores(search_terms: &Vec<String>) {
     let mut compositions: Vec<Composition> = vec![];
     let scores = read_dir(&score_files);
 
-    if !scores.is_ok() {
+    if scores.is_err() {
         return;
     }
 
