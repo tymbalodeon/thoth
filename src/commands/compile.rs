@@ -17,7 +17,7 @@ fn get_modified(file: &PathBuf) -> Option<SystemTime> {
     }
 }
 
-fn already_compiled(input_file: &PathBuf, output_file: &PathBuf) -> bool {
+fn is_already_compiled(input_file: &PathBuf, output_file: &PathBuf) -> bool {
     let input_modified = get_modified(input_file);
     let output_modified = get_modified(output_file);
 
@@ -38,7 +38,7 @@ fn compile_input_file(input_file: &PathBuf, config: &Config) {
             .expect("Failed to read glob pattern")
             .flatten()
         {
-            if already_compiled(input_file, &entry) {
+            if is_already_compiled(input_file, &entry) {
                 return;
             }
         }
