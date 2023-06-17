@@ -150,11 +150,14 @@ pub fn templates_main() {
     table.set_titles(row!["NAME", "DESCRIPTION"]);
 
     let values = vec![
-                ["form", "Form chart with separate sections and form summary at the bottom."],
-                ["lead", "Lead sheet showing melody and chords."],
-                ["piano", "Piano staff score."],
-                ["single", "Score for a single staff instrument."],
-            ];
+        [
+            "form",
+            "Form chart with separate sections and form summary at the bottom",
+        ],
+        ["lead", "Lead sheet showing melody and chords"],
+        ["piano", "Piano staff score"],
+        ["single", "Score for a single staff instrument"],
+    ];
 
     for value in values {
         let cells: Vec<Cell> =
