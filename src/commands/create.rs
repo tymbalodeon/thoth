@@ -1,7 +1,7 @@
 use super::templates::{get_piano_template, get_single_template};
 use crate::config::Config;
-use crate::Template;
 use crate::Template::{Form, Lead, Piano, Single};
+use crate::{add_value_to_string_if_some, Template};
 use std::fs::{create_dir_all, File};
 use std::io::prelude::*;
 use std::path::Path;
@@ -85,4 +85,26 @@ pub fn create_score(
     }
 
     files
+}
+
+pub fn print_score_info(
+    title: &String,
+    subtitle: &Option<String>,
+    composer: &String,
+    arranger: &Option<String>,
+    instrument: &Option<String>,
+    template: &Template,
+) {
+    let mut score_info = format!(
+        "Created score for \"{title}\" using {:?} template:\n",
+        template
+    );
+
+    score_info = add_value_to_string_if_some(score_info, "subtitle", subtitle);
+    score_info.push_str(format!("Composer = {composer}\n").as_str());
+    score_info = add_value_to_string_if_some(score_info, "Arranger", arranger);
+    score_info =
+        add_value_to_string_if_some(score_info, "Instrument", instrument);
+
+    println!("{score_info}");
 }

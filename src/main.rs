@@ -7,7 +7,7 @@ mod config;
 use clap::{Parser, Subcommand, ValueEnum};
 use commands::clean::clean_pdfs;
 use commands::compile::compile_pdfs;
-use commands::create::create_score;
+use commands::create::{create_score, print_score_info};
 use commands::edit::edit_score;
 use commands::list::list_scores;
 use commands::open::open_pdf;
@@ -19,6 +19,19 @@ use std::path::PathBuf;
 use std::println;
 
 static COMPOSER: Lazy<String> = Lazy::new(get_composer);
+
+pub fn add_value_to_string_if_some(
+    mut string: String,
+    key: &str,
+    value: &Option<String>,
+) -> String {
+    if let Some(value) = value {
+        let line = format!("{key} = \"{value}\"\n");
+        string.push_str(&line);
+    };
+
+    string.to_string()
+}
 
 #[derive(Clone, Debug, Deserialize, ValueEnum)]
 pub enum Template {
@@ -135,9 +148,8 @@ fn main() {
                 edit,
             );
 
-            println!(
-                "Created score for \"{title}\" by {composer} using {:?} template:",
-                template
+            print_score_info(
+                title, subtitle, composer, arranger, instrument, template,
             );
 
             for file in files {

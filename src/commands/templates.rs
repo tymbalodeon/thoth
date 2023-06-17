@@ -1,3 +1,4 @@
+use crate::add_value_to_string_if_some;
 use regex::Regex;
 use std::process::Command;
 
@@ -31,19 +32,6 @@ fn add_version_number(content: &str) -> String {
     template
 }
 
-fn add_header_value_if_some(
-    mut header: String,
-    key: &str,
-    value: &Option<String>,
-) -> String {
-    if let Some(value) = value {
-        let line = format!("{key} = \"{value}\"\n");
-        header.push_str(&line);
-    };
-
-    header
-}
-
 fn get_header(
     title: &String,
     subtitle: &Option<String>,
@@ -57,9 +45,9 @@ fn get_header(
 "
     );
 
-    header = add_header_value_if_some(header, "subtitle", subtitle);
+    header = add_value_to_string_if_some(header, "subtitle", subtitle);
     header.push_str(format!("composer = \"{composer}\"\n").as_str());
-    header = add_header_value_if_some(header, "arranger", arranger);
+    header = add_value_to_string_if_some(header, "arranger", arranger);
     header.push_str("}\n");
 
     header
