@@ -1,4 +1,4 @@
-use crate::Template;
+use crate::commands::templates::Template;
 use serde::Deserialize;
 use shellexpand::tilde;
 use std::{fs::read_to_string, process::Command};
@@ -126,6 +126,26 @@ impl Config {
         }
     }
 
+    pub fn get_composer() -> String {
+        Config::from_config_file().composer
+    }
+
+    pub fn get_instrument() -> String {
+        Config::from_config_file().instrument
+    }
+
+    pub fn get_scores_directory() -> String {
+        Config::from_config_file().scores_directory
+    }
+
+    pub fn get_pdfs_directory() -> String {
+        Config::from_config_file().pdfs_directory
+    }
+
+    pub fn get_template() -> Template {
+        Config::from_config_file().template
+    }
+
     pub fn display() {
         let config = Config::from_config_file();
 
@@ -157,18 +177,32 @@ impl Config {
 
     pub fn display_value(key: &str) {
         match key.replace('-', "_").to_lowercase().as_str() {
-            "composer" => println!("{}", Config::from_config_file().composer),
+            "composer" => println!("{}", Config::get_composer()),
+            "instrument" => {
+                println!("{}", Config::get_instrument())
+            }
             "scores_directory" => {
-                println!("{}", Config::from_config_file().scores_directory)
+                println!("{}", Config::get_scores_directory())
             }
             "pdfs_directory" => {
-                println!("{}", Config::from_config_file().pdfs_directory)
+                println!("{}", Config::get_pdfs_directory())
+            }
+            "template" => {
+                println!("{:?}", Config::get_template())
             }
             _ => println!("\"{key}\" is not a recognized config key"),
         };
     }
 }
 
-pub fn get_composer() -> String {
-    Config::from_config_file().composer
+pub fn config_main(edit: &bool, path: &bool, key: &Option<String>) {
+    if *edit {
+        Config::edit();
+    } else if *path {
+        Config::display_path();
+    } else if let Some(key) = key {
+        Config::display_value(key);
+    } else {
+        Config::display();
+    }
 }

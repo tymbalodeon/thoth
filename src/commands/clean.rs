@@ -17,7 +17,7 @@ fn confirmation_received() -> bool {
     response.eq("y") || response.eq("Y")
 }
 
-pub fn clean_pdfs(scores: &Vec<String>) {
+pub fn clean_main(scores: &Vec<String>) {
     if scores.is_empty() && !confirmation_received() {
         return;
     };

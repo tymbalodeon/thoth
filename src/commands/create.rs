@@ -1,10 +1,13 @@
 use super::templates::{get_piano_template, get_single_template};
+use crate::add_value_to_string_if_some;
+use crate::commands::edit::edit_score;
+use crate::commands::templates::Template;
+use crate::commands::templates::Template::{Form, Lead, Piano, Single};
 use crate::config::Config;
-use crate::Template::{Form, Lead, Piano, Single};
-use crate::{add_value_to_string_if_some, Template};
 use std::fs::{create_dir_all, File};
 use std::io::prelude::*;
 use std::path::Path;
+use std::path::PathBuf;
 
 fn get_templates(
     title: &String,
@@ -107,4 +110,51 @@ pub fn print_score_info(
         add_value_to_string_if_some(score_info, "Instrument", instrument);
 
     println!("{score_info}");
+}
+
+pub fn create_main(
+    title: &String,
+    subtitle: &Option<String>,
+    composer: &Option<String>,
+    arranger: &Option<String>,
+    instrument: &Option<String>,
+    template: &Option<Template>,
+    edit: &bool,
+) {
+    let config = Config::from_config_file();
+
+    let template = if let Some(template) = template {
+        template
+    } else {
+        &config.template
+    };
+
+    let composer = if let Some(composer) = composer {
+        composer
+    } else {
+        &config.composer
+    };
+
+    let files = create_score(
+        title, subtitle, composer, arranger, instrument, template, edit,
+    );
+
+    print_score_info(
+        title, subtitle, composer, arranger, instrument, template,
+    );
+
+    for file in files {
+        println!("{file}");
+
+        if *edit {
+            let file_stem = PathBuf::from(&file)
+                .file_stem()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_string();
+
+            edit_score(&file_stem)
+        }
+    }
 }

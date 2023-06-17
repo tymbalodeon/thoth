@@ -1,6 +1,17 @@
 use crate::add_value_to_string_if_some;
+use clap::ValueEnum;
+use prettytable::{format, Cell, Row, Table};
 use regex::Regex;
+use serde::Deserialize;
 use std::process::Command;
+
+#[derive(Clone, Debug, Deserialize, ValueEnum)]
+pub enum Template {
+    Form,
+    Lead,
+    Piano,
+    Single,
+}
 
 fn get_lilypond_version() -> String {
     let output = String::from_utf8(
@@ -130,4 +141,27 @@ music = \\relative c'' {{
     );
 
     add_version_number(&content)
+}
+
+pub fn templates_main() {
+    let mut table = Table::new();
+
+    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+    table.set_titles(row!["NAME", "DESCRIPTION"]);
+
+    let values = vec![
+                ["form", "Form chart with separate sections and form summary at the bottom."],
+                ["lead", "Lead sheet showing melody and chords."],
+                ["piano", "Piano staff score."],
+                ["single", "Score for a single staff instrument."],
+            ];
+
+    for value in values {
+        let cells: Vec<Cell> =
+            value.iter().map(|item| Cell::new(item)).collect();
+        table.add_row(Row::new(cells));
+    }
+
+    println!();
+    table.printstd();
 }

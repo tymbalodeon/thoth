@@ -65,7 +65,7 @@ fn compile_input_file(input_file: &PathBuf, config: &Config) {
     }
 }
 
-pub fn compile_pdfs(scores: &Vec<String>) {
+pub fn compile_main(scores: &Vec<String>) {
     let config: Config = Config::from_config_file();
     let patterns = get_patterns(scores, ".ly");
 

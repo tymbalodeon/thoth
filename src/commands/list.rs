@@ -44,7 +44,7 @@ impl PartialEq for Composition {
     }
 }
 
-pub fn list_scores(search_terms: &Vec<String>) {
+pub fn list_main(search_terms: &Vec<String>) {
     let config = Config::from_config_file();
     let scores_directory = config.scores_directory;
     let score_files = format!("{scores_directory}/scores");

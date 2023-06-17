@@ -1,3 +1,4 @@
+use crate::commands::compile::compile_main;
 use crate::commands::patterns::get_scores_directory_pattern;
 use glob::glob;
 use std::process::Command;
@@ -20,4 +21,9 @@ pub fn edit_score(score: &String) {
             }
         }
     }
+}
+
+pub fn edit_main(score: &String) {
+    compile_main(&vec![score.to_string()]);
+    edit_score(score);
 }

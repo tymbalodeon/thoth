@@ -2,7 +2,7 @@ use crate::commands::patterns::get_patterns;
 use glob::glob;
 use std::process::Command;
 
-pub fn open_pdf(scores: &Vec<String>) {
+pub fn open_main(scores: &Vec<String>) {
     let patterns = get_patterns(scores, ".pdf");
 
     for pattern in patterns {
