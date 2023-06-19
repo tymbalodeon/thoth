@@ -1,8 +1,7 @@
 use crate::config::Config;
 use glob::glob;
-use std::cmp::Ordering;
-
 use prettytable::{format, Cell, Row, Table};
+use std::cmp::Ordering;
 use std::fs::{read_dir, DirEntry};
 use titlecase::titlecase;
 

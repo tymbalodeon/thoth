@@ -1,13 +1,12 @@
+use super::edit::edit_main;
 use super::templates::{get_piano_template, get_single_template};
 use crate::add_value_to_string_if_some;
-use crate::commands::edit::edit_score;
 use crate::commands::templates::Template;
 use crate::commands::templates::Template::{Form, Lead, Piano, Single};
 use crate::config::Config;
 use std::fs::{create_dir_all, File};
 use std::io::prelude::*;
 use std::path::Path;
-use std::path::PathBuf;
 
 fn get_templates(
     title: &String,
@@ -145,16 +144,9 @@ pub fn create_main(
 
     for file in files {
         println!("{file}");
+    }
 
-        if *edit {
-            let file_stem = PathBuf::from(&file)
-                .file_stem()
-                .unwrap()
-                .to_str()
-                .unwrap()
-                .to_string();
-
-            edit_score(&file_stem)
-        }
+    if *edit {
+        edit_main(&get_file_system_name(title));
     }
 }
