@@ -1,5 +1,6 @@
 use super::patterns::get_score_file;
 use crate::{commands::compile::compile_main, config::Config};
+use glob::glob;
 use miette::{IntoDiagnostic, Result};
 use std::convert::Infallible;
 use std::path::PathBuf;
@@ -14,6 +15,21 @@ use watchexec::{
 };
 use watchexec_signals::Signal;
 
+fn get_watched_files(file: &String, scores_directory: &String) -> Vec<String> {
+    let ily_files_pattern = format!("{}/**/*.ily", scores_directory);
+    let ily_files = glob(&ily_files_pattern);
+
+    let mut watched_files: Vec<String> = ily_files
+        .expect("")
+        .flatten()
+        .map(|path| path.to_str().unwrap().to_string())
+        .collect();
+
+    watched_files.push(file.to_string());
+
+    watched_files
+}
+
 #[tokio::main]
 async fn watch(file: PathBuf) -> Result<()> {
     let mut init_config = InitConfig::default();
@@ -25,9 +41,9 @@ async fn watch(file: PathBuf) -> Result<()> {
 
     let mut runtime_config = RuntimeConfig::default();
     let file = file.to_str().unwrap().to_string();
-    runtime_config.pathset([&file]);
-
     let config = Config::from_config_file();
+    let watched_files = get_watched_files(&file, &config.scores_directory);
+    runtime_config.pathset(watched_files);
 
     runtime_config.command(WatchexecCommand::Exec {
         prog: "lilypond".to_string(),
