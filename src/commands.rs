@@ -59,7 +59,12 @@ pub enum Commands {
     Edit { score: String },
 
     /// List pdf(s)
-    List { scores: Vec<String> },
+    List {
+        scores: Vec<String>,
+
+        #[arg(long)]
+        outdated: bool,
+    },
 
     /// Open pdf(s)
     Open { scores: Vec<String> },

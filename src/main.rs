@@ -64,7 +64,9 @@ fn main() {
         Some(Commands::Edit { score }) => {
             edit_main(score);
         }
-        Some(Commands::List { scores }) => list_main(scores),
+        Some(Commands::List { scores, outdated }) => {
+            list_main(scores, outdated)
+        }
         Some(Commands::Open { scores }) => {
             open_main(scores);
         }

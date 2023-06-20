@@ -43,7 +43,7 @@ impl PartialEq for Composition {
     }
 }
 
-pub fn list_main(search_terms: &Vec<String>) {
+pub fn list_main(search_terms: &Vec<String>, outdated: &bool) {
     let config = Config::from_config_file();
     let scores_directory = config.scores_directory;
     let score_files = format!("{scores_directory}/scores");
@@ -103,11 +103,13 @@ pub fn list_main(search_terms: &Vec<String>) {
                             }
                         }
 
-                        compositions.push(Composition {
-                            artist: artist.clone(),
-                            composition,
-                            pdf,
-                        });
+                        if !*outdated || !pdf {
+                            compositions.push(Composition {
+                                artist: artist.clone(),
+                                composition,
+                                pdf,
+                            });
+                        }
                     }
                 }
             }
