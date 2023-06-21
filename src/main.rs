@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate prettytable;
-
 mod commands;
 mod config;
 
@@ -64,9 +61,11 @@ fn main() {
         Some(Commands::Edit { score }) => {
             edit_main(score);
         }
-        Some(Commands::List { scores, outdated }) => {
-            list_main(scores, outdated)
-        }
+        Some(Commands::List {
+            scores,
+            outdated,
+            compiled,
+        }) => list_main(scores, outdated, compiled),
         Some(Commands::Open { scores }) => {
             open_main(scores);
         }

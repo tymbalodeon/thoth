@@ -1,9 +1,10 @@
 use crate::add_value_to_string_if_some;
 use clap::ValueEnum;
-use prettytable::{format, Cell, Row, Table};
 use regex::Regex;
 use serde::Deserialize;
 use std::process::Command;
+
+use super::table::print_table;
 pub mod form;
 pub mod lead;
 pub mod piano;
@@ -68,12 +69,8 @@ fn get_header(
 }
 
 pub fn templates_main() {
-    let mut table = Table::new();
-
-    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-    table.set_titles(row!["NAME", "DESCRIPTION"]);
-
-    let values = vec![
+    let titles = vec!["NAME".to_string(), "DESCRIPTION".to_string()];
+    let rows = vec![
         [
             "Form",
             "Form chart with separate sections and form summary at the bottom",
@@ -83,12 +80,10 @@ pub fn templates_main() {
         ["Single", "Score for a single staff instrument"],
     ];
 
-    for value in values {
-        let cells: Vec<Cell> =
-            value.iter().map(|item| Cell::new(item)).collect();
-        table.add_row(Row::new(cells));
-    }
+    let rows = rows
+        .iter()
+        .map(|row| row.iter().map(|value| value.to_string()).collect())
+        .collect();
 
-    println!();
-    table.printstd();
+    print_table(titles, rows);
 }

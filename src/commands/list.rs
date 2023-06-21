@@ -1,6 +1,6 @@
+use crate::commands::table::print_table;
 use crate::config::Config;
 use glob::glob;
-use prettytable::{format, Cell, Row, Table};
 use std::cmp::Ordering;
 use std::fs::{read_dir, DirEntry};
 use titlecase::titlecase;
@@ -20,6 +20,14 @@ struct Composition {
 impl Composition {
     fn remove_leading_the(&self) -> String {
         self.artist.replace("the ", "")
+    }
+
+    fn get_row_values(&self) -> Vec<String> {
+        let artist = titlecase(&self.artist);
+        let title = titlecase(&self.composition);
+        let pdf = self.pdf.to_string();
+
+        vec![artist, title, pdf]
     }
 }
 
@@ -43,7 +51,11 @@ impl PartialEq for Composition {
     }
 }
 
-pub fn list_main(search_terms: &Vec<String>, outdated: &bool) {
+pub fn list_main(
+    search_terms: &Vec<String>,
+    outdated: &bool,
+    compiled: &bool,
+) {
     let config = Config::from_config_file();
     let scores_directory = config.scores_directory;
     let score_files = format!("{scores_directory}/scores");
@@ -103,7 +115,11 @@ pub fn list_main(search_terms: &Vec<String>, outdated: &bool) {
                             }
                         }
 
-                        if !*outdated || !pdf {
+                        let should_display = *outdated && !pdf
+                            || *compiled && pdf
+                            || !*outdated && !*compiled;
+
+                        if should_display {
                             compositions.push(Composition {
                                 artist: artist.clone(),
                                 composition,
@@ -117,25 +133,18 @@ pub fn list_main(search_terms: &Vec<String>, outdated: &bool) {
         }
     }
 
-    println!();
-    let mut table = Table::new();
+    if !compositions.is_empty() {
+        let titles = vec![
+            "ARTIST".to_string(),
+            "COMPOSITION".to_string(),
+            "STATUS".to_string(),
+        ];
 
-    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-    table.set_titles(row!["ARTIST", "COMPOSITION", "STATUS"]);
-    compositions.sort();
-
-    for composition in compositions {
-        let artist = titlecase(&composition.artist);
-        let title = titlecase(&composition.composition);
-        let pdf = composition.pdf;
-
-        let cells: Vec<Cell> = [&artist, &title, &pdf.to_string()]
+        let rows = compositions
             .iter()
-            .map(|item| Cell::new(item))
+            .map(|composition| composition.get_row_values())
             .collect();
 
-        table.add_row(Row::new(cells));
+        print_table(titles, rows);
     }
-
-    table.printstd();
 }

@@ -37,12 +37,12 @@ fn get_templates(
 fn create_file(
     template: TemplateFile,
     parent: &String,
-    title: &mut String,
+    mut title: String,
 ) -> String {
     if let Some(filename) = template.filename {
-        *title = format!("{title}-{filename}.ily").as_mut().to_string();
+        title = format!("{title}-{filename}.ily").as_mut().to_string();
     } else {
-        *title = format!("{title}.ly")
+        title = format!("{title}.ly")
     }
 
     let filename = format!("{parent}/{title}");
@@ -97,8 +97,7 @@ pub fn create_score(
     let mut files = Vec::new();
 
     for template in templates {
-        let file =
-            create_file(template, &parent, &mut file_system_title.clone());
+        let file = create_file(template, &parent, file_system_title.clone());
         files.push(file)
     }
 

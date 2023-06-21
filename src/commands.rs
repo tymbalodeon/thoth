@@ -5,6 +5,7 @@ pub mod edit;
 pub mod list;
 pub mod open;
 mod patterns;
+mod table;
 pub mod templates;
 
 use crate::commands::templates::Template;
@@ -61,6 +62,9 @@ pub enum Commands {
     /// List pdf(s)
     List {
         scores: Vec<String>,
+
+        #[arg(long)]
+        compiled: bool,
 
         #[arg(long)]
         outdated: bool,
