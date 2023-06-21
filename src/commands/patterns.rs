@@ -2,14 +2,18 @@ use crate::config::Config;
 use glob::glob;
 use std::path::PathBuf;
 
-fn get_scores_directory_pattern() -> String {
-    let config: Config = Config::from_config_file();
-    let scores_directory = config.scores_directory;
-    format!("{scores_directory}/**/")
+fn get_base(extension: &str) -> String {
+    if extension == ".pdf" {
+        let pdfs_directory = Config::get_pdfs_directory();
+        format!("{pdfs_directory}/**/")
+    } else {
+        let scores_directory = Config::get_scores_directory();
+        format!("{scores_directory}/**/")
+    }
 }
 
 pub fn get_score_file(score: &String, extension: &str) -> Option<PathBuf> {
-    let base = get_scores_directory_pattern();
+    let base = get_base(extension);
     let pattern = format!("{base}*{score}*{extension}");
 
     for entry in glob(&pattern).expect("Failed to read glob pattern") {
@@ -25,7 +29,7 @@ pub fn get_score_file(score: &String, extension: &str) -> Option<PathBuf> {
 }
 
 pub fn get_patterns(scores: &Vec<String>, extension: &str) -> Vec<String> {
-    let base = get_scores_directory_pattern();
+    let base = get_base(extension);
 
     if !scores.is_empty() {
         scores
