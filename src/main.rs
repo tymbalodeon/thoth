@@ -6,11 +6,11 @@ use crate::commands::Commands;
 use clap::Parser;
 use commands::clean::clean_main;
 use commands::compile::compile_main;
+use commands::config::config_main;
 use commands::create::create_main;
 use commands::list::list_main;
 use commands::open::open_main;
 use commands::templates::templates_main;
-use config::config_main;
 use std::println;
 
 pub fn add_value_to_string_if_some(
