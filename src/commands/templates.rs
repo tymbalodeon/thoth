@@ -44,7 +44,7 @@ fn get_lilypond_version() -> String {
         .as_str()
         .to_owned();
 
-    format!("\\version \"{found}\"\n\n")
+    format!("\\version \"{found}\"")
 }
 
 fn get_header(
@@ -63,7 +63,7 @@ fn get_header(
     header = add_value_to_string_if_some(header, "subtitle", subtitle);
     header.push_str(format!("  composer = \"{composer}\"\n").as_str());
     header = add_value_to_string_if_some(header, "arranger", arranger);
-    header.push_str("}\n");
+    header.push_str("}");
 
     header
 }
