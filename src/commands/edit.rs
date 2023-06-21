@@ -1,4 +1,4 @@
-use super::patterns::get_score_file;
+use crate::commands::patterns::get_score_file;
 use crate::{commands::compile::compile_main, config::Config};
 use glob::glob;
 use miette::{IntoDiagnostic, Result};

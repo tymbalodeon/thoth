@@ -4,6 +4,10 @@ use prettytable::{format, Cell, Row, Table};
 use regex::Regex;
 use serde::Deserialize;
 use std::process::Command;
+pub mod form;
+pub mod lead;
+pub mod piano;
+pub mod single;
 
 #[derive(Clone, Debug, Deserialize, ValueEnum)]
 pub enum Template {
@@ -11,6 +15,11 @@ pub enum Template {
     Lead,
     Piano,
     Single,
+}
+
+pub struct TemplateFile {
+    pub filename: Option<String>,
+    pub content: String,
 }
 
 fn get_lilypond_version() -> String {
@@ -37,12 +46,6 @@ fn get_lilypond_version() -> String {
     format!("\\version \"{found}\"\n\n")
 }
 
-fn add_version_number(content: &str) -> String {
-    let mut template = get_lilypond_version();
-    template.push_str(content);
-    template
-}
-
 fn get_header(
     title: &String,
     subtitle: &Option<String>,
@@ -64,85 +67,6 @@ fn get_header(
     header
 }
 
-pub fn get_piano_template(
-    title: &String,
-    subtitle: &Option<String>,
-    composer: &String,
-    arranger: &Option<String>,
-) -> String {
-    let header = get_header(title, subtitle, composer, arranger);
-
-    let content = format!(
-        "\
-\\include \"settings.ily\"
-
-{header}
-
-key_and_time = {{
-  \\key c \\major
-  \\time 4/4
-}}
-
-upper_staff = \\relative c'' {{
-  \\key_and_time
-  | c1
-}}
-
-lower_staff = \\relative c {{
-  \\clef bass
-  \\key_and_time
-  | c1
-}}
-
-\\score {{
-  \\new PianoStaff \\with {{
-    instrumentName = \"Piano\"
-  }}
-  <<
-    \\new Staff = \"upper\" \\upper_staff
-    \\new Staff = \"lower\" \\lower_staff
-  >>
-}}"
-    );
-
-    add_version_number(&content)
-}
-
-pub fn get_single_template(
-    title: &String,
-    subtitle: &Option<String>,
-    composer: &String,
-    arranger: &Option<String>,
-    instrument: &String,
-) -> String {
-    let header = get_header(title, subtitle, composer, arranger);
-
-    let content = format!(
-        "\
-\\include \"settings.ily\"
-
-{header}
-
-music = \\relative c'' {{
-    \\key c \\major
-    \\time 4/4
-    | c1
-}}
-
-\\score {{
-    \\new Staff \\with {{
-        instrumentName = \"{instrument}\"
-        \\numericTimeSignature
-    }} {{
-        \\compressMMRests
-        \\music
-    }}
-}}"
-    );
-
-    add_version_number(&content)
-}
-
 pub fn templates_main() {
     let mut table = Table::new();
 
@@ -151,12 +75,12 @@ pub fn templates_main() {
 
     let values = vec![
         [
-            "form",
+            "Form",
             "Form chart with separate sections and form summary at the bottom",
         ],
-        ["lead", "Lead sheet showing melody and chords"],
-        ["piano", "Piano staff score"],
-        ["single", "Score for a single staff instrument"],
+        ["Lead", "Lead sheet showing melody and chords"],
+        ["Piano", "Piano staff score"],
+        ["Single", "Score for a single staff instrument"],
     ];
 
     for value in values {

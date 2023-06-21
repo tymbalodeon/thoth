@@ -1,8 +1,14 @@
-use super::edit::edit_main;
-use super::templates::{get_piano_template, get_single_template};
 use crate::add_value_to_string_if_some;
-use crate::commands::templates::Template;
-use crate::commands::templates::Template::{Form, Lead, Piano, Single};
+use crate::commands::edit::edit_main;
+use crate::commands::templates::form::get_form_templates;
+use crate::commands::templates::lead::get_lead_templates;
+use crate::commands::templates::piano::get_piano_template;
+use crate::commands::templates::single::get_single_template;
+use crate::commands::templates::{
+    Template,
+    Template::{Form, Lead, Piano, Single},
+    TemplateFile,
+};
 use crate::config::Config;
 use std::fs::{create_dir_all, File};
 use std::io::prelude::*;
@@ -15,28 +21,40 @@ fn get_templates(
     arranger: &Option<String>,
     instrument: &String,
     template: &Template,
-) -> Vec<String> {
+) -> Vec<TemplateFile> {
     match template {
-        Form => vec![get_piano_template(title, subtitle, composer, arranger)],
-        Lead => vec![get_piano_template(title, subtitle, composer, arranger)],
-        Piano => vec![get_piano_template(title, subtitle, composer, arranger)],
-        Single => vec![get_single_template(
+        Form => get_form_templates(title, subtitle, composer, arranger),
+        Lead => {
+            get_lead_templates(title, subtitle, composer, arranger, instrument)
+        }
+        Piano => get_piano_template(title, subtitle, composer, arranger),
+        Single => get_single_template(
             title, subtitle, composer, arranger, instrument,
-        )],
+        ),
     }
 }
 
-fn create_file(template: String, parent: &String, title: &String) -> String {
-    let filename = format!("{parent}/{title}.ly");
+fn create_file(
+    template: TemplateFile,
+    parent: &String,
+    title: &mut String,
+) -> String {
+    if let Some(filename) = template.filename {
+        *title = format!("{title}-{filename}.ily").as_mut().to_string();
+    } else {
+        *title = format!("{title}.ly")
+    }
+
+    let filename = format!("{parent}/{title}");
     let path = Path::new(&filename);
     let file_display = path.display();
 
     let mut file = match File::create(path) {
-        Err(message) => panic!("couldn't create {file_display}: {message}"),
         Ok(file) => file,
+        Err(message) => panic!("couldn't create {file_display}: {message}"),
     };
 
-    if let Err(message) = file.write_all(template.as_bytes()) {
+    if let Err(message) = file.write_all(template.content.as_bytes()) {
         panic!("couldn't write to {file_display}: {message}")
     };
 
@@ -75,10 +93,12 @@ pub fn create_score(
     let templates = get_templates(
         title, subtitle, composer, arranger, instrument, template,
     );
+
     let mut files = Vec::new();
 
     for template in templates {
-        let file = create_file(template, &parent, &file_system_title);
+        let file =
+            create_file(template, &parent, &mut file_system_title.clone());
         files.push(file)
     }
 
