@@ -19,7 +19,7 @@ pub fn add_value_to_string_if_some(
     value: &Option<String>,
 ) -> String {
     if let Some(value) = value {
-        let line = format!("{key} = \"{value}\"\n");
+        let line = format!("  {key} = \"{value}\"\n");
         string.push_str(&line);
     };
 

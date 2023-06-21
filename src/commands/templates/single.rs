@@ -14,7 +14,7 @@ pub fn get_single_template(
 
     let content = format!(
         "\
-\\version {lilypond_version}
+{lilypond_version}
 
 \\include \"settings.ily\"
 

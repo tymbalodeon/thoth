@@ -61,7 +61,7 @@ fn get_header(
     );
 
     header = add_value_to_string_if_some(header, "subtitle", subtitle);
-    header.push_str(format!("composer = \"{composer}\"\n").as_str());
+    header.push_str(format!("  composer = \"{composer}\"\n").as_str());
     header = add_value_to_string_if_some(header, "arranger", arranger);
     header.push_str("}\n");
 

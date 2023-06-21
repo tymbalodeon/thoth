@@ -50,7 +50,7 @@ fn get_lead_main(
 
     format!(
         "\
-\\version {lilypond_version}
+{lilypond_version}
 
 \\include \"settings.ily\"
 

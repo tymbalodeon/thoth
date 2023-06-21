@@ -26,7 +26,7 @@ fn get_form_main(
 
     format!(
         "\
-\\version {lilypond_version}
+{lilypond_version}
 
 \\include \"settings.ily\"
 \\include \"helpers/set-bars-per-line.ily\"
