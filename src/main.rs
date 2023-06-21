@@ -40,7 +40,10 @@ fn main() {
 
     match &cli.command {
         Some(Commands::Clean { scores }) => clean_main(scores),
-        Some(Commands::Compile { scores }) => compile_main(scores),
+        Some(Commands::Compile {
+            scores,
+            pdfs_directory,
+        }) => compile_main(scores, pdfs_directory),
         Some(Commands::Config { edit, path, key }) => {
             config_main(edit, path, key)
         }
@@ -52,14 +55,24 @@ fn main() {
             instrument,
             template,
             edit,
+            pdfs_directory,
         }) => {
             create_main(
-                title, subtitle, composer, arranger, instrument, template,
+                title,
+                subtitle,
+                composer,
+                arranger,
+                template,
+                instrument,
                 edit,
+                pdfs_directory,
             );
         }
-        Some(Commands::Edit { score }) => {
-            edit_main(score);
+        Some(Commands::Edit {
+            score,
+            pdfs_directory,
+        }) => {
+            edit_main(score, pdfs_directory);
         }
         Some(Commands::List {
             scores,

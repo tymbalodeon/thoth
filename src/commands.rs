@@ -17,7 +17,12 @@ pub enum Commands {
     Clean { scores: Vec<String> },
 
     /// Create pdf(s)
-    Compile { scores: Vec<String> },
+    Compile {
+        scores: Vec<String>,
+
+        #[arg(long)]
+        pdfs_directory: Option<String>,
+    },
 
     /// Display config
     Config {
@@ -54,10 +59,18 @@ pub enum Commands {
         /// Open for editing after creating
         #[arg(long)]
         edit: bool,
+
+        #[arg(long)]
+        pdfs_directory: Option<String>,
     },
 
     /// Open <score> in editor and pdf viewer, recompiling on file changes
-    Edit { score: String },
+    Edit {
+        score: String,
+
+        #[arg(long)]
+        pdfs_directory: Option<String>,
+    },
 
     /// List pdf(s)
     List {

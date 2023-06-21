@@ -135,9 +135,10 @@ pub fn create_main(
     subtitle: &Option<String>,
     composer: &Option<String>,
     arranger: &Option<String>,
-    instrument: &Option<String>,
     template: &Option<Template>,
+    instrument: &Option<String>,
     edit: &bool,
+    pdfs_directory: &Option<String>,
 ) {
     let config = Config::from_config_file();
 
@@ -166,6 +167,6 @@ pub fn create_main(
     }
 
     if *edit {
-        edit_main(&get_file_system_name(title));
+        edit_main(&get_file_system_name(title), pdfs_directory);
     }
 }

@@ -88,8 +88,8 @@ pub fn open_file(file: PathBuf) {
     Command::new("open").arg(&file).output().unwrap();
 }
 
-pub fn edit_main(score: &String) {
-    compile_main(&vec![score.to_string()]);
+pub fn edit_main(score: &String, pdfs_directory: &Option<String>) {
+    compile_main(&vec![score.to_string()], pdfs_directory);
     let lilypond_file = get_score_file(score, ".ly");
     let pdf_file = get_score_file(score, ".pdf");
 
