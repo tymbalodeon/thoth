@@ -22,7 +22,7 @@ pub fn print_table(titles: Vec<String>, mut rows: Vec<Vec<String>>) {
 
     PrettyPrinter::new()
         .input_from_bytes(table_bytes.as_bytes())
-        .theme("gruvbox-dark")
+        .colored_output(false)
         .paging_mode(PagingMode::QuitIfOneScreen)
         .print()
         .unwrap();
