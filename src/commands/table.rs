@@ -1,3 +1,4 @@
+use bat::{PagingMode, PrettyPrinter};
 use prettytable::{format, Cell, Row, Table};
 
 fn create_row(values: Vec<String>) -> Row {
@@ -17,6 +18,12 @@ pub fn print_table(titles: Vec<String>, mut rows: Vec<Vec<String>>) {
         table.add_row(create_row(row_values));
     }
 
-    println!();
-    table.printstd();
+    let table_bytes = table.to_string();
+
+    PrettyPrinter::new()
+        .input_from_bytes(table_bytes.as_bytes())
+        .theme("gruvbox-dark")
+        .paging_mode(PagingMode::QuitIfOneScreen)
+        .print()
+        .unwrap();
 }
