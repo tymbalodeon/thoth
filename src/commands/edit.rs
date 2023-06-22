@@ -3,7 +3,7 @@ use crate::{commands::compile::compile_main, config::Config};
 use glob::glob;
 use miette::{IntoDiagnostic, Result};
 use std::convert::Infallible;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use watchexec::{
     action::{Action, Outcome},
@@ -15,16 +15,25 @@ use watchexec::{
 };
 use watchexec_signals::Signal;
 
-fn get_watched_files(file: &String, scores_directory: &String) -> Vec<String> {
-    let ily_files_pattern = format!("{}/**/*.ily", scores_directory);
-    let ily_files = glob(&ily_files_pattern);
-
-    let mut watched_files: Vec<String> = ily_files
+fn get_ily_files(pattern: String) -> Vec<String> {
+    glob(&pattern)
         .expect("")
         .flatten()
         .map(|path| path.to_str().unwrap().to_string())
-        .collect();
+        .collect()
+}
 
+fn get_watched_files(file: &String) -> Vec<String> {
+    let parent = Path::new(file).parent().unwrap();
+    let score_ily_files_pattern =
+        format!("{}/**/*.ily", parent.to_str().unwrap());
+    let mut watched_files = get_ily_files(score_ily_files_pattern);
+    let scores_directory = Config::get_scores_directory();
+    let helper_ily_files_pattern =
+        format!("{}/helpers/*.ily", scores_directory);
+    let mut helper_ily_files = get_ily_files(helper_ily_files_pattern);
+
+    watched_files.append(&mut helper_ily_files);
     watched_files.push(file.to_string());
 
     watched_files
@@ -42,7 +51,7 @@ async fn watch(file: PathBuf) -> Result<()> {
     let mut runtime_config = RuntimeConfig::default();
     let file = file.to_str().unwrap().to_string();
     let config = Config::from_config_file();
-    let watched_files = get_watched_files(&file, &config.scores_directory);
+    let watched_files = get_watched_files(&file);
     runtime_config.pathset(watched_files);
 
     runtime_config.command(WatchexecCommand::Exec {

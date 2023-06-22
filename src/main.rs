@@ -86,7 +86,6 @@ fn main() {
             open_main(scores);
         }
         Some(Command::Templates { command }) => templates_main(command),
-
         _ => {
             println!("Please choose a command.")
         }
