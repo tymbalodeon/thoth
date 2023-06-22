@@ -1,13 +1,17 @@
 use crate::commands::{templates::Template, ConfigKey};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use shellexpand::tilde;
-use std::{fs::read_to_string, process::Command};
-use toml::from_str;
+use std::{
+    fs::{create_dir_all, read_to_string, write},
+    path::Path,
+    process::Command,
+};
+use toml::{from_str, to_string};
 use users::get_current_username;
 
 static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 struct ConfigFile {
     composer: Option<String>,
     scores_directory: Option<String>,
@@ -232,7 +236,13 @@ impl Config {
             ConfigKey::Instrument => config.instrument = value,
         };
 
-        let config_file = ConfigFile::from_config(config);
-        dbg!(config_file);
+        let contents = to_string(&ConfigFile::from_config(config)).unwrap();
+        let config_path = get_config_path();
+        let config_path = Path::new(&config_path);
+
+        create_dir_all(config_path.parent().unwrap()).unwrap();
+
+        write(Path::new(&config_path), contents)
+            .expect("Unable to write config");
     }
 }
