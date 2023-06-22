@@ -1,6 +1,7 @@
 use crate::commands::templates::{
     get_header, get_lilypond_version, TemplateFile,
 };
+use indoc::formatdoc;
 
 pub fn get_piano_template(
     title: &String,
@@ -11,39 +12,40 @@ pub fn get_piano_template(
     let lilypond_version = get_lilypond_version();
     let header = get_header(title, subtitle, composer, arranger);
 
-    let content = format!(
-        "\
-{lilypond_version}
+    let content = formatdoc!(
+        "
+        {lilypond_version}
 
-\\include \"settings.ily\"
+        \\include \"settings.ily\"
 
-{header}
+        {header}
 
-key_and_time = {{
-  \\key c \\major
-  \\time 4/4
-}}
+        key_and_time = {{
+          \\key c \\major
+          \\time 4/4
+        }}
 
-upper_staff = \\relative c'' {{
-  \\key_and_time
-  | c1
-}}
+        upper_staff = \\relative c'' {{
+          \\key_and_time
+          | c1
+        }}
 
-lower_staff = \\relative c {{
-  \\clef bass
-  \\key_and_time
-  | c1
-}}
+        lower_staff = \\relative c {{
+          \\clef bass
+          \\key_and_time
+          | c1
+        }}
 
-\\score {{
-  \\new PianoStaff \\with {{
-    instrumentName = \"Piano\"
-  }}
-  <<
-    \\new Staff = \"upper\" \\upper_staff
-    \\new Staff = \"lower\" \\lower_staff
-  >>
-}}"
+        \\score {{
+          \\new PianoStaff \\with {{
+            instrumentName = \"Piano\"
+          }}
+          <<
+            \\new Staff = \"upper\" \\upper_staff
+            \\new Staff = \"lower\" \\lower_staff
+          >>
+        }}
+"
     );
 
     vec![TemplateFile {

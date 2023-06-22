@@ -8,14 +8,14 @@ use crate::{
 };
 use clap::ValueEnum;
 use regex::Regex;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::process::Command;
 pub mod form;
 pub mod lead;
 pub mod piano;
 pub mod single;
 
-#[derive(Clone, Debug, Deserialize, ValueEnum)]
+#[derive(Clone, Debug, Deserialize, Serialize, ValueEnum)]
 pub enum Template {
     Form,
     Lead,

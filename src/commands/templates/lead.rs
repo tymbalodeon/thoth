@@ -1,41 +1,44 @@
 use crate::commands::templates::{
     get_header, get_lilypond_version, TemplateFile,
 };
+use indoc::formatdoc;
 
 fn get_lead_changes() -> String {
-    "\
-verse = \\chordmode {
-  | c1
-}
+    formatdoc!(
+        "
+        verse = \\chordmode {{
+          | c1
+        }}
 
-chorus = \\chordmode {
-  | c1
-}
+        chorus = \\chordmode {{
+          | c1
+        }}
 
-changes = \\chords {
-  \\verse
-  \\chorus
-}
+        changes = \\chords {{
+          \\verse
+          \\chorus
+        }}
 "
-    .to_string()
+    )
 }
 
 fn get_lead_lyrics() -> String {
-    "\
-verse = \\lyricmode {
-  Verse one
-}
+    formatdoc!(
+        "
+        verse = \\lyricmode {{
+          Verse one
+        }}
 
-chorus = \\lyricmode {
-  Chorus
-}
+        chorus = \\lyricmode {{
+          Chorus
+        }}
 
-words = \\lyricmode {
-  \\verse
-  \\chorus
-}
+        words = \\lyricmode {{
+          \\verse
+          \\chorus
+        }}
 "
-    .to_string()
+    )
 }
 
 fn get_lead_main(
@@ -48,73 +51,75 @@ fn get_lead_main(
     let lilypond_version = get_lilypond_version();
     let header = get_header(title, subtitle, composer, arranger);
 
-    format!(
-        "\
-{lilypond_version}
+    formatdoc!(
+        "
+        {lilypond_version}
 
-\\include \"settings.ily\"
+        \\include \"settings.ily\"
 
-{header}
+        {header}
 
-music = \\relative c'' {{
-    \\key c \\major
-    \\time 4/4
-    | c1
-}}
+        music = \\relative c'' {{
+            \\key c \\major
+            \\time 4/4
+            | c1
+        }}
 
-\\score {{
-    \\new Staff \\with {{
-        instrumentName = \"{instrument}\"
-        \\numericTimeSignature
-    }} {{
-        \\compressMMRests
-        \\music
-    }}
-}}
+        \\score {{
+            \\new Staff \\with {{
+                instrumentName = \"{instrument}\"
+                \\numericTimeSignature
+            }} {{
+                \\compressMMRests
+                \\music
+            }}
+        }}
 "
     )
 }
 
 fn get_lead_melody() -> String {
-    "\
-verse = \\relative c'' {
-  | c1
-}
+    formatdoc!(
+        "
+        verse = \\relative c'' {{
+          | c1
+        }}
 
-chorus = \\relative c'' {
-  | c1
-}
+        chorus = \\relative c'' {{
+          | c1
+        }}
 
-melody = {
-  \\verse
-  \\chorus
-}
+        melody = {{
+          \\verse
+          \\chorus
+        }}
 "
-    .to_string()
+    )
 }
 
 fn get_lead_structure() -> String {
-    "\
-key_and_time = {
-  \\key c \\major
-  \\time 4/4
-}
+    formatdoc!(
+        "
+        key_and_time = {{
+          \\key c \\major
+          \\time 4/4
+        }}
 
-verse = {
-  | s1 * 4
-}
+        verse = {{
+          | s1 * 4
+        }}
 
-chorus = {
-  | s1 * 4
-}
+        chorus = {{
+          | s1 * 4
+        }}
 
-structure = {
-  \\key_and_time
-  \\verse
-  \\chorus
-}
+        structure = {{
+          \\key_and_time
+          \\verse
+          \\chorus
+        }}
 "
-    .to_string()
+    )
 }
 
 pub fn get_lead_templates(
