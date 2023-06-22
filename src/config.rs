@@ -36,17 +36,33 @@ fn get_config_path() -> String {
     tilde(CONFIG_PATH).to_string()
 }
 
-fn load_config_file() -> ConfigFile {
-    let config_path =
-        if let Ok(config_path) = read_to_string(get_config_path()) {
-            config_path
-        } else {
-            "".to_owned()
-        };
+fn create_config_file() {
+    let config_path = get_config_path();
+    let path = Path::new(&config_path);
+    create_dir_all(path.parent().unwrap()).unwrap();
+    let contents = to_string(&ConfigFile::default()).unwrap();
+    write(config_path, contents).expect("Unable to write config");
+}
 
-    if let Ok(config_file) = from_str(&config_path) {
+fn load_config_file() -> ConfigFile {
+    let config_path_name = get_config_path();
+    let config_path = Path::new(&config_path_name);
+
+    if !config_path.exists() {
+        create_config_file();
+    }
+
+    let config = if let Ok(config_path) = read_to_string(config_path_name) {
+        config_path
+    } else {
+        "".to_owned()
+    };
+
+    if let Ok(config_file) = from_str(&config) {
         config_file
     } else {
+        create_config_file();
+
         ConfigFile::default()
     }
 }
@@ -237,12 +253,9 @@ impl Config {
         };
 
         let contents = to_string(&ConfigFile::from_config(config)).unwrap();
-        let config_path = get_config_path();
-        let config_path = Path::new(&config_path);
-
-        create_dir_all(config_path.parent().unwrap()).unwrap();
-
-        write(Path::new(&config_path), contents)
-            .expect("Unable to write config");
+        let config_path_name = get_config_path();
+        let config_path = Path::new(&config_path_name);
+        write(config_path, contents).expect("Unable to write config");
+        Config::display();
     }
 }
