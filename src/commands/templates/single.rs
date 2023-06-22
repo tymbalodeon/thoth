@@ -17,7 +17,7 @@ pub fn get_single_template(
         "
         {lilypond_version}
 
-        \\include \"settings.ily\"
+        \\include \"helpers/settings.ily\"
 
         {header}
 

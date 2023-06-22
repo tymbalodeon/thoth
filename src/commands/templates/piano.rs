@@ -16,7 +16,7 @@ pub fn get_piano_template(
         "
         {lilypond_version}
 
-        \\include \"settings.ily\"
+        \\include \"helpers/settings.ily\"
 
         {header}
 

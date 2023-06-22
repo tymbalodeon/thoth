@@ -18,7 +18,10 @@ fn get_modified(file: &PathBuf) -> Option<SystemTime> {
     }
 }
 
-fn is_already_compiled(input_file: &PathBuf, output_file: &PathBuf) -> bool {
+pub fn is_already_compiled(
+    input_file: &PathBuf,
+    output_file: &PathBuf,
+) -> bool {
     let input_modified = get_modified(input_file);
     let output_modified = get_modified(output_file);
 

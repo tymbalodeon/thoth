@@ -55,7 +55,7 @@ fn get_lead_main(
         "
         {lilypond_version}
 
-        \\include \"settings.ily\"
+        \\include \"helpers/settings.ily\"
 
         {header}
 

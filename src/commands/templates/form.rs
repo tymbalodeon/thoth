@@ -30,7 +30,7 @@ fn get_form_main(
         "
         {lilypond_version}
 
-        \\include \"settings.ily\"
+        \\include \"helpers/settings.ily\"
         \\include \"helpers/set-bars-per-line.ily\"
         \\include \"melody.ily\"
         \\include \"changes.ily\"

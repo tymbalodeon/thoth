@@ -5,6 +5,8 @@ use std::cmp::Ordering;
 use std::fs::{read_dir, DirEntry};
 use titlecase::titlecase;
 
+use super::compile::is_already_compiled;
+
 fn get_display(path: &DirEntry) -> String {
     let artist = String::from(path.file_name().to_str().unwrap());
     artist.replace('-', " ")
@@ -76,13 +78,13 @@ pub fn list_main(
                 let artist = get_display(&path);
 
                 for entry in read_dir(path.path()).unwrap() {
-                    let entry = entry.unwrap();
+                    let score_file = entry.unwrap();
 
-                    if entry.file_name() == ".DS_Store" {
+                    if score_file.file_name() == ".DS_Store" {
                         continue;
                     }
 
-                    let composition = get_display(&entry);
+                    let composition = get_display(&score_file);
                     let mut is_match = true;
 
                     if !search_terms.is_empty() {
@@ -100,16 +102,21 @@ pub fn list_main(
 
                     if is_match {
                         let mut pdf = false;
-                        let path =
-                            String::from(entry.file_name().to_str().unwrap());
+                        let path = String::from(
+                            score_file.file_name().to_str().unwrap(),
+                        );
                         let pdfs_directory = &config.pdfs_directory;
                         let pattern =
                             format!("{pdfs_directory}/{}*.pdf", path);
 
-                        for entry in glob(&pattern)
+                        for pdf_file in glob(&pattern)
                             .expect("Failed to read glob pattern")
+                            .flatten()
                         {
-                            if entry.is_ok() {
+                            if is_already_compiled(
+                                &score_file.path(),
+                                &pdf_file,
+                            ) {
                                 pdf = true;
                                 break;
                             }
