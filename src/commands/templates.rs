@@ -6,6 +6,7 @@ use super::{table::print_table, TemplateCommand};
 use crate::{
     add_value_to_string_if_some, commands::create::get_file_system_name,
 };
+use bat::{PagingMode, PrettyPrinter};
 use clap::ValueEnum;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -74,23 +75,39 @@ fn get_header(
     header
 }
 
+fn format_filename(filename: &Option<String>, title: &str) -> String {
+    let filename = if let Some(filename) = filename {
+        format!("{filename}.ily")
+    } else {
+        let title = get_file_system_name(title);
+        format!("{title}.ly")
+    };
+
+    let lines = "-".repeat(filename.len());
+
+    format!("% {lines}\n% {filename}\n% {lines}\n\n")
+}
+
 fn print_templates(templates: Vec<TemplateFile>, title: &str) {
+    let mut lines: String = Default::default();
+
     for (index, template) in templates.iter().enumerate() {
         if index > 0 {
-            println!();
+            lines.push('\n');
         }
 
-        let filename = if let Some(filename) = &template.filename {
-            format!("{filename}.ily")
-        } else {
-            let title = get_file_system_name(title);
-            format!("{title}.ly")
-        };
-
-        let lines = "-".repeat(filename.len());
-        println!("% {lines}\n% {filename}\n% {lines}\n");
-        println!("{}", template.content);
+        let filename = format_filename(&template.filename, title);
+        lines.push_str(&filename);
+        lines.push_str(&template.content);
+        lines.push('\n');
     }
+
+    PrettyPrinter::new()
+        .input_from_bytes(lines.as_bytes())
+        .colored_output(false)
+        .paging_mode(PagingMode::QuitIfOneScreen)
+        .print()
+        .unwrap();
 }
 
 fn show_template(template: &Template) {
