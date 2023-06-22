@@ -113,7 +113,7 @@ fn print_templates(templates: Vec<TemplateFile>, title: &str) {
 fn show_template(template: &Template) {
     let title = &"Title".to_string();
     let subtitle = &Some("Subtitle".to_string());
-    let composer = &"Compsoer".to_string();
+    let composer = &"Composer".to_string();
     let arranger = &Some("Arranger".to_string());
     let instrument = &"Instrument".to_string();
 
