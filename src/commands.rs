@@ -13,7 +13,13 @@ use crate::commands::templates::Template;
 use clap::Subcommand;
 
 #[derive(Subcommand)]
-pub enum Commands {
+pub enum TemplateCommand {
+    /// Show the template contents
+    Show { template: Template },
+}
+
+#[derive(Subcommand)]
+pub enum Command {
     /// Remove pdf(s)
     Clean { scores: Vec<String> },
 
@@ -88,5 +94,8 @@ pub enum Commands {
     Open { scores: Vec<String> },
 
     /// List template types
-    Templates,
+    Templates {
+        #[command(subcommand)]
+        command: Option<TemplateCommand>,
+    },
 }

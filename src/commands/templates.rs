@@ -1,10 +1,15 @@
-use crate::add_value_to_string_if_some;
+use self::form::get_form_templates;
+use self::lead::get_lead_templates;
+use self::piano::get_piano_template;
+use self::single::get_single_template;
+use super::{table::print_table, TemplateCommand};
+use crate::{
+    add_value_to_string_if_some, commands::create::get_file_system_name,
+};
 use clap::ValueEnum;
 use regex::Regex;
 use serde::Deserialize;
 use std::process::Command;
-
-use super::table::print_table;
 pub mod form;
 pub mod lead;
 pub mod piano;
@@ -18,6 +23,7 @@ pub enum Template {
     Single,
 }
 
+#[derive(Debug)]
 pub struct TemplateFile {
     pub filename: Option<String>,
     pub content: String,
@@ -68,7 +74,72 @@ fn get_header(
     header
 }
 
-pub fn templates_main() {
+fn print_templates(templates: Vec<TemplateFile>, title: &str) {
+    for (index, template) in templates.iter().enumerate() {
+        if index > 0 {
+            println!();
+        }
+
+        let filename = if let Some(filename) = &template.filename {
+            format!("{filename}.ily")
+        } else {
+            let title = get_file_system_name(title);
+            format!("{title}.ly")
+        };
+
+        let lines = "-".repeat(filename.len());
+        println!("% {lines}\n% {filename}\n% {lines}\n");
+        println!("{}", template.content);
+    }
+}
+
+fn show_template(template: &Template) {
+    let title = &"Title".to_string();
+    let subtitle = &Some("Subtitle".to_string());
+    let composer = &"Compsoer".to_string();
+    let arranger = &Some("Arranger".to_string());
+    let instrument = &"Instrument".to_string();
+
+    match template {
+        Template::Form => {
+            let templates =
+                get_form_templates(title, subtitle, composer, arranger);
+            print_templates(templates, title);
+        }
+        Template::Lead => {
+            let templates = get_lead_templates(
+                title, subtitle, composer, arranger, instrument,
+            );
+            print_templates(templates, title);
+        }
+        Template::Piano => {
+            let templates =
+                get_piano_template(title, subtitle, composer, arranger);
+            print_templates(templates, title);
+        }
+        Template::Single => {
+            let templates = get_single_template(
+                title, subtitle, composer, arranger, instrument,
+            );
+            print_templates(templates, title);
+        }
+    }
+}
+
+pub fn templates_main(command: &Option<TemplateCommand>) {
+    if command.is_some() {
+        match command.as_ref().unwrap() {
+            TemplateCommand::Show { template } => match template {
+                Template::Form => show_template(&Template::Form),
+                Template::Lead => show_template(&Template::Lead),
+                Template::Piano => show_template(&Template::Piano),
+                Template::Single => show_template(&Template::Single),
+            },
+        }
+
+        return;
+    }
+
     let titles = vec!["NAME".to_string(), "DESCRIPTION".to_string()];
     let rows = vec![
         [

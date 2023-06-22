@@ -61,7 +61,7 @@ fn create_file(
     filename
 }
 
-fn get_file_system_name(text: &str) -> String {
+pub fn get_file_system_name(text: &str) -> String {
     text.replace(' ', "-").to_lowercase()
 }
 
