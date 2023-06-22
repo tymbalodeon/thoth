@@ -15,6 +15,7 @@ pub mod form;
 pub mod lead;
 pub mod piano;
 pub mod single;
+use indoc::formatdoc;
 
 #[derive(Clone, Debug, Deserialize, Serialize, ValueEnum)]
 pub enum Template {
@@ -60,10 +61,10 @@ fn get_header(
     composer: &String,
     arranger: &Option<String>,
 ) -> String {
-    let mut header = format!(
-        "\
-\\header {{
-  title = \"{title}\"
+    let mut header = formatdoc!(
+        "
+        \\header {{
+          title = \"{title}\"
 "
     );
 
