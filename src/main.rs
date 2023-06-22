@@ -2,7 +2,7 @@ mod commands;
 mod config;
 
 use crate::commands::edit::edit_main;
-use crate::commands::Commands;
+use crate::commands::Command;
 use clap::Parser;
 use commands::clean::clean_main;
 use commands::compile::compile_main;
@@ -32,22 +32,22 @@ pub fn add_value_to_string_if_some(
 #[command(arg_required_else_help(true))]
 struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Option<Command>,
 }
 
 fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::Clean { scores }) => clean_main(scores),
-        Some(Commands::Compile {
+        Some(Command::Clean { scores }) => clean_main(scores),
+        Some(Command::Compile {
             scores,
             pdfs_directory,
         }) => compile_main(scores, pdfs_directory),
-        Some(Commands::Config { edit, path, key }) => {
+        Some(Command::Config { edit, path, key }) => {
             config_main(edit, path, key)
         }
-        Some(Commands::Create {
+        Some(Command::Create {
             title,
             subtitle,
             composer,
@@ -68,21 +68,21 @@ fn main() {
                 pdfs_directory,
             );
         }
-        Some(Commands::Edit {
+        Some(Command::Edit {
             score,
             pdfs_directory,
         }) => {
             edit_main(score, pdfs_directory);
         }
-        Some(Commands::List {
+        Some(Command::List {
             scores,
             outdated,
             compiled,
         }) => list_main(scores, outdated, compiled),
-        Some(Commands::Open { scores }) => {
+        Some(Command::Open { scores }) => {
             open_main(scores);
         }
-        Some(Commands::Templates) => templates_main(),
+        Some(Command::Templates { command }) => templates_main(command),
 
         _ => {
             println!("Please choose a command.")
