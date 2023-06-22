@@ -1,16 +1,33 @@
 pub mod clean;
+use clap::ValueEnum;
 pub mod compile;
 pub mod config;
 pub mod create;
 pub mod edit;
 pub mod list;
+use serde::Deserialize;
 pub mod open;
 mod patterns;
 mod table;
 pub mod templates;
-
 use crate::commands::templates::Template;
 use clap::Subcommand;
+use std::fmt::{Display, Formatter, Result};
+
+#[derive(Clone, Debug, Deserialize, ValueEnum)]
+pub enum ConfigKey {
+    Composer,
+    Instrument,
+    PDFSDirectory,
+    ScoresDirectory,
+    Template,
+}
+
+impl Display for ConfigKey {
+    fn fmt(&self, formatter: &mut Formatter) -> Result {
+        write!(formatter, "{self:?}")
+    }
+}
 
 #[derive(Subcommand)]
 pub enum TemplateCommand {
@@ -33,7 +50,10 @@ pub enum Command {
 
     /// Display config
     Config {
-        key: Option<String>,
+        key: Option<ConfigKey>,
+
+        #[arg(long)]
+        set: Option<String>,
 
         /// Open config file in editor
         #[arg(long)]

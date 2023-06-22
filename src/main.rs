@@ -44,9 +44,12 @@ fn main() {
             scores,
             pdfs_directory,
         }) => compile_main(scores, pdfs_directory),
-        Some(Command::Config { edit, path, key }) => {
-            config_main(edit, path, key)
-        }
+        Some(Command::Config {
+            edit,
+            path,
+            key,
+            set,
+        }) => config_main(edit, path, key, set),
         Some(Command::Create {
             title,
             subtitle,

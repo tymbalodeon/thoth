@@ -1,4 +1,4 @@
-use crate::commands::templates::Template;
+use crate::commands::{templates::Template, ConfigKey};
 use serde::Deserialize;
 use shellexpand::tilde;
 use std::{fs::read_to_string, process::Command};
@@ -14,6 +14,18 @@ struct ConfigFile {
     pdfs_directory: Option<String>,
     template: Option<Template>,
     instrument: Option<String>,
+}
+
+impl ConfigFile {
+    pub fn from_config(config: Config) -> Self {
+        ConfigFile {
+            composer: Some(config.composer),
+            scores_directory: Some(config.scores_directory),
+            pdfs_directory: Some(config.pdfs_directory),
+            template: Some(config.template),
+            instrument: Some(config.instrument),
+        }
+    }
 }
 
 fn get_config_path() -> String {
@@ -75,6 +87,16 @@ impl Default for Config {
             template: get_default_template(),
             instrument: get_default_instrument(),
         }
+    }
+}
+
+fn get_template_from_string(value: String) -> Option<Template> {
+    match value.as_str() {
+        "form" => Some(Template::Form),
+        "lead" => Some(Template::Lead),
+        "piano" => Some(Template::Piano),
+        "single" => Some(Template::Single),
+        _ => None,
     }
 }
 
@@ -175,8 +197,8 @@ impl Config {
             .unwrap();
     }
 
-    pub fn display_value(key: &str) {
-        match key.replace('-', "_").to_lowercase().as_str() {
+    pub fn display_value(key: &ConfigKey) {
+        match key.to_string().replace('-', "_").to_lowercase().as_str() {
             "composer" => println!("{}", Config::get_composer()),
             "instrument" => {
                 println!("{}", Config::get_instrument())
@@ -192,5 +214,25 @@ impl Config {
             }
             _ => println!("\"{key}\" is not a recognized config key"),
         };
+    }
+
+    pub fn set_value(key: &ConfigKey, value: String) {
+        let mut config = Config::from_config_file();
+
+        match key {
+            ConfigKey::Composer => config.composer = value,
+            ConfigKey::ScoresDirectory => config.scores_directory = value,
+            ConfigKey::PDFSDirectory => config.pdfs_directory = value,
+            ConfigKey::Template => {
+                let value = get_template_from_string(value);
+                if let Some(template) = value {
+                    config.template = template;
+                }
+            }
+            ConfigKey::Instrument => config.instrument = value,
+        };
+
+        let config_file = ConfigFile::from_config(config);
+        dbg!(config_file);
     }
 }
