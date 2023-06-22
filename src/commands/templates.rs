@@ -3,8 +3,9 @@ use self::lead::get_lead_templates;
 use self::piano::get_piano_template;
 use self::single::get_single_template;
 use super::{table::print_table, TemplateCommand};
-use crate::add_value_to_string_if_some;
-use bat::PrettyPrinter;
+use crate::{
+    add_value_to_string_if_some, commands::create::get_file_system_name,
+};
 use clap::ValueEnum;
 use regex::Regex;
 use serde::Deserialize;
@@ -73,23 +74,22 @@ fn get_header(
     header
 }
 
-fn print_templates(templates: Vec<TemplateFile>) {
-    for template in templates {
+fn print_templates(templates: Vec<TemplateFile>, title: &str) {
+    for (index, template) in templates.iter().enumerate() {
+        if index > 0 {
+            println!();
+        }
+
         let filename = if let Some(filename) = &template.filename {
-            filename
+            format!("{filename}.ily")
         } else {
-            "main.ly"
+            let title = get_file_system_name(title);
+            format!("{title}.ly")
         };
 
-        println!("\n{filename}\n--------\n");
-
-        PrettyPrinter::new()
-            .input_from_bytes(template.content.as_bytes())
-            .colored_output(false)
-            .print()
-            .unwrap();
-
-        println!();
+        let lines = "-".repeat(filename.len());
+        println!("% {lines}\n% {filename}\n% {lines}\n");
+        println!("{}", template.content);
     }
 }
 
@@ -104,24 +104,24 @@ fn show_template(template: &Template) {
         Template::Form => {
             let templates =
                 get_form_templates(title, subtitle, composer, arranger);
-            print_templates(templates);
+            print_templates(templates, title);
         }
         Template::Lead => {
             let templates = get_lead_templates(
                 title, subtitle, composer, arranger, instrument,
             );
-            print_templates(templates);
+            print_templates(templates, title);
         }
         Template::Piano => {
             let templates =
                 get_piano_template(title, subtitle, composer, arranger);
-            print_templates(templates);
+            print_templates(templates, title);
         }
         Template::Single => {
             let templates = get_single_template(
                 title, subtitle, composer, arranger, instrument,
             );
-            print_templates(templates);
+            print_templates(templates, title);
         }
     }
 }
