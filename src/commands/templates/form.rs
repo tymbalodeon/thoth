@@ -100,19 +100,19 @@ fn get_form_main(
 fn get_form_melody() -> String {
     formatdoc!(
         "
-        melody_verse = \\new Voice \\with {
+        melody_verse = \\new Voice \\with {{
           \\consists \"Pitch_squash_engraver\"
-        } \\relative c' {
+        }} \\relative c' {{
           \\improvisationOn
           | c1
-        }
+        }}
 
-        melody_chorus = \\new Voice \\with {
+        melody_chorus = \\new Voice \\with {{
           \\consists \"Pitch_squash_engraver\"
-        } \\relative c' {
+        }} \\relative c' {{
           \\improvisationOn
           | c1
-        }
+        }}
 "
     )
 }
@@ -120,22 +120,22 @@ fn get_form_melody() -> String {
 fn get_form_structure() -> String {
     formatdoc!(
         "
-        key_and_time = {
+        key_and_time = {{
           \\key c \\major
           \time 4/4
-        }
+        }}
 
-        structure_verse = {
+        structure_verse = {{
           \\key_and_time
           | s1 * 4
           \\bar \"||\"
-        }
+        }}
 
-        structure_chorus = {
+        structure_chorus = {{
           \\key_and_time
           | s1 * 4
           \\bar \"||\"
-        }
+        }}
         "
     )
 }

@@ -1,6 +1,7 @@
 use crate::commands::templates::{
     get_header, get_lilypond_version, TemplateFile,
 };
+use indoc::formatdoc;
 
 pub fn get_single_template(
     title: &String,
@@ -12,29 +13,30 @@ pub fn get_single_template(
     let lilypond_version = get_lilypond_version();
     let header = get_header(title, subtitle, composer, arranger);
 
-    let content = format!(
-        "\
-{lilypond_version}
+    let content = formatdoc!(
+        "
+        {lilypond_version}
 
-\\include \"settings.ily\"
+        \\include \"settings.ily\"
 
-{header}
+        {header}
 
-music = \\relative c'' {{
-    \\key c \\major
-    \\time 4/4
-    | c1
-}}
+        music = \\relative c'' {{
+            \\key c \\major
+            \\time 4/4
+            | c1
+        }}
 
-\\score {{
-    \\new Staff \\with {{
-        instrumentName = \"{instrument}\"
-        \\numericTimeSignature
-    }} {{
-        \\compressMMRests
-        \\music
-    }}
-}}"
+        \\score {{
+            \\new Staff \\with {{
+                instrumentName = \"{instrument}\"
+                \\numericTimeSignature
+            }} {{
+                \\compressMMRests
+                \\music
+            }}
+        }}
+"
     );
 
     vec![TemplateFile {
