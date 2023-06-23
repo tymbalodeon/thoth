@@ -1,6 +1,8 @@
-use crate::config::Config;
-use glob::glob;
 use std::path::PathBuf;
+
+use glob::glob;
+
+use crate::config::Config;
 
 fn get_base(extension: &str) -> String {
     if extension == ".pdf" {

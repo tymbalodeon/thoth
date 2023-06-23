@@ -1,10 +1,9 @@
-use crate::commands::patterns::get_score_file;
-use crate::{commands::compile::compile_main, config::Config};
-use glob::glob;
-use miette::{IntoDiagnostic, Result};
 use std::convert::Infallible;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+
+use glob::glob;
+use miette::{IntoDiagnostic, Result};
 use watchexec::{
     action::{Action, Outcome},
     command::Command as WatchexecCommand,
@@ -14,6 +13,9 @@ use watchexec::{
     ErrorHook, Watchexec,
 };
 use watchexec_signals::Signal;
+
+use crate::commands::patterns::get_score_file;
+use crate::{commands::compile::compile_main, config::Config};
 
 fn get_ily_files(pattern: String) -> Vec<String> {
     glob(&pattern)

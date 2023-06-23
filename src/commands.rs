@@ -1,18 +1,24 @@
 pub mod clean;
-use clap::ValueEnum;
 pub mod compile;
 pub mod config;
 pub mod create;
 pub mod edit;
+pub mod helpers;
 pub mod list;
-use serde::Deserialize;
 pub mod open;
 mod patterns;
 mod table;
 pub mod templates;
-use crate::commands::templates::Template;
-use clap::Subcommand;
+
 use std::fmt::{Display, Formatter, Result};
+
+use clap::Subcommand;
+use clap::ValueEnum;
+use convert_case::{Case::Kebab, Casing};
+use serde::Deserialize;
+
+use crate::commands::helpers::Helper;
+use crate::commands::templates::Template;
 
 #[derive(Clone, Debug, Deserialize, ValueEnum)]
 pub enum ConfigKey {
@@ -25,7 +31,8 @@ pub enum ConfigKey {
 
 impl Display for ConfigKey {
     fn fmt(&self, formatter: &mut Formatter) -> Result {
-        write!(formatter, "{self:?}")
+        let display = format!("{self:?}").to_case(Kebab);
+        write!(formatter, "{display}")
     }
 }
 
@@ -33,6 +40,12 @@ impl Display for ConfigKey {
 pub enum TemplateCommand {
     /// Show the template contents
     Show { template: Template },
+}
+
+#[derive(Subcommand)]
+pub enum HelperCommand {
+    /// Show helper file contents
+    Show { helper: Helper },
 }
 
 #[derive(Subcommand)]
@@ -117,5 +130,11 @@ pub enum Command {
     Templates {
         #[command(subcommand)]
         command: Option<TemplateCommand>,
+    },
+
+    /// List helper files
+    Helpers {
+        #[command(subcommand)]
+        command: Option<HelperCommand>,
     },
 }

@@ -1,8 +1,10 @@
-use crate::commands::patterns::get_patterns;
-use glob::glob;
 use std::fs::remove_file;
 use std::io::Write;
 use std::io::{stdin, stdout};
+
+use glob::glob;
+
+use crate::commands::patterns::get_patterns;
 
 fn confirmation_received() -> bool {
     print!("Are you sure you want to remove all pdfs? [y/n] ");

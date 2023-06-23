@@ -9,6 +9,7 @@ description = "CLI for working with LilyPond files"
 [dependencies]
 bat = "0.23.0"
 clap = { version = "4.2.7", features = ["derive"] }
+convert_case = "0.6.0"
 derivative = "2.2.0"
 glob = "0.3.1"
 indoc = "2.0.1"

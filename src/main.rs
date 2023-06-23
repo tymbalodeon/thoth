@@ -1,17 +1,19 @@
 mod commands;
 mod config;
 
-use crate::commands::edit::edit_main;
-use crate::commands::Command;
+use std::println;
+
 use clap::Parser;
 use commands::clean::clean_main;
 use commands::compile::compile_main;
 use commands::config::config_main;
 use commands::create::create_main;
+use commands::edit::edit_main;
+use commands::helpers::helpers_main;
 use commands::list::list_main;
 use commands::open::open_main;
 use commands::templates::templates_main;
-use std::println;
+use commands::Command;
 
 pub fn add_value_to_string_if_some(
     mut string: String,
@@ -86,6 +88,7 @@ fn main() {
             open_main(scores);
         }
         Some(Command::Templates { command }) => templates_main(command),
+        Some(Command::Helpers { command }) => helpers_main(command),
         _ => {
             println!("Please choose a command.")
         }
