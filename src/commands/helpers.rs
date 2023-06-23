@@ -42,9 +42,7 @@ fn display_helper_file(helper: &Helper) {
             PrettyPrinter::new()
                 .input_file(file_path)
                 .colored_output(false)
-                .header(true)
                 .line_numbers(true)
-                .grid(true)
                 .paging_mode(PagingMode::QuitIfOneScreen)
                 .print()
                 .unwrap();
