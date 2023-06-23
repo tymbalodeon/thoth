@@ -139,6 +139,7 @@ pub fn create_main(
     template: &Option<Template>,
     instrument: &Option<String>,
     edit: &bool,
+    scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
     let config = Config::from_config_file();
@@ -168,6 +169,10 @@ pub fn create_main(
     }
 
     if *edit {
-        edit_main(&get_file_system_name(title), pdfs_directory);
+        edit_main(
+            &get_file_system_name(title),
+            scores_directory,
+            pdfs_directory,
+        );
     }
 }

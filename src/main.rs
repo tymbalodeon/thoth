@@ -34,8 +34,9 @@ fn main() {
         }) => clean_main(scores, pdfs_directory),
         Some(Command::Compile {
             scores,
+            scores_directory,
             pdfs_directory,
-        }) => compile_main(scores, pdfs_directory),
+        }) => compile_main(scores, scores_directory, pdfs_directory),
         Some(Command::Config {
             edit,
             path,
@@ -50,6 +51,7 @@ fn main() {
             instrument,
             template,
             edit,
+            scores_directory,
             pdfs_directory,
         }) => {
             create_main(
@@ -60,21 +62,30 @@ fn main() {
                 template,
                 instrument,
                 edit,
+                scores_directory,
                 pdfs_directory,
             );
         }
         Some(Command::Edit {
             score,
+            scores_directory,
             pdfs_directory,
         }) => {
-            edit_main(score, pdfs_directory);
+            edit_main(score, scores_directory, pdfs_directory);
         }
         Some(Command::List {
             scores,
             outdated,
             compiled,
+            scores_directory,
             pdfs_directory,
-        }) => list_main(scores, outdated, compiled, pdfs_directory),
+        }) => list_main(
+            scores,
+            outdated,
+            compiled,
+            scores_directory,
+            pdfs_directory,
+        ),
         Some(Command::Open {
             scores,
             pdfs_directory,

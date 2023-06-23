@@ -99,10 +99,16 @@ pub fn open_file(file: PathBuf) {
     Command::new("open").arg(&file).output().unwrap();
 }
 
-pub fn edit_main(score: &String, pdfs_directory: &Option<String>) {
-    compile_main(&vec![score.to_string()], pdfs_directory);
-    let lilypond_file = get_score_file(score, ".ly", pdfs_directory);
-    let pdf_file = get_score_file(score, ".pdf", pdfs_directory);
+pub fn edit_main(
+    score: &String,
+    scores_directory: &Option<String>,
+    pdfs_directory: &Option<String>,
+) {
+    compile_main(&vec![score.to_string()], scores_directory, pdfs_directory);
+    let lilypond_file =
+        get_score_file(score, ".ly", scores_directory, pdfs_directory);
+    let pdf_file =
+        get_score_file(score, ".pdf", scores_directory, pdfs_directory);
 
     for file in [&lilypond_file, &pdf_file].into_iter().flatten() {
         open_file(file.to_path_buf());

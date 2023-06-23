@@ -75,9 +75,11 @@ fn compile_input_file(input_file: &PathBuf, pdfs_directory: &Option<String>) {
 
 fn compile_selected_scores(
     scores: &Vec<String>,
+    scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    let matching_scores = get_matching_scores(scores, ".ly", pdfs_directory);
+    let matching_scores =
+        get_matching_scores(scores, ".ly", scores_directory, pdfs_directory);
 
     if matching_scores.len() > 1 {
         let selected_items = get_selected_items(matching_scores);
@@ -94,14 +96,19 @@ fn compile_selected_scores(
     }
 }
 
-pub fn compile_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
+pub fn compile_main(
+    scores: &Vec<String>,
+    scores_directory: &Option<String>,
+    pdfs_directory: &Option<String>,
+) {
     {
         let pdfs_directory = get_pdfs_directory_from_arg(pdfs_directory);
         create_dir_all(&pdfs_directory).unwrap();
     }
 
     if scores.is_empty() {
-        let patterns = get_patterns(scores, ".ly", pdfs_directory);
+        let patterns =
+            get_patterns(scores, ".ly", scores_directory, pdfs_directory);
 
         for pattern in patterns {
             for entry in glob(&pattern).expect("Failed to read glob pattern") {
@@ -112,6 +119,6 @@ pub fn compile_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
             }
         }
     } else {
-        compile_selected_scores(scores, pdfs_directory);
+        compile_selected_scores(scores, scores_directory, pdfs_directory);
     }
 }

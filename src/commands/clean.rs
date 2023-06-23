@@ -32,7 +32,8 @@ pub fn clean_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
         return;
     };
 
-    let matching_scores = get_matching_scores(scores, ".pdf", pdfs_directory);
+    let matching_scores =
+        get_matching_scores(scores, ".pdf", &None, pdfs_directory);
 
     if matching_scores.len() > 1 {
         let selected_items = get_selected_items(matching_scores);

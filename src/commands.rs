@@ -66,6 +66,9 @@ pub enum Command {
         scores: Vec<String>,
 
         #[arg(long)]
+        scores_directory: Option<String>,
+
+        #[arg(long)]
         pdfs_directory: Option<String>,
     },
 
@@ -109,12 +112,18 @@ pub enum Command {
         edit: bool,
 
         #[arg(long)]
+        scores_directory: Option<String>,
+
+        #[arg(long)]
         pdfs_directory: Option<String>,
     },
 
     /// Open <score> in editor and pdf viewer, recompiling on file changes
     Edit {
         score: String,
+
+        #[arg(long)]
+        scores_directory: Option<String>,
 
         #[arg(long)]
         pdfs_directory: Option<String>,
@@ -129,6 +138,9 @@ pub enum Command {
 
         #[arg(long)]
         outdated: bool,
+
+        #[arg(long)]
+        scores_directory: Option<String>,
 
         #[arg(long)]
         pdfs_directory: Option<String>,
@@ -166,6 +178,16 @@ pub fn add_value_to_string_if_some(
     };
 
     string.to_string()
+}
+
+pub fn get_scores_directory_from_arg(
+    scores_directory: &Option<String>,
+) -> String {
+    if let Some(path) = scores_directory {
+        tilde(&path).to_string()
+    } else {
+        Config::get_scores_directory()
+    }
 }
 
 pub fn get_pdfs_directory_from_arg(pdfs_directory: &Option<String>) -> String {

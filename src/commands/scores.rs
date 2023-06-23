@@ -9,9 +9,11 @@ use super::patterns::get_patterns;
 pub fn get_matching_scores(
     scores: &Vec<String>,
     extension: &str,
+    scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) -> Vec<PathBuf> {
-    let patterns = get_patterns(scores, extension, pdfs_directory);
+    let patterns =
+        get_patterns(scores, extension, scores_directory, pdfs_directory);
     let mut paths = vec![];
 
     for pattern in patterns {

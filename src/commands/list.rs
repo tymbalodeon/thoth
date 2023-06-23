@@ -5,9 +5,8 @@ use glob::glob;
 use titlecase::titlecase;
 
 use super::compile::is_already_compiled;
-use super::get_pdfs_directory_from_arg;
+use super::{get_pdfs_directory_from_arg, get_scores_directory_from_arg};
 use crate::commands::table::print_table;
-use crate::config::Config;
 
 fn get_display(path: &DirEntry) -> String {
     let artist = String::from(path.file_name().to_str().unwrap());
@@ -59,9 +58,10 @@ pub fn list_main(
     search_terms: &Vec<String>,
     outdated: &bool,
     compiled: &bool,
+    scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    let scores_directory = Config::get_scores_directory();
+    let scores_directory = get_scores_directory_from_arg(scores_directory);
     let score_files = format!("{scores_directory}/scores");
     let mut compositions: Vec<Composition> = vec![];
     let scores = read_dir(&score_files);
