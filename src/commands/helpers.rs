@@ -41,7 +41,8 @@ fn display_helper_file(helper: &Helper) {
         if file_path.ends_with(file_name.as_str()) {
             PrettyPrinter::new()
                 .input_file(file_path)
-                .colored_output(false)
+                .language("lisp")
+                .theme("gruvbox-dark")
                 .line_numbers(true)
                 .paging_mode(PagingMode::QuitIfOneScreen)
                 .print()
