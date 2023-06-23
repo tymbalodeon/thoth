@@ -5,6 +5,7 @@ use glob::glob;
 use titlecase::titlecase;
 
 use super::compile::is_already_compiled;
+use super::get_pdfs_directory_from_arg;
 use crate::commands::table::print_table;
 use crate::config::Config;
 
@@ -58,9 +59,9 @@ pub fn list_main(
     search_terms: &Vec<String>,
     outdated: &bool,
     compiled: &bool,
+    pdfs_directory: &Option<String>,
 ) {
-    let config = Config::from_config_file();
-    let scores_directory = config.scores_directory;
+    let scores_directory = Config::get_scores_directory();
     let score_files = format!("{scores_directory}/scores");
     let mut compositions: Vec<Composition> = vec![];
     let scores = read_dir(&score_files);
@@ -106,7 +107,8 @@ pub fn list_main(
                         let path = String::from(
                             score_file.file_name().to_str().unwrap(),
                         );
-                        let pdfs_directory = &config.pdfs_directory;
+                        let pdfs_directory =
+                            get_pdfs_directory_from_arg(pdfs_directory);
                         let pattern =
                             format!("{pdfs_directory}/{}*.pdf", path);
 

@@ -2,7 +2,7 @@ use std::fs::{create_dir_all, File};
 use std::io::prelude::*;
 use std::path::Path;
 
-use crate::add_value_to_string_if_some;
+use super::add_value_to_string_if_some;
 use crate::commands::edit::edit_main;
 use crate::commands::templates::form::get_form_templates;
 use crate::commands::templates::lead::get_lead_templates;

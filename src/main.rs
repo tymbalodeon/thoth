@@ -15,19 +15,6 @@ use commands::open::open_main;
 use commands::templates::templates_main;
 use commands::Command;
 
-pub fn add_value_to_string_if_some(
-    mut string: String,
-    key: &str,
-    value: &Option<String>,
-) -> String {
-    if let Some(value) = value {
-        let line = format!("  {key} = \"{value}\"\n");
-        string.push_str(&line);
-    };
-
-    string.to_string()
-}
-
 #[derive(Parser)]
 #[command(about, long_about = None)]
 #[command(version)]
@@ -41,7 +28,10 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Command::Clean { scores }) => clean_main(scores),
+        Some(Command::Clean {
+            scores,
+            pdfs_directory,
+        }) => clean_main(scores, pdfs_directory),
         Some(Command::Compile {
             scores,
             pdfs_directory,
@@ -83,9 +73,13 @@ fn main() {
             scores,
             outdated,
             compiled,
-        }) => list_main(scores, outdated, compiled),
-        Some(Command::Open { scores }) => {
-            open_main(scores);
+            pdfs_directory,
+        }) => list_main(scores, outdated, compiled, pdfs_directory),
+        Some(Command::Open {
+            scores,
+            pdfs_directory,
+        }) => {
+            open_main(scores, pdfs_directory);
         }
         Some(Command::Templates { command }) => templates_main(command),
         Some(Command::Helpers { command }) => helpers_main(command),

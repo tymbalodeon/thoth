@@ -101,8 +101,8 @@ pub fn open_file(file: PathBuf) {
 
 pub fn edit_main(score: &String, pdfs_directory: &Option<String>) {
     compile_main(&vec![score.to_string()], pdfs_directory);
-    let lilypond_file = get_score_file(score, ".ly");
-    let pdf_file = get_score_file(score, ".pdf");
+    let lilypond_file = get_score_file(score, ".ly", pdfs_directory);
+    let pdf_file = get_score_file(score, ".pdf", pdfs_directory);
 
     for file in [&lilypond_file, &pdf_file].into_iter().flatten() {
         open_file(file.to_path_buf());

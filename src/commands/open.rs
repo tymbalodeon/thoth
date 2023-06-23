@@ -4,8 +4,8 @@ use glob::glob;
 
 use crate::commands::patterns::get_patterns;
 
-pub fn open_main(scores: &Vec<String>) {
-    let patterns = get_patterns(scores, ".pdf");
+pub fn open_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
+    let patterns = get_patterns(scores, ".pdf", pdfs_directory);
 
     for pattern in patterns {
         for entry in glob(&pattern).expect("Failed to read glob pattern") {

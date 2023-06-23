@@ -17,9 +17,11 @@ use clap::Subcommand;
 use clap::ValueEnum;
 use convert_case::{Case::Kebab, Casing};
 use serde::Deserialize;
+use shellexpand::tilde;
 
 use crate::commands::helpers::Helper;
 use crate::commands::templates::Template;
+use crate::config::Config;
 
 #[derive(Clone, Debug, Deserialize, ValueEnum)]
 pub enum ConfigKey {
@@ -52,7 +54,12 @@ pub enum HelperCommand {
 #[derive(Subcommand)]
 pub enum Command {
     /// Remove pdf(s)
-    Clean { scores: Vec<String> },
+    Clean {
+        scores: Vec<String>,
+
+        #[arg(long)]
+        pdfs_directory: Option<String>,
+    },
 
     /// Create pdf(s)
     Compile {
@@ -122,10 +129,18 @@ pub enum Command {
 
         #[arg(long)]
         outdated: bool,
+
+        #[arg(long)]
+        pdfs_directory: Option<String>,
     },
 
     /// Open pdf(s)
-    Open { scores: Vec<String> },
+    Open {
+        scores: Vec<String>,
+
+        #[arg(long)]
+        pdfs_directory: Option<String>,
+    },
 
     /// List template types
     Templates {
@@ -138,4 +153,25 @@ pub enum Command {
         #[command(subcommand)]
         command: Option<HelperCommand>,
     },
+}
+
+pub fn add_value_to_string_if_some(
+    mut string: String,
+    key: &str,
+    value: &Option<String>,
+) -> String {
+    if let Some(value) = value {
+        let line = format!("  {key} = \"{value}\"\n");
+        string.push_str(&line);
+    };
+
+    string.to_string()
+}
+
+pub fn get_pdfs_directory_from_arg(pdfs_directory: &Option<String>) -> String {
+    if let Some(path) = pdfs_directory {
+        tilde(&path).to_string()
+    } else {
+        Config::get_pdfs_directory()
+    }
 }

@@ -16,8 +16,8 @@ use self::lead::get_lead_templates;
 use self::piano::get_piano_template;
 use self::single::get_single_template;
 use super::{table::print_table, TemplateCommand};
-use crate::{
-    add_value_to_string_if_some, commands::create::get_file_system_name,
+use crate::commands::{
+    add_value_to_string_if_some, create::get_file_system_name,
 };
 
 #[derive(Clone, Debug, Deserialize, Serialize, ValueEnum)]

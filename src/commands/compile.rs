@@ -8,8 +8,8 @@ use std::process::Command;
 use std::time::SystemTime;
 
 use glob::glob;
-use shellexpand::tilde;
 
+use super::get_pdfs_directory_from_arg;
 use super::patterns::get_patterns;
 use super::scores::get_matching_scores;
 use super::scores::get_selected_items;
@@ -33,7 +33,9 @@ pub fn is_already_compiled(
     input_modified <= output_modified
 }
 
-fn compile_input_file(input_file: &PathBuf, pdfs_directory: &String) {
+fn compile_input_file(input_file: &PathBuf, pdfs_directory: &Option<String>) {
+    let pdfs_directory = &get_pdfs_directory_from_arg(pdfs_directory);
+
     if let Some(file) = input_file.to_str() {
         let output_file_pattern = format!(
             "{pdfs_directory}/*{}*.pdf",
@@ -71,8 +73,11 @@ fn compile_input_file(input_file: &PathBuf, pdfs_directory: &String) {
     }
 }
 
-fn compile_selected_scores(scores: &Vec<String>, pdfs_directory: &String) {
-    let matching_scores = get_matching_scores(scores, ".ly");
+fn compile_selected_scores(
+    scores: &Vec<String>,
+    pdfs_directory: &Option<String>,
+) {
+    let matching_scores = get_matching_scores(scores, ".ly", pdfs_directory);
 
     if matching_scores.len() > 1 {
         let selected_items = get_selected_items(matching_scores);
@@ -90,26 +95,23 @@ fn compile_selected_scores(scores: &Vec<String>, pdfs_directory: &String) {
 }
 
 pub fn compile_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
-    let pdfs_directory = if let Some(path) = pdfs_directory {
-        tilde(&path).to_string()
-    } else {
-        Config::get_pdfs_directory()
-    };
-
-    create_dir_all(&pdfs_directory).unwrap();
+    {
+        let pdfs_directory = get_pdfs_directory_from_arg(pdfs_directory);
+        create_dir_all(&pdfs_directory).unwrap();
+    }
 
     if scores.is_empty() {
-        let patterns = get_patterns(scores, ".ly");
+        let patterns = get_patterns(scores, ".ly", pdfs_directory);
 
         for pattern in patterns {
             for entry in glob(&pattern).expect("Failed to read glob pattern") {
                 match entry {
-                    Ok(path) => compile_input_file(&path, &pdfs_directory),
+                    Ok(path) => compile_input_file(&path, pdfs_directory),
                     Err(message) => println!("{:?}", message),
                 }
             }
         }
     } else {
-        compile_selected_scores(scores, &pdfs_directory);
+        compile_selected_scores(scores, pdfs_directory);
     }
 }

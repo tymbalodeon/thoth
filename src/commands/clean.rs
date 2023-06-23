@@ -27,12 +27,12 @@ fn remove_score(path: &Path) {
     };
 }
 
-pub fn clean_main(scores: &Vec<String>) {
+pub fn clean_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
     if scores.is_empty() && !received_confirmation() {
         return;
     };
 
-    let matching_scores = get_matching_scores(scores, ".pdf");
+    let matching_scores = get_matching_scores(scores, ".pdf", pdfs_directory);
 
     if matching_scores.len() > 1 {
         let selected_items = get_selected_items(matching_scores);
