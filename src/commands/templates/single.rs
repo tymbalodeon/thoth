@@ -1,7 +1,8 @@
+use indoc::formatdoc;
+
 use crate::commands::templates::{
     get_header, get_lilypond_version, TemplateFile,
 };
-use indoc::formatdoc;
 
 pub fn get_single_template(
     title: &String,

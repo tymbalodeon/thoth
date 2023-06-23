@@ -1,6 +1,8 @@
-use crate::commands::patterns::get_patterns;
-use glob::glob;
 use std::process::Command;
+
+use glob::glob;
+
+use crate::commands::patterns::get_patterns;
 
 pub fn open_main(scores: &Vec<String>) {
     let patterns = get_patterns(scores, ".pdf");

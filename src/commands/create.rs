@@ -1,3 +1,7 @@
+use std::fs::{create_dir_all, File};
+use std::io::prelude::*;
+use std::path::Path;
+
 use crate::add_value_to_string_if_some;
 use crate::commands::edit::edit_main;
 use crate::commands::templates::form::get_form_templates;
@@ -10,9 +14,6 @@ use crate::commands::templates::{
     TemplateFile,
 };
 use crate::config::Config;
-use std::fs::{create_dir_all, File};
-use std::io::prelude::*;
-use std::path::Path;
 
 fn get_templates(
     title: &String,

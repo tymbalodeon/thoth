@@ -1,11 +1,12 @@
-use crate::commands::table::print_table;
-use crate::config::Config;
-use glob::glob;
 use std::cmp::Ordering;
 use std::fs::{read_dir, DirEntry};
+
+use glob::glob;
 use titlecase::titlecase;
 
 use super::compile::is_already_compiled;
+use crate::commands::table::print_table;
+use crate::config::Config;
 
 fn get_display(path: &DirEntry) -> String {
     let artist = String::from(path.file_name().to_str().unwrap());

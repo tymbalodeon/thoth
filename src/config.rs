@@ -1,13 +1,15 @@
-use crate::commands::{templates::Template, ConfigKey};
-use serde::{Deserialize, Serialize};
-use shellexpand::tilde;
 use std::{
     fs::{create_dir_all, read_to_string, write},
     path::Path,
     process::Command,
 };
+
+use serde::{Deserialize, Serialize};
+use shellexpand::tilde;
 use toml::{from_str, to_string};
 use users::get_current_username;
+
+use crate::commands::{templates::Template, ConfigKey};
 
 static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
 

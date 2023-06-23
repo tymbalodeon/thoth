@@ -1,3 +1,16 @@
+pub mod form;
+pub mod lead;
+pub mod piano;
+pub mod single;
+
+use std::process::Command;
+
+use bat::{PagingMode, PrettyPrinter};
+use clap::ValueEnum;
+use indoc::formatdoc;
+use regex::Regex;
+use serde::{Deserialize, Serialize};
+
 use self::form::get_form_templates;
 use self::lead::get_lead_templates;
 use self::piano::get_piano_template;
@@ -6,16 +19,6 @@ use super::{table::print_table, TemplateCommand};
 use crate::{
     add_value_to_string_if_some, commands::create::get_file_system_name,
 };
-use bat::{PagingMode, PrettyPrinter};
-use clap::ValueEnum;
-use regex::Regex;
-use serde::{Deserialize, Serialize};
-use std::process::Command;
-pub mod form;
-pub mod lead;
-pub mod piano;
-pub mod single;
-use indoc::formatdoc;
 
 #[derive(Clone, Debug, Deserialize, Serialize, ValueEnum)]
 pub enum Template {
@@ -147,12 +150,7 @@ fn show_template(template: &Template) {
 pub fn templates_main(command: &Option<TemplateCommand>) {
     if command.is_some() {
         match command.as_ref().unwrap() {
-            TemplateCommand::Show { template } => match template {
-                Template::Form => show_template(&Template::Form),
-                Template::Lead => show_template(&Template::Lead),
-                Template::Piano => show_template(&Template::Piano),
-                Template::Single => show_template(&Template::Single),
-            },
+            TemplateCommand::Show { template } => show_template(template),
         }
 
         return;

@@ -1,7 +1,3 @@
-use crate::commands::patterns::get_patterns;
-use crate::config::Config;
-use glob::glob;
-use shellexpand::tilde;
 use std::fs::create_dir_all;
 use std::fs::metadata;
 use std::io::{self, Write};
@@ -9,6 +5,12 @@ use std::path::PathBuf;
 use std::println;
 use std::process::Command;
 use std::time::SystemTime;
+
+use glob::glob;
+use shellexpand::tilde;
+
+use crate::commands::patterns::get_patterns;
+use crate::config::Config;
 
 fn get_modified(file: &PathBuf) -> Option<SystemTime> {
     if let Ok(file_metadata) = metadata(file) {
