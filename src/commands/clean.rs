@@ -1,14 +1,9 @@
 use std::fs::remove_file;
-use std::io::Cursor;
 use std::io::Write;
 use std::io::{stdin, stdout};
 use std::path::Path;
-use std::path::PathBuf;
 
-use glob::glob;
-use skim::prelude::*;
-
-use crate::commands::patterns::get_patterns;
+use crate::commands::scores::{get_matching_scores, get_selected_items};
 
 fn received_confirmation() -> bool {
     print!("Are you sure you want to remove all pdfs? [y/n] ");
@@ -22,48 +17,11 @@ fn received_confirmation() -> bool {
     response.replace('\n', "").to_lowercase().eq("y")
 }
 
-fn get_matching_scores(scores: &Vec<String>) -> Vec<PathBuf> {
-    let patterns = get_patterns(scores, ".pdf");
-    let mut paths = vec![];
-
-    for pattern in patterns {
-        for entry in glob(&pattern).expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => {
-                    paths.push(path);
-                }
-                Err(message) => println!("{:?}", message),
-            }
-        }
-    }
-
-    paths
-}
-
-fn get_items(paths: Vec<PathBuf>) -> Option<Receiver<Arc<dyn SkimItem>>> {
-    let paths: Vec<&str> =
-        paths.iter().map(|path| path.to_str().unwrap()).collect();
-    let input = paths.join("\n");
-    let item_reader = SkimItemReader::default();
-
-    Some(item_reader.of_bufread(Cursor::new(input)))
-}
-
-fn get_selected_items(
-    matching_scores: Vec<PathBuf>,
-) -> Vec<Arc<dyn SkimItem>> {
-    let options = SkimOptionsBuilder::default().multi(true).build().unwrap();
-    let selections = get_items(matching_scores);
-
-    Skim::run_with(&options, selections)
-        .map(|out| out.selected_items)
-        .unwrap_or_else(Vec::new)
-}
-
 fn remove_score(path: &Path) {
-    if let Err(error) = remove_file(path) {
-        println!("Removed {}", path.display());
-        println!("Failed to remove {} ({error})", path.display());
+    if let Err(message) = remove_file(path) {
+        let display = path.display();
+        println!("Removed {display}");
+        println!("Failed to remove {display} ({message})");
     } else {
         println!("Removed {}", path.display());
     };
@@ -74,7 +32,7 @@ pub fn clean_main(scores: &Vec<String>) {
         return;
     };
 
-    let matching_scores = get_matching_scores(scores);
+    let matching_scores = get_matching_scores(scores, ".pdf");
 
     if matching_scores.len() > 1 {
         let selected_items = get_selected_items(matching_scores);

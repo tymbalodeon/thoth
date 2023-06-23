@@ -1,6 +1,7 @@
 use std::fs::create_dir_all;
 use std::fs::metadata;
 use std::io::{self, Write};
+use std::path::Path;
 use std::path::PathBuf;
 use std::println;
 use std::process::Command;
@@ -9,7 +10,9 @@ use std::time::SystemTime;
 use glob::glob;
 use shellexpand::tilde;
 
-use crate::commands::patterns::get_patterns;
+use super::patterns::get_patterns;
+use super::scores::get_matching_scores;
+use super::scores::get_selected_items;
 use crate::config::Config;
 
 fn get_modified(file: &PathBuf) -> Option<SystemTime> {
@@ -31,8 +34,6 @@ pub fn is_already_compiled(
 }
 
 fn compile_input_file(input_file: &PathBuf, pdfs_directory: &String) {
-    create_dir_all(pdfs_directory).unwrap();
-
     if let Some(file) = input_file.to_str() {
         let output_file_pattern = format!(
             "{pdfs_directory}/*{}*.pdf",
@@ -70,6 +71,24 @@ fn compile_input_file(input_file: &PathBuf, pdfs_directory: &String) {
     }
 }
 
+fn compile_selected_scores(scores: &Vec<String>, pdfs_directory: &String) {
+    let matching_scores = get_matching_scores(scores, ".ly");
+
+    if matching_scores.len() > 1 {
+        let selected_items = get_selected_items(matching_scores);
+
+        for item in selected_items.iter() {
+            let path = item.output().to_string();
+            let path = Path::new(&path);
+            compile_input_file(&path.to_path_buf(), pdfs_directory);
+        }
+    } else {
+        for score in matching_scores {
+            compile_input_file(&score, pdfs_directory);
+        }
+    }
+}
+
 pub fn compile_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
     let pdfs_directory = if let Some(path) = pdfs_directory {
         tilde(&path).to_string()
@@ -77,16 +96,20 @@ pub fn compile_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
         Config::get_pdfs_directory()
     };
 
-    let patterns = get_patterns(scores, ".ly");
+    create_dir_all(&pdfs_directory).unwrap();
 
-    for pattern in patterns {
-        for entry in glob(&pattern).expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => {
-                    compile_input_file(&path, &pdfs_directory);
+    if scores.is_empty() {
+        let patterns = get_patterns(scores, ".ly");
+
+        for pattern in patterns {
+            for entry in glob(&pattern).expect("Failed to read glob pattern") {
+                match entry {
+                    Ok(path) => compile_input_file(&path, &pdfs_directory),
+                    Err(message) => println!("{:?}", message),
                 }
-                Err(error) => println!("{error}"),
             }
         }
+    } else {
+        compile_selected_scores(scores, &pdfs_directory);
     }
 }

@@ -7,6 +7,7 @@ pub mod helpers;
 pub mod list;
 pub mod open;
 mod patterns;
+mod scores;
 mod table;
 pub mod templates;
 
