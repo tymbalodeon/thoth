@@ -49,8 +49,9 @@ fn get_items(paths: Vec<PathBuf>) -> Option<Receiver<Arc<dyn SkimItem>>> {
     Some(item_reader.of_bufread(Cursor::new(input)))
 }
 
-fn get_selected_items(scores: &Vec<String>) -> Vec<Arc<dyn SkimItem>> {
-    let matching_scores = get_matching_scores(scores);
+fn get_selected_items(
+    matching_scores: Vec<PathBuf>,
+) -> Vec<Arc<dyn SkimItem>> {
     let options = SkimOptionsBuilder::default().multi(true).build().unwrap();
     let selections = get_items(matching_scores);
 
@@ -59,22 +60,33 @@ fn get_selected_items(scores: &Vec<String>) -> Vec<Arc<dyn SkimItem>> {
         .unwrap_or_else(Vec::new)
 }
 
+fn remove_score(path: &Path) {
+    if let Err(error) = remove_file(path) {
+        println!("Removed {}", path.display());
+        println!("Failed to remove {} ({error})", path.display());
+    } else {
+        println!("Removed {}", path.display());
+    };
+}
+
 pub fn clean_main(scores: &Vec<String>) {
     if scores.is_empty() && !received_confirmation() {
         return;
     };
 
-    let selected_items = get_selected_items(scores);
+    let matching_scores = get_matching_scores(scores);
 
-    for item in selected_items.iter() {
-        let path = item.output().to_string();
-        let path = Path::new(&path);
+    if matching_scores.len() > 1 {
+        let selected_items = get_selected_items(matching_scores);
 
-        if let Err(error) = remove_file(path) {
-            println!("Removed {}", path.display());
-            println!("Failed to remove {} ({error})", path.display());
-        } else {
-            println!("Removed {}", path.display());
-        };
+        for item in selected_items.iter() {
+            let path = item.output().to_string();
+            let path = Path::new(&path);
+            remove_score(path);
+        }
+    } else {
+        for score in matching_scores {
+            remove_score(score.as_path());
+        }
     }
 }
