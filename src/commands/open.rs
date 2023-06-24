@@ -1,27 +1,61 @@
 use std::process::Command;
 
-use crate::commands::scores::{get_matching_scores, get_selected_items};
+use crate::commands::scores::get_matching_scores;
+
+use super::{
+    scores::{get_selected_lilypond_files, get_selected_pdf_files},
+    ScoreFileType,
+};
 
 fn open_file(file_path: &String) {
     Command::new("open").arg(file_path).output().unwrap();
     println!("Opened {file_path}");
 }
 
-pub fn open_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
-    let matching_scores =
-        get_matching_scores(scores, ".pdf", &None, pdfs_directory);
+pub fn open_main(
+    scores: &Vec<String>,
+    file_type: &Option<ScoreFileType>,
+    scores_directory: &Option<String>,
+    pdfs_directory: &Option<String>,
+) {
+    let matching_files = match file_type {
+        Some(ScoreFileType::Both) => {
+            let mut ly_files = get_selected_lilypond_files(
+                scores,
+                scores_directory,
+                pdfs_directory,
+            );
 
-    if matching_scores.len() > 1 {
-        let selected_items = get_selected_items(matching_scores, true);
+            let file_stems: Vec<String> = ly_files
+                .iter()
+                .map(|file| {
+                    file.file_stem().unwrap().to_str().unwrap().to_string()
+                })
+                .collect();
 
-        for item in selected_items.iter() {
-            let path = item.output().to_string();
-            open_file(&path);
+            let pdfs = get_matching_scores(
+                &file_stems,
+                ".pdf",
+                &None,
+                pdfs_directory,
+            );
+
+            ly_files.extend(pdfs);
+
+            ly_files
         }
-    } else {
-        for score in matching_scores {
-            let path = score.to_str().unwrap().to_string();
-            open_file(&path);
+        Some(ScoreFileType::Lilypond) => get_selected_lilypond_files(
+            scores,
+            scores_directory,
+            pdfs_directory,
+        ),
+        Some(ScoreFileType::Pdf) | None => {
+            get_selected_pdf_files(scores, scores_directory, pdfs_directory)
         }
+    };
+
+    for file in matching_files {
+        let path = file.to_str().unwrap().to_string();
+        open_file(&path);
     }
 }

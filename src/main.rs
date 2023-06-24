@@ -88,9 +88,11 @@ fn main() {
         ),
         Some(Command::Open {
             scores,
+            file_type,
+            scores_directory,
             pdfs_directory,
         }) => {
-            open_main(scores, pdfs_directory);
+            open_main(scores, file_type, scores_directory, pdfs_directory);
         }
         Some(Command::Templates { command }) => templates_main(command),
         Some(Command::Helpers { command }) => helpers_main(command),

@@ -50,3 +50,48 @@ pub fn get_selected_items(
         .map(|output| output.selected_items)
         .unwrap_or_else(Vec::new)
 }
+
+fn convert_to_path_bufs(items: Vec<Arc<dyn SkimItem>>) -> Vec<PathBuf> {
+    items
+        .iter()
+        .map(|item| PathBuf::from(item.output().to_string()))
+        .collect()
+}
+
+pub fn get_selected_scores(
+    scores: &Vec<String>,
+    extension: &str,
+    scores_directory: &Option<String>,
+    pdfs_directory: &Option<String>,
+) -> Vec<PathBuf> {
+    let matching_files = get_matching_scores(
+        scores,
+        extension,
+        scores_directory,
+        pdfs_directory,
+    );
+
+    if matching_files.len() > 1 {
+        let selected_items = get_selected_items(matching_files, true);
+
+        convert_to_path_bufs(selected_items)
+    } else {
+        matching_files
+    }
+}
+
+pub fn get_selected_lilypond_files(
+    scores: &Vec<String>,
+    scores_directory: &Option<String>,
+    pdfs_directory: &Option<String>,
+) -> Vec<PathBuf> {
+    get_selected_scores(scores, ".ly", scores_directory, pdfs_directory)
+}
+
+pub fn get_selected_pdf_files(
+    scores: &Vec<String>,
+    scores_directory: &Option<String>,
+    pdfs_directory: &Option<String>,
+) -> Vec<PathBuf> {
+    get_selected_scores(scores, ".pdf", scores_directory, pdfs_directory)
+}

@@ -39,6 +39,13 @@ impl Display for ConfigKey {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, ValueEnum)]
+pub enum ScoreFileType {
+    Both,
+    Lilypond,
+    Pdf,
+}
+
 #[derive(Subcommand)]
 pub enum TemplateCommand {
     /// Show the template contents
@@ -149,6 +156,12 @@ pub enum Command {
     /// Open pdf(s)
     Open {
         scores: Vec<String>,
+
+        #[arg(long)]
+        file_type: Option<ScoreFileType>,
+
+        #[arg(long)]
+        scores_directory: Option<String>,
 
         #[arg(long)]
         pdfs_directory: Option<String>,
