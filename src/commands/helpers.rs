@@ -18,8 +18,8 @@ pub enum Helper {
     BarNumbersCenter,
     BarNumbersLeft,
     CalculateGlissandoSlope,
-    FakeBassClef,
-    FakeTrebleClef,
+    FakeClefBass,
+    FakeClefTreble,
     HalfBracket,
     MoveArticulationsBelow,
     RemoveFingerings,
@@ -74,11 +74,11 @@ pub fn helpers_main(command: &Option<HelperCommand>) {
         ],
         ["calculate-glissando-slope", "Custom glissando"],
         [
-            "fake-bass-clef",
+            "fake-clef-bass",
             "Display bass clef that doesn't affect the input notes",
         ],
         [
-            "fake-treble-clef",
+            "fake-clef-treble",
             "Display treble clef that doesn't affect the input notes",
         ],
         [
