@@ -153,7 +153,7 @@ pub enum Command {
         pdfs_directory: Option<String>,
     },
 
-    /// Open pdf(s)
+    /// Open score(s)
     Open {
         scores: Vec<String>,
 
