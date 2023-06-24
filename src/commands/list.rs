@@ -1,4 +1,3 @@
-use std::cmp::Ordering;
 use std::fs::{read_dir, DirEntry};
 
 use glob::glob;
@@ -8,49 +7,25 @@ use super::compile::is_already_compiled;
 use super::{get_pdfs_directory_from_arg, get_scores_directory_from_arg};
 use crate::commands::table::print_table;
 
-fn get_display(path: &DirEntry) -> String {
+fn convert_path_to_string(path: &DirEntry) -> String {
     let artist = String::from(path.file_name().to_str().unwrap());
     artist.replace('-', " ")
 }
 
-#[derive(Eq)]
+#[derive(Eq, PartialEq, Ord, PartialOrd)]
 struct Composition {
     artist: String,
     title: String,
-    pdf: bool,
+    is_compiled: bool,
 }
 
 impl Composition {
-    fn remove_leading_the(&self) -> String {
-        self.artist.replace("the ", "")
-    }
-
     fn get_row_values(&self) -> Vec<String> {
         let artist = titlecase(&self.artist);
         let title = titlecase(&self.title);
-        let pdf = self.pdf.to_string();
+        let pdf = self.is_compiled.to_string();
 
         vec![artist, title, pdf]
-    }
-}
-
-impl Ord for Composition {
-    fn cmp(&self, other: &Self) -> Ordering {
-        let self_artist = self.remove_leading_the();
-        let other_artist = other.remove_leading_the();
-        self_artist.cmp(&other_artist)
-    }
-}
-
-impl PartialOrd for Composition {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl PartialEq for Composition {
-    fn eq(&self, other: &Self) -> bool {
-        self.artist == other.artist
     }
 }
 
@@ -77,7 +52,7 @@ pub fn list_main(
                     continue;
                 }
 
-                let artist = get_display(&path);
+                let artist = convert_path_to_string(&path);
 
                 for entry in read_dir(path.path()).unwrap() {
                     let score_file = entry.unwrap();
@@ -86,7 +61,7 @@ pub fn list_main(
                         continue;
                     }
 
-                    let composition = get_display(&score_file);
+                    let composition = convert_path_to_string(&score_file);
                     let mut is_match = true;
 
                     if !search_terms.is_empty() {
@@ -133,7 +108,7 @@ pub fn list_main(
                             compositions.push(Composition {
                                 artist: artist.clone(),
                                 title: composition,
-                                pdf,
+                                is_compiled: pdf,
                             });
                         }
                     }
@@ -144,7 +119,7 @@ pub fn list_main(
     }
 
     if !compositions.is_empty() {
-        let titles = vec![
+        let header = vec![
             "ARTIST".to_string(),
             "TITLE".to_string(),
             "STATUS".to_string(),
@@ -155,6 +130,6 @@ pub fn list_main(
             .map(|composition| composition.get_row_values())
             .collect();
 
-        print_table(titles, rows);
+        print_table(header, rows);
     }
 }
