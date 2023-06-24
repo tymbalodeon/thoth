@@ -15,6 +15,15 @@ use crate::commands::templates::{
 };
 use crate::config::Config;
 
+pub struct ScoreFileSettings<'a> {
+    pub title: &'a String,
+    pub subtitle: &'a Option<String>,
+    pub composer: &'a Option<String>,
+    pub arranger: &'a Option<String>,
+    pub template: &'a Option<Template>,
+    pub instrument: &'a Option<String>,
+}
+
 fn get_templates(
     title: &String,
     subtitle: &Option<String>,
@@ -132,16 +141,18 @@ pub fn print_score_info(
 }
 
 pub fn create_main(
-    title: &String,
-    subtitle: &Option<String>,
-    composer: &Option<String>,
-    arranger: &Option<String>,
-    template: &Option<Template>,
-    instrument: &Option<String>,
+    settings: ScoreFileSettings,
     edit: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
+    let title = settings.title;
+    let subtitle = settings.subtitle;
+    let composer = settings.composer;
+    let arranger = settings.arranger;
+    let template = settings.template;
+    let instrument = settings.instrument;
+
     let config = Config::from_config_file();
 
     let template = if let Some(template) = template {

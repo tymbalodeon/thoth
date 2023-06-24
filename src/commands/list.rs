@@ -16,7 +16,7 @@ fn get_display(path: &DirEntry) -> String {
 #[derive(Eq)]
 struct Composition {
     artist: String,
-    composition: String,
+    title: String,
     pdf: bool,
 }
 
@@ -27,7 +27,7 @@ impl Composition {
 
     fn get_row_values(&self) -> Vec<String> {
         let artist = titlecase(&self.artist);
-        let title = titlecase(&self.composition);
+        let title = titlecase(&self.title);
         let pdf = self.pdf.to_string();
 
         vec![artist, title, pdf]
@@ -132,7 +132,7 @@ pub fn list_main(
                         if should_display {
                             compositions.push(Composition {
                                 artist: artist.clone(),
-                                composition,
+                                title: composition,
                                 pdf,
                             });
                         }
@@ -146,7 +146,7 @@ pub fn list_main(
     if !compositions.is_empty() {
         let titles = vec![
             "ARTIST".to_string(),
-            "COMPOSITION".to_string(),
+            "TITLE".to_string(),
             "STATUS".to_string(),
         ];
 

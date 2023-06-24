@@ -7,7 +7,7 @@ use clap::Parser;
 use commands::clean::clean_main;
 use commands::compile::compile_main;
 use commands::config::config_main;
-use commands::create::create_main;
+use commands::create::{create_main, ScoreFileSettings};
 use commands::edit::edit_main;
 use commands::helpers::helpers_main;
 use commands::list::list_main;
@@ -54,17 +54,16 @@ fn main() {
             scores_directory,
             pdfs_directory,
         }) => {
-            create_main(
+            let settings = ScoreFileSettings {
                 title,
                 subtitle,
                 composer,
                 arranger,
                 template,
                 instrument,
-                edit,
-                scores_directory,
-                pdfs_directory,
-            );
+            };
+
+            create_main(settings, edit, scores_directory, pdfs_directory);
         }
         Some(Command::Edit {
             score,
