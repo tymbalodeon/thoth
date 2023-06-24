@@ -41,11 +41,12 @@ fn get_items(paths: Vec<PathBuf>) -> Option<Receiver<Arc<dyn SkimItem>>> {
 
 pub fn get_selected_items(
     matching_scores: Vec<PathBuf>,
+    multi: bool,
 ) -> Vec<Arc<dyn SkimItem>> {
-    let options = SkimOptionsBuilder::default().multi(true).build().unwrap();
+    let options = SkimOptionsBuilder::default().multi(multi).build().unwrap();
     let selections = get_items(matching_scores);
 
     Skim::run_with(&options, selections)
-        .map(|out| out.selected_items)
+        .map(|output| output.selected_items)
         .unwrap_or_else(Vec::new)
 }

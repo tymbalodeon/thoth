@@ -36,7 +36,7 @@ pub fn clean_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
         get_matching_scores(scores, ".pdf", &None, pdfs_directory);
 
     if matching_scores.len() > 1 {
-        let selected_items = get_selected_items(matching_scores);
+        let selected_items = get_selected_items(matching_scores, true);
 
         for item in selected_items.iter() {
             let path = item.output().to_string();

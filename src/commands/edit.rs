@@ -15,7 +15,10 @@ use watchexec::{
 use watchexec_signals::Signal;
 
 use crate::commands::patterns::get_score_file;
-use crate::{commands::compile::compile_main, config::Config};
+use crate::config::Config;
+
+use super::compile::compile_input_file;
+use super::scores::{get_matching_scores, get_selected_items};
 
 fn get_ily_files(pattern: String) -> Vec<String> {
     glob(&pattern)
@@ -99,22 +102,57 @@ pub fn open_file(file: PathBuf) {
     Command::new("open").arg(&file).output().unwrap();
 }
 
+fn edit_file(
+    lilypond_file: String,
+    scores_directory: &Option<String>,
+    pdfs_directory: &Option<String>,
+) {
+    let score_path = PathBuf::from(&lilypond_file);
+    compile_input_file(&score_path, scores_directory, pdfs_directory);
+
+    let pdf_file = get_score_file(
+        &score_path
+            .file_stem()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string(),
+        ".pdf",
+        scores_directory,
+        pdfs_directory,
+    )
+    .unwrap();
+
+    for file in vec![&score_path, &pdf_file].iter() {
+        open_file(file.to_path_buf());
+    }
+
+    watch(score_path).unwrap();
+}
+
 pub fn edit_main(
     score: &String,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    compile_main(&vec![score.to_string()], scores_directory, pdfs_directory);
-    let lilypond_file =
-        get_score_file(score, ".ly", scores_directory, pdfs_directory);
-    let pdf_file =
-        get_score_file(score, ".pdf", scores_directory, pdfs_directory);
+    let matching_scores = get_matching_scores(
+        &vec![score.to_string()],
+        ".ly",
+        scores_directory,
+        pdfs_directory,
+    );
 
-    for file in [&lilypond_file, &pdf_file].into_iter().flatten() {
-        open_file(file.to_path_buf());
-    }
+    if matching_scores.len() > 1 {
+        let selected_scores = get_selected_items(matching_scores, false);
 
-    if let Some(path) = lilypond_file {
-        watch(path).unwrap();
+        for score in selected_scores.iter() {
+            let score = score.output().to_string();
+            edit_file(score, scores_directory, pdfs_directory);
+        }
+    } else {
+        for score in matching_scores {
+            let score = score.to_str().unwrap().to_string();
+            edit_file(score, scores_directory, pdfs_directory);
+        }
     }
 }
