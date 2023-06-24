@@ -15,6 +15,8 @@ pub enum Helper {
     AddArticulations,
     AddFingerings,
     AddStringNumbers,
+    BarNumbersCenter,
+    BarNumbersLeft,
     CalculateGlissandoSlope,
     FakeBassClef,
     FakeTrebleClef,
@@ -65,6 +67,11 @@ pub fn helpers_main(command: &Option<HelperCommand>) {
         ["add-articulations", "Add articulations"],
         ["add-fingerings", "Add fingerings"],
         ["add-string-numbers", "Add string numbers"],
+        ["bar-numbers-center", "Center bar numbers"],
+        [
+            "bar-numbers-left",
+            "Left algin bar numbers (will appear above the clef)",
+        ],
         ["calculate-glissando-slope", "Custom glissando"],
         [
             "fake-bass-clef",
