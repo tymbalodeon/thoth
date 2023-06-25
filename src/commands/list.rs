@@ -50,6 +50,8 @@ pub fn list_main(
     search_terms: &Vec<String>,
     outdated: &bool,
     compiled: &bool,
+    search_artist: &bool,
+    search_title: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -63,6 +65,8 @@ pub fn list_main(
     }
 
     for entry in read_dir(score_files).unwrap() {
+        let search_all_fields = !search_artist && !search_title;
+
         match entry {
             Ok(path) => {
                 if !path.path().is_dir() {
@@ -78,15 +82,18 @@ pub fn list_main(
                         continue;
                     }
 
-                    let composition = convert_path_to_string(&score_file);
+                    let title = convert_path_to_string(&score_file);
                     let mut is_match = true;
 
                     if !search_terms.is_empty() {
                         is_match = false;
 
                         for term in search_terms {
-                            if artist.contains(term)
-                                || composition.contains(term)
+                            if search_all_fields
+                                && (artist.contains(term)
+                                    || title.contains(term))
+                                || (*search_artist && artist.contains(term))
+                                || (*search_title && title.contains(term))
                             {
                                 is_match = true;
                                 break;
@@ -124,7 +131,7 @@ pub fn list_main(
                         if should_display {
                             compositions.push(Composition {
                                 artist: artist.clone(),
-                                title: composition,
+                                title,
                                 is_compiled: pdf,
                             });
                         }

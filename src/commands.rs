@@ -147,6 +147,12 @@ pub enum Command {
         outdated: bool,
 
         #[arg(long)]
+        artist: bool,
+
+        #[arg(long)]
+        title: bool,
+
+        #[arg(long)]
         scores_directory: Option<String>,
 
         #[arg(long)]
