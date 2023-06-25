@@ -12,7 +12,6 @@ fn convert_path_to_string(path: &DirEntry) -> String {
     artist.replace('-', " ")
 }
 
-#[derive(Eq, PartialEq, Ord, PartialOrd)]
 struct Composition {
     artist: String,
     title: String,
@@ -27,6 +26,24 @@ impl Composition {
 
         vec![artist, title, pdf]
     }
+}
+
+fn remove_leading_article(value: &String, article: &str) -> String {
+    let article = format!("{article} ");
+
+    if value.to_lowercase().starts_with(&article) {
+        value[article.len()..].to_string()
+    } else {
+        value.to_string()
+    }
+}
+
+fn remove_leading_articles(mut value: String) -> String {
+    value = remove_leading_article(&value, "the");
+    value = remove_leading_article(&value, "a");
+    value = remove_leading_article(&value, "an");
+
+    value
 }
 
 pub fn list_main(
@@ -119,6 +136,17 @@ pub fn list_main(
     }
 
     if !compositions.is_empty() {
+        compositions.sort_by(|a, b| {
+            let self_artist = remove_leading_articles(a.artist.clone());
+            let other_artist = remove_leading_articles(b.artist.clone());
+            let self_title = remove_leading_articles(a.title.clone());
+            let other_title = remove_leading_articles(b.title.clone());
+
+            self_artist
+                .cmp(&other_artist)
+                .then(self_title.cmp(&other_title))
+        });
+
         let header = vec![
             "ARTIST".to_string(),
             "TITLE".to_string(),
