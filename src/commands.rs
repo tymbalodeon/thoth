@@ -138,7 +138,7 @@ pub enum Command {
 
     /// List pdf(s)
     List {
-        scores: Vec<String>,
+        search_terms: Vec<String>,
 
         #[arg(long)]
         compiled: bool,

@@ -73,7 +73,7 @@ fn main() {
             edit_main(score, scores_directory, pdfs_directory);
         }
         Some(Command::List {
-            scores,
+            search_terms,
             outdated,
             compiled,
             artist,
@@ -81,7 +81,7 @@ fn main() {
             scores_directory,
             pdfs_directory,
         }) => list_main(
-            scores,
+            search_terms,
             outdated,
             compiled,
             artist,
