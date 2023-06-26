@@ -7,6 +7,7 @@ use std::{
 };
 
 fn print_info(
+    lilypond_vesrion: Option<String>,
     title: Option<String>,
     composer: Option<String>,
     arranger: Option<String>,
@@ -14,6 +15,10 @@ fn print_info(
     time: Option<String>,
     mut instruments: Vec<String>,
 ) {
+    if let Some(lilypond_version) = lilypond_vesrion {
+        println!("LilyPond version = {lilypond_version}");
+    }
+
     if let Some(title) = title {
         println!("Title = {title}");
     }
@@ -34,6 +39,8 @@ fn print_info(
 
     if let Some(time) = time {
         println!("Time Signature = {time}");
+    } else {
+        println!("Time = 4/4");
     }
 
     if !instruments.is_empty() {
@@ -51,12 +58,16 @@ fn display_score_info(score: &String) {
     let buf_reader = BufReader::new(file);
     let lines: Vec<String> =
         buf_reader.lines().collect::<Result<_, _>>().unwrap();
+
+    let mut lilypond_version: Option<String> = None;
     let mut title: Option<String> = None;
     let mut composer: Option<String> = None;
     let mut arranger: Option<String> = None;
     let mut key: Option<String> = None;
     let mut time: Option<String> = None;
     let mut instruments: Vec<String> = vec![];
+
+    let lilypond_version_line = "\\version ";
     let title_line = "  title = ";
     let composer_line = "  composer = ";
     let arranger_line = "  arranger = ";
@@ -65,6 +76,12 @@ fn display_score_info(score: &String) {
     let time_line = "  \\time ";
 
     for line in lines {
+        if line.starts_with(lilypond_version_line) {
+            let line =
+                line.replace(lilypond_version_line, "").replace('"', "");
+            lilypond_version = Some(line);
+        }
+
         if line.starts_with(title_line) {
             let line = line.replace(title_line, "").replace('"', "");
             title = Some(line);
@@ -102,7 +119,15 @@ fn display_score_info(score: &String) {
         }
     }
 
-    print_info(title, composer, arranger, key, time, instruments);
+    print_info(
+        lilypond_version,
+        title,
+        composer,
+        arranger,
+        key,
+        time,
+        instruments,
+    );
 }
 
 pub fn info_main(
