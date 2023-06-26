@@ -10,6 +10,7 @@ use commands::config::config_main;
 use commands::create::{create_main, ScoreFileSettings};
 use commands::edit::edit_main;
 use commands::helpers::helpers_main;
+use commands::info::info_main;
 use commands::list::list_main;
 use commands::open::open_main;
 use commands::templates::templates_main;
@@ -71,6 +72,13 @@ fn main() {
             pdfs_directory,
         }) => {
             edit_main(score, scores_directory, pdfs_directory);
+        }
+        Some(Command::Info {
+            score,
+            scores_directory,
+            pdfs_directory,
+        }) => {
+            info_main(score, scores_directory, pdfs_directory);
         }
         Some(Command::List {
             search_terms,

@@ -4,6 +4,7 @@ pub mod config;
 pub mod create;
 pub mod edit;
 pub mod helpers;
+pub mod info;
 pub mod list;
 pub mod open;
 mod patterns;
@@ -127,6 +128,17 @@ pub enum Command {
 
     /// Open <score> in editor and pdf viewer, recompiling on file changes
     Edit {
+        score: String,
+
+        #[arg(long)]
+        scores_directory: Option<String>,
+
+        #[arg(long)]
+        pdfs_directory: Option<String>,
+    },
+
+    /// Display <score> info
+    Info {
         score: String,
 
         #[arg(long)]
