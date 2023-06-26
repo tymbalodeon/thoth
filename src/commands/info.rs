@@ -1,24 +1,70 @@
+use convert_case::{Case::Title, Casing};
+
 use super::scores::{get_matching_scores, get_selected_items};
 use std::{
     fs::File,
     io::{BufRead, BufReader},
 };
 
+fn print_info(
+    title: Option<String>,
+    composer: Option<String>,
+    arranger: Option<String>,
+    key: Option<String>,
+    time: Option<String>,
+    mut instruments: Vec<String>,
+) {
+    if let Some(title) = title {
+        println!("Title = {title}");
+    }
+
+    if let Some(composer) = composer {
+        println!("Composer = {composer}");
+    }
+
+    if let Some(arranger) = arranger {
+        println!("Arranger = {arranger}");
+    }
+
+    if let Some(key) = key {
+        println!("Key = {key}");
+    } else {
+        println!("Key = C Major");
+    }
+
+    if let Some(time) = time {
+        println!("Time Signature = {time}");
+    }
+
+    if !instruments.is_empty() {
+        instruments.sort();
+        println!("Instrumentation:");
+
+        for instrument in instruments {
+            println!("    {instrument}");
+        }
+    }
+}
+
 fn display_score_info(score: &String) {
     let file = File::open(score).expect("file not found");
     let buf_reader = BufReader::new(file);
     let lines: Vec<String> =
         buf_reader.lines().collect::<Result<_, _>>().unwrap();
+    let mut title: Option<String> = None;
+    let mut composer: Option<String> = None;
+    let mut arranger: Option<String> = None;
+    let mut key: Option<String> = None;
+    let mut time: Option<String> = None;
+    let mut instruments: Vec<String> = vec![];
+    let title_line = "  title = ";
+    let composer_line = "  composer = ";
+    let arranger_line = "  arranger = ";
+    let instrument_line = "instrumentName = ";
+    let key_line = "  \\key ";
+    let time_line = "  \\time ";
 
     for line in lines {
-        let mut title: Option<String> = None;
-        let mut composer: Option<String> = None;
-        let mut arranger: Option<String> = None;
-
-        let title_line = "  title = ";
-        let composer_line = "  composer = ";
-        let arranger_line = "  arranger = ";
-
         if line.starts_with(title_line) {
             let line = line.replace(title_line, "").replace('"', "");
             title = Some(line);
@@ -34,18 +80,29 @@ fn display_score_info(score: &String) {
             arranger = Some(line);
         }
 
-        if let Some(title) = title {
-            println!("Title = {title}");
+        if line.starts_with(key_line) {
+            let line = line
+                .replace(key_line, "")
+                .replace('\\', "")
+                .to_case(Title)
+                .replace('s', "#")
+                .replace('b', "♭");
+            key = Some(line);
         }
 
-        if let Some(composer) = composer {
-            println!("Composer = {composer}");
+        if line.starts_with(time_line) {
+            let line = line.replace(time_line, "").replace('\\', "");
+            time = Some(line);
         }
 
-        if let Some(arranger) = arranger {
-            println!("Arranger = {arranger}");
+        if line.contains(instrument_line) {
+            let line =
+                line.replace(instrument_line, "").replace(['"', ' '], "");
+            instruments.push(line);
         }
     }
+
+    print_info(title, composer, arranger, key, time, instruments);
 }
 
 pub fn info_main(
