@@ -102,7 +102,7 @@ fn display_score_info(score: &String) {
                 .replace(key_line, "")
                 .replace('\\', "")
                 .to_case(Title)
-                .replace('s', "#")
+                .replace('s', "♯")
                 .replace('f', "♭");
             key = Some(line);
         }
