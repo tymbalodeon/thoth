@@ -48,7 +48,7 @@ fn print_info(
         println!("Instrumentation:");
 
         for instrument in instruments {
-            println!("    {instrument}");
+            println!("    - {instrument}");
         }
     }
 }
@@ -103,7 +103,7 @@ fn display_score_info(score: &String) {
                 .replace('\\', "")
                 .to_case(Title)
                 .replace('s', "#")
-                .replace('b', "♭");
+                .replace('f', "♭");
             key = Some(line);
         }
 
