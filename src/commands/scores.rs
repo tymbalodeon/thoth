@@ -20,6 +20,10 @@ pub fn get_matching_scores(
         for entry in glob(&pattern).expect("Failed to read glob pattern") {
             match entry {
                 Ok(path) => {
+                    if path.display().to_string().contains("templates") {
+                        continue;
+                    }
+
                     paths.push(path);
                 }
                 Err(message) => println!("{:?}", message),
