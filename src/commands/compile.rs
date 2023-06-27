@@ -122,11 +122,17 @@ pub fn compile_main(
         for pattern in patterns {
             for entry in glob(&pattern).expect("Failed to read glob pattern") {
                 match entry {
-                    Ok(path) => compile_input_file(
-                        &path,
-                        scores_directory,
-                        pdfs_directory,
-                    ),
+                    Ok(path) => {
+                        if path.display().to_string().contains("templates") {
+                            continue;
+                        }
+
+                        compile_input_file(
+                            &path,
+                            scores_directory,
+                            pdfs_directory,
+                        );
+                    }
                     Err(message) => println!("{:?}", message),
                 }
             }
