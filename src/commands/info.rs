@@ -6,47 +6,51 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-fn print_info(
-    lilypond_vesrion: Option<String>,
+struct CompositionMetadata {
+    lilypond_version: Option<String>,
     title: Option<String>,
     subtitle: Option<String>,
     composer: Option<String>,
     arranger: Option<String>,
     key: Option<String>,
     time: Option<String>,
-    mut instruments: Vec<String>,
-) {
-    if let Some(lilypond_version) = lilypond_vesrion {
+    instruments: Vec<String>,
+}
+
+fn print_info(composition_metadata: CompositionMetadata) {
+    if let Some(lilypond_version) = composition_metadata.lilypond_version {
         println!("LilyPond version = {lilypond_version}");
     }
 
-    if let Some(title) = title {
+    if let Some(title) = composition_metadata.title {
         println!("Title = {title}");
     }
 
-    if let Some(subtitle) = subtitle {
+    if let Some(subtitle) = composition_metadata.subtitle {
         println!("Subtitle = {subtitle}");
     }
 
-    if let Some(composer) = composer {
+    if let Some(composer) = composition_metadata.composer {
         println!("Composer = {composer}");
     }
 
-    if let Some(arranger) = arranger {
+    if let Some(arranger) = composition_metadata.arranger {
         println!("Arranger = {arranger}");
     }
 
-    if let Some(key) = key {
+    if let Some(key) = composition_metadata.key {
         println!("Key = {key}");
     } else {
         println!("Key = C Major");
     }
 
-    if let Some(time) = time {
+    if let Some(time) = composition_metadata.time {
         println!("Time Signature = {time}");
     } else {
         println!("Time = 4/4");
     }
+
+    let mut instruments = composition_metadata.instruments;
 
     if !instruments.is_empty() {
         instruments.sort();
@@ -131,7 +135,7 @@ fn display_score_info(score: &String) {
         }
     }
 
-    print_info(
+    let metadata = CompositionMetadata {
         lilypond_version,
         title,
         subtitle,
@@ -140,7 +144,9 @@ fn display_score_info(score: &String) {
         key,
         time,
         instruments,
-    );
+    };
+
+    print_info(metadata);
 }
 
 pub fn info_main(
