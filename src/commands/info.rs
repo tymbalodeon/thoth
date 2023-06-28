@@ -9,6 +9,7 @@ use std::{
 fn print_info(
     lilypond_vesrion: Option<String>,
     title: Option<String>,
+    subtitle: Option<String>,
     composer: Option<String>,
     arranger: Option<String>,
     key: Option<String>,
@@ -21,6 +22,10 @@ fn print_info(
 
     if let Some(title) = title {
         println!("Title = {title}");
+    }
+
+    if let Some(subtitle) = subtitle {
+        println!("Subtitle = {subtitle}");
     }
 
     if let Some(composer) = composer {
@@ -61,6 +66,7 @@ fn display_score_info(score: &String) {
 
     let mut lilypond_version: Option<String> = None;
     let mut title: Option<String> = None;
+    let mut subtitle: Option<String> = None;
     let mut composer: Option<String> = None;
     let mut arranger: Option<String> = None;
     let mut key: Option<String> = None;
@@ -69,6 +75,7 @@ fn display_score_info(score: &String) {
 
     let lilypond_version_line = "\\version ";
     let title_line = "  title = ";
+    let subtitle_line = "  subtitle = ";
     let composer_line = "  composer = ";
     let arranger_line = "  arranger = ";
     let instrument_line = "instrumentName = ";
@@ -85,6 +92,11 @@ fn display_score_info(score: &String) {
         if line.starts_with(title_line) {
             let line = line.replace(title_line, "").replace('"', "");
             title = Some(line);
+        }
+
+        if line.starts_with(subtitle_line) {
+            let line = line.replace(subtitle_line, "").replace('"', "");
+            subtitle = Some(line);
         }
 
         if line.starts_with(composer_line) {
@@ -122,6 +134,7 @@ fn display_score_info(score: &String) {
     print_info(
         lilypond_version,
         title,
+        subtitle,
         composer,
         arranger,
         key,
