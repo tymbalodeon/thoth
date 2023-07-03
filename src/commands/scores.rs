@@ -61,51 +61,6 @@ pub fn get_selected_items(
         .unwrap_or_else(Vec::new)
 }
 
-fn convert_to_path_bufs(items: Vec<Arc<dyn SkimItem>>) -> Vec<PathBuf> {
-    items
-        .iter()
-        .map(|item| PathBuf::from(item.output().to_string()))
-        .collect()
-}
-
-pub fn get_selected_scores(
-    scores: &Vec<String>,
-    extension: &str,
-    scores_directory: &Option<String>,
-    pdfs_directory: &Option<String>,
-) -> Vec<PathBuf> {
-    let matching_files = get_matching_scores(
-        scores,
-        extension,
-        scores_directory,
-        pdfs_directory,
-    );
-
-    if matching_files.len() > 1 {
-        let selected_items = get_selected_items(matching_files, true);
-
-        convert_to_path_bufs(selected_items)
-    } else {
-        matching_files
-    }
-}
-
-pub fn get_selected_lilypond_files(
-    scores: &Vec<String>,
-    scores_directory: &Option<String>,
-    pdfs_directory: &Option<String>,
-) -> Vec<PathBuf> {
-    get_selected_scores(scores, ".ly", scores_directory, pdfs_directory)
-}
-
-pub fn get_selected_pdf_files(
-    scores: &Vec<String>,
-    scores_directory: &Option<String>,
-    pdfs_directory: &Option<String>,
-) -> Vec<PathBuf> {
-    get_selected_scores(scores, ".pdf", scores_directory, pdfs_directory)
-}
-
 fn convert_path_to_string(path: &DirEntry) -> String {
     let artist = String::from(path.file_name().to_str().unwrap());
     artist.replace('-', " ")
@@ -180,6 +135,28 @@ pub fn get_score_ly_file(score: &String) -> Option<String> {
         .flatten()
         .next()
         .map(|ly_file| ly_file.to_str().unwrap().to_string())
+}
+
+pub fn get_found_ly_files(
+    search_terms: &Vec<String>,
+    search_artist: &bool,
+    search_title: &bool,
+    scores_directory: &Option<String>,
+) -> Vec<PathBuf> {
+    let found_scores = get_found_scores(
+        search_terms,
+        search_artist,
+        search_title,
+        scores_directory,
+    );
+
+    found_scores
+        .iter()
+        .filter_map(|score| {
+            get_score_ly_file(&score.to_str().unwrap().to_string())
+        })
+        .map(PathBuf::from)
+        .collect()
 }
 
 pub fn get_found_pdfs(

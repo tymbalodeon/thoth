@@ -1,44 +1,41 @@
-use std::process::Command;
-
-use crate::commands::scores::get_matching_scores;
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 use super::{
-    scores::{get_selected_lilypond_files, get_selected_pdf_files},
+    scores::{get_found_ly_files, get_found_pdfs, get_selected_items},
     ScoreFileType,
 };
 
-fn open_file(file_path: &String) {
-    Command::new("open").arg(file_path).output().unwrap();
+fn open_file(file_path: &Path) {
+    let file_path = file_path.to_str().unwrap().to_string();
+    Command::new("open").arg(&file_path).output().unwrap();
     println!("Opened {file_path}");
 }
 
 pub fn open_main(
     search_terms: &Vec<String>,
-    _artist: &bool,
-    _title: &bool,
+    search_artist: &bool,
+    search_title: &bool,
     file_type: &Option<ScoreFileType>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
     let matching_files = match file_type {
         Some(ScoreFileType::Both) => {
-            let mut ly_files = get_selected_lilypond_files(
+            let mut ly_files = get_found_ly_files(
                 search_terms,
+                search_artist,
+                search_title,
                 scores_directory,
-                pdfs_directory,
             );
 
-            let file_stems: Vec<String> = ly_files
-                .iter()
-                .map(|file| {
-                    file.file_stem().unwrap().to_str().unwrap().to_string()
-                })
-                .collect();
-
-            let pdfs = get_matching_scores(
-                &file_stems,
-                ".pdf",
-                &None,
+            let pdfs = get_found_pdfs(
+                search_terms,
+                search_artist,
+                search_title,
+                scores_directory,
                 pdfs_directory,
             );
 
@@ -46,20 +43,32 @@ pub fn open_main(
 
             ly_files
         }
-        Some(ScoreFileType::Lilypond) => get_selected_lilypond_files(
+        Some(ScoreFileType::Lilypond) => get_found_ly_files(
             search_terms,
+            search_artist,
+            search_title,
             scores_directory,
-            pdfs_directory,
         ),
-        Some(ScoreFileType::Pdf) | None => get_selected_pdf_files(
+        Some(ScoreFileType::Pdf) | None => get_found_pdfs(
             search_terms,
+            search_artist,
+            search_title,
             scores_directory,
             pdfs_directory,
         ),
     };
 
-    for file in matching_files {
-        let path = file.to_str().unwrap().to_string();
-        open_file(&path);
+    if matching_files.len() > 1 {
+        let selected_items = get_selected_items(matching_files, true);
+
+        for item in selected_items.iter() {
+            let path = item.output().to_string();
+            let path = PathBuf::from(path);
+            open_file(&path);
+        }
+    } else {
+        for score in matching_files {
+            open_file(&score);
+        }
     }
 }

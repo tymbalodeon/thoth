@@ -12,7 +12,7 @@ struct Composition {
     is_compiled: bool,
 }
 
-fn get_display(value: &String) -> String {
+fn get_display(value: &str) -> String {
     titlecase(&value.replace('-', " "))
 }
 
