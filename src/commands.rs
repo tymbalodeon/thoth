@@ -65,9 +65,11 @@ pub enum Command {
     Clean {
         search_terms: Vec<String>,
 
+        /// Match search terms against artist field only
         #[arg(long)]
         artist: bool,
 
+        /// Match search terms against title field only
         #[arg(long)]
         title: bool,
 
@@ -82,9 +84,11 @@ pub enum Command {
     Compile {
         search_terms: Vec<String>,
 
+        /// Match search terms against artist field only
         #[arg(long)]
         artist: bool,
 
+        /// Match search terms against title field only
         #[arg(long)]
         title: bool,
 
@@ -145,9 +149,11 @@ pub enum Command {
     Edit {
         search_terms: String,
 
+        /// Match search terms against artist field only
         #[arg(long)]
         artist: bool,
 
+        /// Match search terms against title field only
         #[arg(long)]
         title: bool,
 
@@ -162,9 +168,11 @@ pub enum Command {
     Info {
         search_term: String,
 
+        /// Match search terms against artist field only
         #[arg(long)]
         artist: bool,
 
+        /// Match search terms against title field only
         #[arg(long)]
         title: bool,
 
@@ -182,9 +190,11 @@ pub enum Command {
         #[arg(long)]
         outdated: bool,
 
+        /// Match search terms against artist field only
         #[arg(long)]
         artist: bool,
 
+        /// Match search terms against title field only
         #[arg(long)]
         title: bool,
 
@@ -199,9 +209,11 @@ pub enum Command {
     Open {
         search_terms: Vec<String>,
 
+        /// Match search terms against artist field only
         #[arg(long)]
         artist: bool,
 
+        /// Match search terms against title field only
         #[arg(long)]
         title: bool,
 
