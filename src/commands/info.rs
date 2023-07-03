@@ -155,6 +155,7 @@ pub fn info_main(
     search_term: &String,
     search_artist: &bool,
     search_title: &bool,
+    use_all_matches: &bool,
     scores_directory: &Option<String>,
 ) {
     let matching_scores = get_found_scores(
@@ -164,7 +165,7 @@ pub fn info_main(
         scores_directory,
     );
 
-    if matching_scores.len() > 1 {
+    if !use_all_matches && matching_scores.len() > 1 {
         let selected_scores = get_selected_items(matching_scores, false);
 
         for score in selected_scores.iter() {

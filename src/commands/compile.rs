@@ -77,13 +77,14 @@ pub fn compile_input_file(
 
 fn compile_selected_scores(
     scores: &Vec<String>,
+    use_all_matches: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
     let matching_scores =
         get_matching_scores(scores, ".ly", scores_directory, pdfs_directory);
 
-    if matching_scores.len() > 1 {
+    if !use_all_matches && matching_scores.len() > 1 {
         let selected_items = get_selected_items(matching_scores, true);
 
         for item in selected_items.iter() {
@@ -106,6 +107,7 @@ pub fn compile_main(
     search_terms: &Vec<String>,
     search_artist: &bool,
     search_title: &bool,
+    use_all_matches: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -128,6 +130,7 @@ pub fn compile_main(
     } else {
         compile_selected_scores(
             search_terms,
+            use_all_matches,
             scores_directory,
             pdfs_directory,
         );

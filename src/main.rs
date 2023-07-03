@@ -33,12 +33,14 @@ fn main() {
             search_terms,
             artist,
             title,
+            all,
             scores_directory,
             pdfs_directory,
         }) => clean_main(
             search_terms,
             artist,
             title,
+            all,
             scores_directory,
             pdfs_directory,
         ),
@@ -46,12 +48,14 @@ fn main() {
             search_terms,
             artist,
             title,
+            all,
             scores_directory,
             pdfs_directory,
         }) => compile_main(
             search_terms,
             artist,
             title,
+            all,
             scores_directory,
             pdfs_directory,
         ),
@@ -87,6 +91,7 @@ fn main() {
             search_terms,
             artist,
             title,
+            all,
             scores_directory,
             pdfs_directory,
         }) => {
@@ -94,6 +99,7 @@ fn main() {
                 search_terms,
                 artist,
                 title,
+                all,
                 scores_directory,
                 pdfs_directory,
             );
@@ -102,9 +108,10 @@ fn main() {
             search_term,
             artist,
             title,
+            all,
             scores_directory,
         }) => {
-            info_main(search_term, artist, title, scores_directory);
+            info_main(search_term, artist, title, all, scores_directory);
         }
         Some(Command::List {
             search_terms,
@@ -129,6 +136,7 @@ fn main() {
             search_terms,
             artist,
             title,
+            all,
             file_type,
             scores_directory,
             pdfs_directory,
@@ -137,6 +145,7 @@ fn main() {
                 search_terms,
                 artist,
                 title,
+                all,
                 file_type,
                 scores_directory,
                 pdfs_directory,

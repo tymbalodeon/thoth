@@ -184,6 +184,7 @@ pub fn create_main(
             &get_file_system_name(title),
             &false,
             &false,
+            &true,
             scores_directory,
             pdfs_directory,
         );

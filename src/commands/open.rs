@@ -18,6 +18,7 @@ pub fn open_main(
     search_terms: &Vec<String>,
     search_artist: &bool,
     search_title: &bool,
+    use_all_matches: &bool,
     file_type: &Option<ScoreFileType>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
@@ -58,7 +59,7 @@ pub fn open_main(
         ),
     };
 
-    if matching_files.len() > 1 {
+    if !use_all_matches && matching_files.len() > 1 {
         let selected_items = get_selected_items(matching_files, true);
 
         for item in selected_items.iter() {

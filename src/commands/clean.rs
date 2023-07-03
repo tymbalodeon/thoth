@@ -30,6 +30,7 @@ pub fn clean_main(
     search_terms: &Vec<String>,
     search_artist: &bool,
     search_title: &bool,
+    use_all_matches: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -45,7 +46,7 @@ pub fn clean_main(
         pdfs_directory,
     );
 
-    if matching_pdfs.len() > 1 {
+    if !use_all_matches && matching_pdfs.len() > 1 {
         let selected_items = get_selected_items(matching_pdfs, true);
 
         for item in selected_items.iter() {

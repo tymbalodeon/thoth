@@ -73,6 +73,10 @@ pub enum Command {
         #[arg(long)]
         title: bool,
 
+        /// Use all matching scores without prompting
+        #[arg(long)]
+        all: bool,
+
         #[arg(long)]
         scores_directory: Option<String>,
 
@@ -91,6 +95,10 @@ pub enum Command {
         /// Match search terms against title field only
         #[arg(long)]
         title: bool,
+
+        /// Use all matching scores without prompting
+        #[arg(long)]
+        all: bool,
 
         #[arg(long)]
         scores_directory: Option<String>,
@@ -157,6 +165,10 @@ pub enum Command {
         #[arg(long)]
         title: bool,
 
+        /// Use all matching scores without prompting
+        #[arg(long)]
+        all: bool,
+
         #[arg(long)]
         scores_directory: Option<String>,
 
@@ -175,6 +187,10 @@ pub enum Command {
         /// Match search terms against title field only
         #[arg(long)]
         title: bool,
+
+        /// Use all matching scores without prompting
+        #[arg(long)]
+        all: bool,
 
         #[arg(long)]
         scores_directory: Option<String>,
@@ -216,6 +232,10 @@ pub enum Command {
         /// Match search terms against title field only
         #[arg(long)]
         title: bool,
+
+        /// Use all matching scores without prompting
+        #[arg(long)]
+        all: bool,
 
         #[arg(long)]
         file_type: Option<ScoreFileType>,
