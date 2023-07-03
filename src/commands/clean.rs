@@ -1,9 +1,8 @@
 use std::fs::remove_file;
-use std::io::Write;
-use std::io::{stdin, stdout};
+use std::io::{stdin, stdout, Write};
 use std::path::Path;
 
-use crate::commands::scores::{get_matching_scores, get_selected_items};
+use super::scores::{get_found_pdfs, get_selected_items};
 
 fn received_confirmation() -> bool {
     print!("Are you sure you want to remove all pdfs? [y/n] ");
@@ -27,16 +26,27 @@ fn remove_score(path: &Path) {
     };
 }
 
-pub fn clean_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
-    if scores.is_empty() && !received_confirmation() {
+pub fn clean_main(
+    search_terms: &Vec<String>,
+    search_artist: &bool,
+    search_title: &bool,
+    scores_directory: &Option<String>,
+    pdfs_directory: &Option<String>,
+) {
+    if search_terms.is_empty() && !received_confirmation() {
         return;
     };
 
-    let matching_scores =
-        get_matching_scores(scores, ".pdf", &None, pdfs_directory);
+    let matching_pdfs = get_found_pdfs(
+        search_terms,
+        search_artist,
+        search_title,
+        scores_directory,
+        pdfs_directory,
+    );
 
-    if matching_scores.len() > 1 {
-        let selected_items = get_selected_items(matching_scores, true);
+    if matching_pdfs.len() > 1 {
+        let selected_items = get_selected_items(matching_pdfs, true);
 
         for item in selected_items.iter() {
             let path = item.output().to_string();
@@ -44,7 +54,7 @@ pub fn clean_main(scores: &Vec<String>, pdfs_directory: &Option<String>) {
             remove_score(path);
         }
     } else {
-        for score in matching_scores {
+        for score in matching_pdfs {
             remove_score(score.as_path());
         }
     }

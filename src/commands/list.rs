@@ -1,16 +1,10 @@
-use std::fs::{read_dir, DirEntry};
-
 use glob::glob;
 use titlecase::titlecase;
 
-use super::compile::is_already_compiled;
-use super::{get_pdfs_directory_from_arg, get_scores_directory_from_arg};
+use super::compile::is_compiled;
+use super::get_pdfs_directory_from_arg;
+use crate::commands::scores::get_found_scores;
 use crate::commands::table::print_table;
-
-fn convert_path_to_string(path: &DirEntry) -> String {
-    let artist = String::from(path.file_name().to_str().unwrap());
-    artist.replace('-', " ")
-}
 
 struct Composition {
     artist: String,
@@ -55,90 +49,60 @@ pub fn list_main(
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    let scores_directory = get_scores_directory_from_arg(scores_directory);
-    let score_files = format!("{scores_directory}/scores");
-    let mut compositions: Vec<Composition> = vec![];
-    let scores = read_dir(&score_files);
+    let mut compositions = vec![];
 
-    if scores.is_err() {
-        return;
-    }
+    let found_scores = get_found_scores(
+        search_terms,
+        search_artist,
+        search_title,
+        scores_directory,
+    );
 
-    for entry in read_dir(score_files).unwrap() {
-        let search_all_fields = !search_artist && !search_title;
+    for score in found_scores {
+        let mut pdf = false;
+        let path = String::from(score.file_name().unwrap().to_str().unwrap());
+        let pdfs_directory = get_pdfs_directory_from_arg(pdfs_directory);
+        let pattern = format!("{pdfs_directory}/{}*.pdf", path);
 
-        match entry {
-            Ok(path) => {
-                if !path.path().is_dir() {
-                    continue;
-                }
-
-                let artist = convert_path_to_string(&path);
-
-                for entry in read_dir(path.path()).unwrap() {
-                    let score_file = entry.unwrap();
-
-                    if score_file.file_name() == ".DS_Store" {
-                        continue;
-                    }
-
-                    let title = convert_path_to_string(&score_file);
-                    let mut is_match = true;
-
-                    if !search_terms.is_empty() {
-                        is_match = false;
-
-                        for term in search_terms {
-                            if search_all_fields
-                                && (artist.contains(term)
-                                    || title.contains(term))
-                                || (*search_artist && artist.contains(term))
-                                || (*search_title && title.contains(term))
-                            {
-                                is_match = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if is_match {
-                        let mut pdf = false;
-                        let path = String::from(
-                            score_file.file_name().to_str().unwrap(),
-                        );
-                        let pdfs_directory =
-                            get_pdfs_directory_from_arg(pdfs_directory);
-                        let pattern =
-                            format!("{pdfs_directory}/{}*.pdf", path);
-
-                        for pdf_file in glob(&pattern)
-                            .expect("Failed to read glob pattern")
-                            .flatten()
-                        {
-                            if is_already_compiled(
-                                &score_file.path(),
-                                &pdf_file,
-                            ) {
-                                pdf = true;
-                                break;
-                            }
-                        }
-
-                        let should_display = *outdated && !pdf
-                            || *compiled && pdf
-                            || !*outdated && !*compiled;
-
-                        if should_display {
-                            compositions.push(Composition {
-                                artist: artist.clone(),
-                                title,
-                                is_compiled: pdf,
-                            });
-                        }
-                    }
-                }
+        for pdf_file in glob(&pattern)
+            .expect("Failed to read glob pattern")
+            .flatten()
+        {
+            if is_compiled(&score, &pdf_file) {
+                pdf = true;
+                break;
             }
-            Err(message) => println!("{message}"),
+        }
+
+        let should_display =
+            *outdated && !pdf || *compiled && pdf || !*outdated && !*compiled;
+
+        if should_display {
+            let artist = score
+                .parent()
+                .unwrap()
+                .file_name()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_string();
+
+            let pattern = format!("{}/*.ly", score.display());
+            let mut title = "".to_string();
+
+            for ly_file in glob(&pattern)
+                .expect("Failed to read glob pattern")
+                .flatten()
+            {
+                title =
+                    ly_file.file_stem().unwrap().to_str().unwrap().to_string();
+            }
+
+            compositions.push(Composition {
+                artist,
+                title,
+                is_compiled: pdf,
+            });
         }
     }
 

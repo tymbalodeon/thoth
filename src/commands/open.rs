@@ -13,7 +13,9 @@ fn open_file(file_path: &String) {
 }
 
 pub fn open_main(
-    scores: &Vec<String>,
+    search_terms: &Vec<String>,
+    _artist: &bool,
+    _title: &bool,
     file_type: &Option<ScoreFileType>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
@@ -21,7 +23,7 @@ pub fn open_main(
     let matching_files = match file_type {
         Some(ScoreFileType::Both) => {
             let mut ly_files = get_selected_lilypond_files(
-                scores,
+                search_terms,
                 scores_directory,
                 pdfs_directory,
             );
@@ -45,13 +47,15 @@ pub fn open_main(
             ly_files
         }
         Some(ScoreFileType::Lilypond) => get_selected_lilypond_files(
-            scores,
+            search_terms,
             scores_directory,
             pdfs_directory,
         ),
-        Some(ScoreFileType::Pdf) | None => {
-            get_selected_pdf_files(scores, scores_directory, pdfs_directory)
-        }
+        Some(ScoreFileType::Pdf) | None => get_selected_pdf_files(
+            search_terms,
+            scores_directory,
+            pdfs_directory,
+        ),
     };
 
     for file in matching_files {

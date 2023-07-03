@@ -11,7 +11,7 @@ use glob::glob;
 
 use super::get_pdfs_directory_from_arg;
 use super::get_scores_directory_from_arg;
-use super::patterns::get_patterns;
+use super::scores::get_found_scores;
 use super::scores::get_matching_scores;
 use super::scores::get_selected_items;
 
@@ -23,10 +23,7 @@ fn get_modified(file: &PathBuf) -> Option<SystemTime> {
     }
 }
 
-pub fn is_already_compiled(
-    input_file: &PathBuf,
-    output_file: &PathBuf,
-) -> bool {
+pub fn is_compiled(input_file: &PathBuf, output_file: &PathBuf) -> bool {
     let input_modified = get_modified(input_file);
     let output_modified = get_modified(output_file);
 
@@ -51,7 +48,7 @@ pub fn compile_input_file(
             .expect("Failed to read glob pattern")
             .flatten()
         {
-            if is_already_compiled(input_file, &entry) {
+            if is_compiled(input_file, &entry) {
                 return;
             }
         }
@@ -106,7 +103,9 @@ fn compile_selected_scores(
 }
 
 pub fn compile_main(
-    scores: &Vec<String>,
+    search_terms: &Vec<String>,
+    search_artist: &bool,
+    search_title: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -115,29 +114,22 @@ pub fn compile_main(
         create_dir_all(&pdfs_directory).unwrap();
     }
 
-    if scores.is_empty() {
-        let patterns =
-            get_patterns(scores, ".ly", scores_directory, pdfs_directory);
+    if search_terms.is_empty() {
+        let found_scores = get_found_scores(
+            search_terms,
+            search_artist,
+            search_title,
+            scores_directory,
+        );
 
-        for pattern in patterns {
-            for entry in glob(&pattern).expect("Failed to read glob pattern") {
-                match entry {
-                    Ok(path) => {
-                        if path.display().to_string().contains("templates") {
-                            continue;
-                        }
-
-                        compile_input_file(
-                            &path,
-                            scores_directory,
-                            pdfs_directory,
-                        );
-                    }
-                    Err(message) => println!("{:?}", message),
-                }
-            }
+        for score in found_scores {
+            compile_input_file(&score, scores_directory, pdfs_directory);
         }
     } else {
-        compile_selected_scores(scores, scores_directory, pdfs_directory);
+        compile_selected_scores(
+            search_terms,
+            scores_directory,
+            pdfs_directory,
+        );
     }
 }

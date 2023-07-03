@@ -182,6 +182,8 @@ pub fn create_main(
     if *edit {
         edit_main(
             &get_file_system_name(title),
+            &false,
+            &false,
             scores_directory,
             pdfs_directory,
         );

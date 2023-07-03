@@ -15,10 +15,11 @@ use watchexec::{
 use watchexec_signals::Signal;
 
 use crate::commands::patterns::get_score_file;
+use crate::commands::scores::{get_found_scores, get_score_ly_file};
 use crate::config::Config;
 
 use super::compile::compile_input_file;
-use super::scores::{get_matching_scores, get_selected_items};
+use super::scores::get_selected_items;
 
 fn get_ily_files(pattern: String) -> Vec<String> {
     glob(&pattern)
@@ -131,15 +132,17 @@ fn edit_file(
 }
 
 pub fn edit_main(
-    score: &String,
+    search_term: &String,
+    search_artist: &bool,
+    search_title: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    let matching_scores = get_matching_scores(
-        &vec![score.to_string()],
-        ".ly",
+    let matching_scores = get_found_scores(
+        &vec![search_term.to_string()],
+        search_artist,
+        search_title,
         scores_directory,
-        pdfs_directory,
     );
 
     if matching_scores.len() > 1 {
@@ -147,12 +150,18 @@ pub fn edit_main(
 
         for score in selected_scores.iter() {
             let score = score.output().to_string();
-            edit_file(score, scores_directory, pdfs_directory);
+
+            if let Some(ly_file) = get_score_ly_file(&score) {
+                edit_file(ly_file, scores_directory, pdfs_directory);
+            }
         }
     } else {
         for score in matching_scores {
             let score = score.to_str().unwrap().to_string();
-            edit_file(score, scores_directory, pdfs_directory);
+
+            if let Some(ly_file) = get_score_ly_file(&score) {
+                edit_file(ly_file, scores_directory, pdfs_directory);
+            }
         }
     }
 }

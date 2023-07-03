@@ -1,6 +1,8 @@
 use convert_case::{Case::Title, Casing};
 
-use super::scores::{get_matching_scores, get_selected_items};
+use crate::commands::scores::{get_found_scores, get_score_ly_file};
+
+use super::scores::get_selected_items;
 use std::{
     fs::File,
     io::{BufRead, BufReader},
@@ -150,15 +152,16 @@ fn display_score_info(score: &String) {
 }
 
 pub fn info_main(
-    score: &String,
+    search_term: &String,
+    search_artist: &bool,
+    search_title: &bool,
     scores_directory: &Option<String>,
-    pdfs_directory: &Option<String>,
 ) {
-    let matching_scores = get_matching_scores(
-        &vec![score.to_string()],
-        ".ly",
+    let matching_scores = get_found_scores(
+        &vec![search_term.to_string()],
+        search_artist,
+        search_title,
         scores_directory,
-        pdfs_directory,
     );
 
     if matching_scores.len() > 1 {
@@ -166,12 +169,18 @@ pub fn info_main(
 
         for score in selected_scores.iter() {
             let score = score.output().to_string();
-            display_score_info(&score);
+
+            if let Some(ly_file) = get_score_ly_file(&score) {
+                display_score_info(&ly_file);
+            }
         }
     } else {
         for score in matching_scores {
             let score = score.to_str().unwrap().to_string();
-            display_score_info(&score);
+
+            if let Some(ly_file) = get_score_ly_file(&score) {
+                display_score_info(&ly_file);
+            }
         }
     }
 }

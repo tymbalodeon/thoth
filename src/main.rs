@@ -30,14 +30,31 @@ fn main() {
 
     match &cli.command {
         Some(Command::Clean {
-            scores,
-            pdfs_directory,
-        }) => clean_main(scores, pdfs_directory),
-        Some(Command::Compile {
-            scores,
+            search_terms,
+            artist,
+            title,
             scores_directory,
             pdfs_directory,
-        }) => compile_main(scores, scores_directory, pdfs_directory),
+        }) => clean_main(
+            search_terms,
+            artist,
+            title,
+            scores_directory,
+            pdfs_directory,
+        ),
+        Some(Command::Compile {
+            search_terms,
+            artist,
+            title,
+            scores_directory,
+            pdfs_directory,
+        }) => compile_main(
+            search_terms,
+            artist,
+            title,
+            scores_directory,
+            pdfs_directory,
+        ),
         Some(Command::Config {
             edit,
             path,
@@ -67,18 +84,27 @@ fn main() {
             create_main(settings, edit, scores_directory, pdfs_directory);
         }
         Some(Command::Edit {
-            score,
+            search_terms,
+            artist,
+            title,
             scores_directory,
             pdfs_directory,
         }) => {
-            edit_main(score, scores_directory, pdfs_directory);
+            edit_main(
+                search_terms,
+                artist,
+                title,
+                scores_directory,
+                pdfs_directory,
+            );
         }
         Some(Command::Info {
-            score,
+            search_term,
+            artist,
+            title,
             scores_directory,
-            pdfs_directory,
         }) => {
-            info_main(score, scores_directory, pdfs_directory);
+            info_main(search_term, artist, title, scores_directory);
         }
         Some(Command::List {
             search_terms,
@@ -88,22 +114,33 @@ fn main() {
             title,
             scores_directory,
             pdfs_directory,
-        }) => list_main(
+        }) => {
+            list_main(
+                search_terms,
+                outdated,
+                compiled,
+                artist,
+                title,
+                scores_directory,
+                pdfs_directory,
+            );
+        }
+        Some(Command::Open {
             search_terms,
-            outdated,
-            compiled,
             artist,
             title,
-            scores_directory,
-            pdfs_directory,
-        ),
-        Some(Command::Open {
-            scores,
             file_type,
             scores_directory,
             pdfs_directory,
         }) => {
-            open_main(scores, file_type, scores_directory, pdfs_directory);
+            open_main(
+                search_terms,
+                artist,
+                title,
+                file_type,
+                scores_directory,
+                pdfs_directory,
+            );
         }
         Some(Command::Templates { command }) => templates_main(command),
         Some(Command::Helpers { command }) => helpers_main(command),

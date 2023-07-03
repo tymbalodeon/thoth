@@ -8,7 +8,7 @@ pub mod info;
 pub mod list;
 pub mod open;
 mod patterns;
-mod scores;
+pub mod scores;
 mod table;
 pub mod templates;
 
@@ -63,7 +63,16 @@ pub enum HelperCommand {
 pub enum Command {
     /// Remove pdf(s)
     Clean {
-        scores: Vec<String>,
+        search_terms: Vec<String>,
+
+        #[arg(long)]
+        artist: bool,
+
+        #[arg(long)]
+        title: bool,
+
+        #[arg(long)]
+        scores_directory: Option<String>,
 
         #[arg(long)]
         pdfs_directory: Option<String>,
@@ -71,7 +80,13 @@ pub enum Command {
 
     /// Create pdf(s)
     Compile {
-        scores: Vec<String>,
+        search_terms: Vec<String>,
+
+        #[arg(long)]
+        artist: bool,
+
+        #[arg(long)]
+        title: bool,
 
         #[arg(long)]
         scores_directory: Option<String>,
@@ -128,7 +143,13 @@ pub enum Command {
 
     /// Open <score> in editor and pdf viewer, recompiling on file changes
     Edit {
-        score: String,
+        search_terms: String,
+
+        #[arg(long)]
+        artist: bool,
+
+        #[arg(long)]
+        title: bool,
 
         #[arg(long)]
         scores_directory: Option<String>,
@@ -139,13 +160,16 @@ pub enum Command {
 
     /// Display <score> info
     Info {
-        score: String,
+        search_term: String,
+
+        #[arg(long)]
+        artist: bool,
+
+        #[arg(long)]
+        title: bool,
 
         #[arg(long)]
         scores_directory: Option<String>,
-
-        #[arg(long)]
-        pdfs_directory: Option<String>,
     },
 
     /// List pdf(s)
@@ -173,7 +197,13 @@ pub enum Command {
 
     /// Open score(s)
     Open {
-        scores: Vec<String>,
+        search_terms: Vec<String>,
+
+        #[arg(long)]
+        artist: bool,
+
+        #[arg(long)]
+        title: bool,
 
         #[arg(long)]
         file_type: Option<ScoreFileType>,
