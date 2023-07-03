@@ -12,10 +12,14 @@ struct Composition {
     is_compiled: bool,
 }
 
+fn get_display(value: &String) -> String {
+    titlecase(&value.replace('-', " "))
+}
+
 impl Composition {
     fn get_row_values(&self) -> Vec<String> {
-        let artist = titlecase(&self.artist);
-        let title = titlecase(&self.title);
+        let artist = get_display(&self.artist);
+        let title = get_display(&self.title);
         let pdf = self.is_compiled.to_string();
 
         vec![artist, title, pdf]
@@ -23,7 +27,7 @@ impl Composition {
 }
 
 fn remove_leading_article(value: &String, article: &str) -> String {
-    let article = format!("{article} ");
+    let article = format!("{article}-");
 
     if value.to_lowercase().starts_with(&article) {
         value[article.len()..].to_string()
