@@ -1,6 +1,6 @@
 use convert_case::{Case::Title, Casing};
 
-use crate::commands::scores::{get_found_scores, get_score_ly_file};
+use crate::commands::scores::{get_matching_scores, get_score_ly_file};
 
 use super::scores::get_selected_items;
 use std::{
@@ -158,7 +158,7 @@ pub fn info_main(
     use_all_matches: &bool,
     scores_directory: &Option<String>,
 ) {
-    let matching_scores = get_found_scores(
+    let matching_scores = get_matching_scores(
         &vec![search_term.to_string()],
         search_artist,
         search_title,

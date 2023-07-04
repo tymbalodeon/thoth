@@ -10,7 +10,7 @@ use glob::glob;
 
 use super::get_pdfs_directory_from_arg;
 use super::get_scores_directory_from_arg;
-use super::scores::get_found_scores;
+use super::scores::get_matching_scores;
 use super::scores::get_score_ly_file;
 use super::scores::get_selected_items;
 
@@ -87,7 +87,7 @@ pub fn compile_main(
         create_dir_all(&pdfs_directory).unwrap();
     }
 
-    let matching_scores = get_found_scores(
+    let matching_scores = get_matching_scores(
         search_terms,
         search_artist,
         search_title,

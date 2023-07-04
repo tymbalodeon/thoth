@@ -36,7 +36,7 @@ fn convert_path_to_string(path: &DirEntry) -> String {
     artist.replace('-', " ")
 }
 
-pub fn get_found_scores(
+pub fn get_matching_scores(
     search_terms: &Vec<String>,
     search_artist: &bool,
     search_title: &bool,
@@ -113,7 +113,7 @@ pub fn get_found_ly_files(
     search_title: &bool,
     scores_directory: &Option<String>,
 ) -> Vec<PathBuf> {
-    let found_scores = get_found_scores(
+    let found_scores = get_matching_scores(
         search_terms,
         search_artist,
         search_title,
@@ -138,7 +138,7 @@ pub fn get_found_pdfs(
 ) -> Vec<PathBuf> {
     let pdfs_directory = &get_pdfs_directory_from_arg(pdfs_directory);
 
-    let matching_scores = get_found_scores(
+    let matching_scores = get_matching_scores(
         search_terms,
         search_artist,
         search_title,

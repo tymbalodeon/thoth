@@ -3,7 +3,7 @@ use titlecase::titlecase;
 
 use super::compile::is_compiled;
 use super::get_pdfs_directory_from_arg;
-use crate::commands::scores::get_found_scores;
+use crate::commands::scores::get_matching_scores;
 use crate::commands::table::print_table;
 
 struct Composition {
@@ -55,7 +55,7 @@ pub fn list_main(
 ) {
     let mut compositions = vec![];
 
-    let found_scores = get_found_scores(
+    let found_scores = get_matching_scores(
         search_terms,
         search_artist,
         search_title,

@@ -15,7 +15,7 @@ use watchexec::{
 use watchexec_signals::Signal;
 
 use crate::commands::patterns::get_score_file;
-use crate::commands::scores::{get_found_scores, get_score_ly_file};
+use crate::commands::scores::{get_matching_scores, get_score_ly_file};
 use crate::config::Config;
 
 use super::compile::compile_input_file;
@@ -139,7 +139,7 @@ pub fn edit_main(
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    let matching_scores = get_found_scores(
+    let matching_scores = get_matching_scores(
         &vec![search_term.to_string()],
         search_artist,
         search_title,
