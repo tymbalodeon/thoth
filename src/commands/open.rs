@@ -8,7 +8,7 @@ use super::{
     ScoreFileType,
 };
 
-fn open_file(file_path: &Path) {
+pub fn open_file(file_path: &Path) {
     let file_path = file_path.to_str().unwrap().to_string();
     Command::new("open").arg(&file_path).output().unwrap();
     println!("Opened {file_path}");

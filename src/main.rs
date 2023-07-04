@@ -13,6 +13,7 @@ use commands::helpers::helpers_main;
 use commands::info::info_main;
 use commands::list::list_main;
 use commands::open::open_main;
+use commands::sketch::sketch_main;
 use commands::templates::templates_main;
 use commands::Command;
 
@@ -77,15 +78,21 @@ fn main() {
             pdfs_directory,
         }) => {
             let settings = ScoreFileSettings {
-                title,
-                subtitle,
-                composer,
-                arranger,
-                template,
-                instrument,
+                title: title.to_owned(),
+                subtitle: subtitle.to_owned(),
+                composer: composer.to_owned(),
+                arranger: arranger.to_owned(),
+                template: template.to_owned(),
+                instrument: instrument.to_owned(),
             };
 
-            create_main(settings, edit, scores_directory, pdfs_directory);
+            create_main(
+                settings,
+                edit,
+                &false,
+                scores_directory,
+                pdfs_directory,
+            );
         }
         Some(Command::Edit {
             search_terms,
@@ -153,6 +160,7 @@ fn main() {
         }
         Some(Command::Templates { command }) => templates_main(command),
         Some(Command::Helpers { command }) => helpers_main(command),
+        Some(Command::Sketch {}) => sketch_main(),
         _ => {
             println!("Please choose a command.")
         }

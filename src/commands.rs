@@ -8,7 +8,8 @@ pub mod info;
 pub mod list;
 pub mod open;
 mod patterns;
-pub mod scores;
+mod scores;
+pub mod sketch;
 mod table;
 pub mod templates;
 
@@ -258,6 +259,9 @@ pub enum Command {
         #[command(subcommand)]
         command: Option<HelperCommand>,
     },
+
+    /// Open temporary sketch file
+    Sketch {},
 }
 
 pub fn add_value_to_string_if_some(
@@ -271,6 +275,22 @@ pub fn add_value_to_string_if_some(
     };
 
     string.to_string()
+}
+
+pub fn get_composer_from_arg(composer: &Option<String>) -> String {
+    if let Some(path) = composer {
+        tilde(&path).to_string()
+    } else {
+        Config::get_composer()
+    }
+}
+
+pub fn get_template_from_arg(template: &Option<Template>) -> Template {
+    if let Some(template) = template {
+        template.to_owned()
+    } else {
+        Config::get_template()
+    }
 }
 
 pub fn get_scores_directory_from_arg(

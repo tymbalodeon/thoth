@@ -46,7 +46,7 @@ fn get_watched_files(file: &String) -> Vec<String> {
 }
 
 #[tokio::main]
-async fn watch(file: PathBuf) -> Result<()> {
+pub async fn watch(file: PathBuf) -> Result<()> {
     let mut init_config = InitConfig::default();
 
     init_config.on_error(|error: ErrorHook| async move {
@@ -103,7 +103,7 @@ pub fn open_file(file: PathBuf) {
     Command::new("open").arg(&file).output().unwrap();
 }
 
-fn edit_file(
+pub fn edit_file(
     lilypond_file: String,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,

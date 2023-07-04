@@ -13,15 +13,32 @@ use crate::commands::templates::{
     Template::{Form, Lead, Piano, Single},
     TemplateFile,
 };
+use crate::commands::{
+    get_composer_from_arg, get_scores_directory_from_arg,
+    get_template_from_arg,
+};
 use crate::config::Config;
 
-pub struct ScoreFileSettings<'a> {
-    pub title: &'a String,
-    pub subtitle: &'a Option<String>,
-    pub composer: &'a Option<String>,
-    pub arranger: &'a Option<String>,
-    pub template: &'a Option<Template>,
-    pub instrument: &'a Option<String>,
+pub struct ScoreFileSettings {
+    pub title: String,
+    pub subtitle: Option<String>,
+    pub composer: Option<String>,
+    pub arranger: Option<String>,
+    pub template: Option<Template>,
+    pub instrument: Option<String>,
+}
+
+impl Default for ScoreFileSettings {
+    fn default() -> Self {
+        ScoreFileSettings {
+            title: "Sketch".to_string(),
+            subtitle: None,
+            composer: None,
+            arranger: None,
+            instrument: None,
+            template: Some(Template::Piano),
+        }
+    }
 }
 
 fn get_templates(
@@ -44,7 +61,7 @@ fn get_templates(
     }
 }
 
-fn create_file(
+pub fn create_file(
     template: TemplateFile,
     parent: &String,
     mut title: String,
@@ -76,23 +93,29 @@ pub fn get_file_system_name(text: &str) -> String {
 }
 
 pub fn create_score(
-    title: &String,
-    subtitle: &Option<String>,
-    composer: &String,
-    arranger: &Option<String>,
-    instrument: &Option<String>,
-    template: &Template,
+    settings: &ScoreFileSettings,
     edit: &bool,
+    scores_directory: &Option<String>,
+    is_sketch: &bool,
 ) -> Vec<String> {
-    let config = Config::from_config_file();
-    let scores_directory = config.scores_directory;
-    let composer_directory = get_file_system_name(composer);
+    let title = &settings.title;
+    let subtitle = &settings.subtitle;
+    let composer = get_composer_from_arg(&settings.composer);
+    let arranger = &settings.arranger;
+    let template = get_template_from_arg(&settings.template);
+    let instrument = &settings.instrument;
     let file_system_title = get_file_system_name(title);
-    let parent = format!(
-        "{scores_directory}/scores/{composer_directory}/{file_system_title}"
-    );
+
+    let parent = if *is_sketch {
+        format!("/tmp/{file_system_title}")
+    } else {
+        let scores_directory = get_scores_directory_from_arg(scores_directory);
+        let composer_directory = get_file_system_name(&composer);
+        format!("{scores_directory}/scores/{composer_directory}/{file_system_title}")
+    };
 
     create_dir_all(&parent).unwrap();
+    let config = Config::from_config_file();
 
     let instrument = if let Some(instrument) = instrument {
         instrument
@@ -101,7 +124,7 @@ pub fn create_score(
     };
 
     let templates = get_templates(
-        title, subtitle, composer, arranger, instrument, template,
+        title, subtitle, &composer, arranger, instrument, &template,
     );
 
     let mut files = Vec::new();
@@ -143,15 +166,16 @@ pub fn print_score_info(
 pub fn create_main(
     settings: ScoreFileSettings,
     edit: &bool,
+    is_sketch: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    let title = settings.title;
-    let subtitle = settings.subtitle;
-    let composer = settings.composer;
-    let arranger = settings.arranger;
-    let template = settings.template;
-    let instrument = settings.instrument;
+    let title = &settings.title;
+    let subtitle = &settings.subtitle;
+    let composer = &settings.composer;
+    let arranger = &settings.arranger;
+    let template = &settings.template;
+    let instrument = &settings.instrument;
 
     let config = Config::from_config_file();
 
@@ -167,9 +191,7 @@ pub fn create_main(
         &config.composer
     };
 
-    let files = create_score(
-        title, subtitle, composer, arranger, instrument, template, edit,
-    );
+    let files = create_score(&settings, edit, scores_directory, is_sketch);
 
     print_score_info(
         title, subtitle, composer, arranger, instrument, template,
