@@ -94,7 +94,10 @@ pub fn compile_main(
         scores_directory,
     );
 
-    if !use_all_matches && matching_scores.len() > 1 {
+    if !search_terms.is_empty()
+        && !use_all_matches
+        && matching_scores.len() > 1
+    {
         let selected_items = get_selected_items(matching_scores, true);
 
         for item in selected_items.iter() {
