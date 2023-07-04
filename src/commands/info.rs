@@ -166,13 +166,14 @@ pub fn info_main(
     );
 
     if !use_all_matches && matching_scores.len() > 1 {
-        let selected_scores = get_selected_items(matching_scores, false);
+        if let Ok(selected_scores) = get_selected_items(matching_scores, false)
+        {
+            for score in selected_scores.iter() {
+                let score = score.output().to_string();
 
-        for score in selected_scores.iter() {
-            let score = score.output().to_string();
-
-            if let Some(ly_file) = get_score_ly_file(&score) {
-                display_score_info(&ly_file);
+                if let Some(ly_file) = get_score_ly_file(&score) {
+                    display_score_info(&ly_file);
+                }
             }
         }
     } else {

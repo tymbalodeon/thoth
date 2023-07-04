@@ -1,6 +1,7 @@
 use std::fs::read_dir;
 use std::fs::DirEntry;
-use std::io::Cursor;
+use std::io::ErrorKind;
+use std::io::{Cursor, Error};
 use std::path::PathBuf;
 
 use glob::glob;
@@ -22,13 +23,21 @@ fn get_items(paths: Vec<PathBuf>) -> Option<Receiver<Arc<dyn SkimItem>>> {
 pub fn get_selected_items(
     matching_scores: Vec<PathBuf>,
     multi: bool,
-) -> Vec<Arc<dyn SkimItem>> {
+) -> Result<Vec<Arc<dyn SkimItem>>, Error> {
     let options = SkimOptionsBuilder::default().multi(multi).build().unwrap();
     let selections = get_items(matching_scores);
 
-    Skim::run_with(&options, selections)
+    let selected_items = Skim::run_with(&options, selections);
+
+    for item in selected_items.iter() {
+        if item.is_abort {
+            return Err(Error::new(ErrorKind::Other, "User aborted"));
+        }
+    }
+
+    Ok(selected_items
         .map(|output| output.selected_items)
-        .unwrap_or_else(Vec::new)
+        .unwrap_or_else(Vec::new))
 }
 
 fn convert_path_to_string(path: &DirEntry) -> String {

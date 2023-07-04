@@ -98,17 +98,17 @@ pub fn compile_main(
         && !use_all_matches
         && matching_scores.len() > 1
     {
-        let selected_items = get_selected_items(matching_scores, true);
+        if let Ok(selected_items) = get_selected_items(matching_scores, true) {
+            for item in selected_items.iter() {
+                let score = item.output().to_string();
 
-        for item in selected_items.iter() {
-            let score = item.output().to_string();
-
-            if let Some(input_file) = get_score_ly_file(&score) {
-                compile_input_file(
-                    &PathBuf::from(input_file),
-                    scores_directory,
-                    pdfs_directory,
-                );
+                if let Some(input_file) = get_score_ly_file(&score) {
+                    compile_input_file(
+                        &PathBuf::from(input_file),
+                        scores_directory,
+                        pdfs_directory,
+                    );
+                }
             }
         }
     } else {

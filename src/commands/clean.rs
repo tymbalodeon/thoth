@@ -47,12 +47,12 @@ pub fn clean_main(
     );
 
     if !use_all_matches && matching_pdfs.len() > 1 {
-        let selected_items = get_selected_items(matching_pdfs, true);
-
-        for item in selected_items.iter() {
-            let path = item.output().to_string();
-            let path = Path::new(&path);
-            remove_score(path);
+        if let Ok(selected_items) = get_selected_items(matching_pdfs, true) {
+            for item in selected_items.iter() {
+                let path = item.output().to_string();
+                let path = Path::new(&path);
+                remove_score(path);
+            }
         }
     } else {
         for score in matching_pdfs {

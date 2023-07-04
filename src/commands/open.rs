@@ -60,12 +60,12 @@ pub fn open_main(
     };
 
     if !use_all_matches && matching_files.len() > 1 {
-        let selected_items = get_selected_items(matching_files, true);
-
-        for item in selected_items.iter() {
-            let path = item.output().to_string();
-            let path = PathBuf::from(path);
-            open_file(&path);
+        if let Ok(selected_items) = get_selected_items(matching_files, true) {
+            for item in selected_items.iter() {
+                let path = item.output().to_string();
+                let path = PathBuf::from(path);
+                open_file(&path);
+            }
         }
     } else {
         for score in matching_files {

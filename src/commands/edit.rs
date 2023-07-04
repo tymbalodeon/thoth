@@ -147,13 +147,14 @@ pub fn edit_main(
     );
 
     if !use_all_matches && matching_scores.len() > 1 {
-        let selected_scores = get_selected_items(matching_scores, false);
+        if let Ok(selected_scores) = get_selected_items(matching_scores, false)
+        {
+            for score in selected_scores.iter() {
+                let score = score.output().to_string();
 
-        for score in selected_scores.iter() {
-            let score = score.output().to_string();
-
-            if let Some(ly_file) = get_score_ly_file(&score) {
-                edit_file(ly_file, scores_directory, pdfs_directory);
+                if let Some(ly_file) = get_score_ly_file(&score) {
+                    edit_file(ly_file, scores_directory, pdfs_directory);
+                }
             }
         }
     } else {
