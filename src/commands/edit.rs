@@ -144,19 +144,13 @@ pub fn edit_file(
 ) {
     let score_path = PathBuf::from(&lilypond_file);
 
-    let scores_directory = if *is_sketch {
-        Some(TEMPORARY_DIRECTORY.to_string())
-    } else {
-        scores_directory.to_owned()
-    };
-
     let pdfs_directory = if *is_sketch {
         Some(TEMPORARY_DIRECTORY.to_string())
     } else {
         pdfs_directory.to_owned()
     };
 
-    compile_input_file(&score_path, &scores_directory, &pdfs_directory);
+    compile_input_file(&score_path, scores_directory, &pdfs_directory);
 
     let pdf_file = get_score_file(
         &score_path
@@ -166,7 +160,7 @@ pub fn edit_file(
             .unwrap()
             .to_string(),
         ".pdf",
-        &scores_directory,
+        scores_directory,
         &pdfs_directory,
     )
     .unwrap();
