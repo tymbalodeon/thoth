@@ -107,6 +107,7 @@ fn main() {
                 artist,
                 title,
                 all,
+                &false,
                 scores_directory,
                 pdfs_directory,
             );

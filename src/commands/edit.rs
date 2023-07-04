@@ -1,8 +1,10 @@
 use std::convert::Infallible;
+use std::fs::remove_dir_all;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use glob::glob;
+use inquire::Confirm;
 use miette::{IntoDiagnostic, Result};
 use watchexec::{
     action::{Action, Outcome},
@@ -46,7 +48,7 @@ fn get_watched_files(file: &String) -> Vec<String> {
 }
 
 #[tokio::main]
-pub async fn watch(file: PathBuf) -> Result<()> {
+pub async fn watch(file: PathBuf, is_sketch: &bool) -> Result<()> {
     let mut init_config = InitConfig::default();
 
     init_config.on_error(|error: ErrorHook| async move {
@@ -57,6 +59,13 @@ pub async fn watch(file: PathBuf) -> Result<()> {
     let mut runtime_config = RuntimeConfig::default();
     let file = file.to_str().unwrap().to_string();
     let config = Config::from_config_file();
+
+    let pdfs_directory = if *is_sketch {
+        "/tmp/thoth".to_string()
+    } else {
+        config.pdfs_directory
+    };
+
     let watched_files = get_watched_files(&file);
     runtime_config.pathset(watched_files);
 
@@ -66,12 +75,35 @@ pub async fn watch(file: PathBuf) -> Result<()> {
             "--include".to_string(),
             config.scores_directory,
             "--output".to_string(),
-            config.pdfs_directory,
+            pdfs_directory,
             file,
         ],
     });
 
     let watchexec = Watchexec::new(init_config, runtime_config.clone())?;
+
+    let interrupt_action = if *is_sketch {
+        |action: Action| {
+            print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
+
+            let ans = Confirm::new("Do you want to save sketch?")
+                .with_default(false)
+                .prompt();
+
+            match ans {
+                Ok(true) => println!("Saving!"),
+                Ok(false) => {
+                    let _ = remove_dir_all("/tmp/thoth");
+                }
+                Err(message) => println!("{message}"),
+            }
+            action.outcome(Outcome::Exit);
+        }
+    } else {
+        |action: Action| {
+            action.outcome(Outcome::Exit);
+        }
+    };
 
     runtime_config.on_action(move |action: Action| async move {
         let signals = action
@@ -81,7 +113,7 @@ pub async fn watch(file: PathBuf) -> Result<()> {
             .collect::<Vec<_>>();
 
         if signals.iter().any(|signal| signal == &Signal::Interrupt) {
-            action.outcome(Outcome::Exit);
+            interrupt_action(action)
         } else if action.events.iter().flat_map(Event::paths).next().is_some()
         {
             action.outcome(Outcome::if_running(
@@ -105,11 +137,25 @@ pub fn open_file(file: PathBuf) {
 
 pub fn edit_file(
     lilypond_file: String,
+    is_sketch: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
     let score_path = PathBuf::from(&lilypond_file);
-    compile_input_file(&score_path, scores_directory, pdfs_directory);
+
+    let scores_directory = if *is_sketch {
+        Some("/tmp/thoth".to_string())
+    } else {
+        scores_directory.to_owned()
+    };
+
+    let pdfs_directory = if *is_sketch {
+        Some("/tmp/thoth".to_string())
+    } else {
+        pdfs_directory.to_owned()
+    };
+
+    compile_input_file(&score_path, &scores_directory, &pdfs_directory);
 
     let pdf_file = get_score_file(
         &score_path
@@ -119,8 +165,8 @@ pub fn edit_file(
             .unwrap()
             .to_string(),
         ".pdf",
-        scores_directory,
-        pdfs_directory,
+        &scores_directory,
+        &pdfs_directory,
     )
     .unwrap();
 
@@ -128,7 +174,7 @@ pub fn edit_file(
         open_file(file.to_path_buf());
     }
 
-    watch(score_path).unwrap();
+    watch(score_path, is_sketch).unwrap();
 }
 
 pub fn edit_main(
@@ -136,6 +182,7 @@ pub fn edit_main(
     search_artist: &bool,
     search_title: &bool,
     use_all_matches: &bool,
+    is_sketch: &bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -153,7 +200,12 @@ pub fn edit_main(
                 let score = score.output().to_string();
 
                 if let Some(ly_file) = get_score_ly_file(&score) {
-                    edit_file(ly_file, scores_directory, pdfs_directory);
+                    edit_file(
+                        ly_file,
+                        is_sketch,
+                        scores_directory,
+                        pdfs_directory,
+                    );
                 }
             }
         }
@@ -162,7 +214,12 @@ pub fn edit_main(
             let score = score.to_str().unwrap().to_string();
 
             if let Some(ly_file) = get_score_ly_file(&score) {
-                edit_file(ly_file, scores_directory, pdfs_directory);
+                edit_file(
+                    ly_file,
+                    is_sketch,
+                    scores_directory,
+                    pdfs_directory,
+                );
             }
         }
     }

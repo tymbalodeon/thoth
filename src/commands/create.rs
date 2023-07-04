@@ -3,6 +3,7 @@ use std::io::prelude::*;
 use std::path::Path;
 
 use super::add_value_to_string_if_some;
+use super::edit::edit_file;
 use crate::commands::edit::edit_main;
 use crate::commands::templates::form::get_form_templates;
 use crate::commands::templates::lead::get_lead_templates;
@@ -94,7 +95,6 @@ pub fn get_file_system_name(text: &str) -> String {
 
 pub fn create_score(
     settings: &ScoreFileSettings,
-    edit: &bool,
     scores_directory: &Option<String>,
     is_sketch: &bool,
 ) -> Vec<String> {
@@ -107,7 +107,7 @@ pub fn create_score(
     let file_system_title = get_file_system_name(title);
 
     let parent = if *is_sketch {
-        format!("/tmp/{file_system_title}")
+        "/tmp/thoth".to_string()
     } else {
         let scores_directory = get_scores_directory_from_arg(scores_directory);
         let composer_directory = get_file_system_name(&composer);
@@ -132,10 +132,6 @@ pub fn create_score(
     for template in templates {
         let file = create_file(template, &parent, file_system_title.clone());
         files.push(file)
-    }
-
-    if *edit {
-        println!("Opening for editing...")
     }
 
     files
@@ -191,24 +187,38 @@ pub fn create_main(
         &config.composer
     };
 
-    let files = create_score(&settings, edit, scores_directory, is_sketch);
+    let files = create_score(&settings, scores_directory, is_sketch);
 
     print_score_info(
         title, subtitle, composer, arranger, instrument, template,
     );
+
+    if *edit {
+        println!("Opening for editing...");
+    }
 
     for file in files {
         println!("{file}");
     }
 
     if *edit {
-        edit_main(
-            &get_file_system_name(title),
-            &false,
-            &false,
-            &true,
-            scores_directory,
-            pdfs_directory,
-        );
+        if *is_sketch {
+            edit_file(
+                "/tmp/thoth/sketch.ly".to_string(),
+                is_sketch,
+                &None,
+                &None,
+            );
+        } else {
+            edit_main(
+                &get_file_system_name(title),
+                &false,
+                &false,
+                &true,
+                is_sketch,
+                scores_directory,
+                pdfs_directory,
+            );
+        };
     }
 }
