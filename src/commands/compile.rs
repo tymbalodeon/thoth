@@ -1,7 +1,6 @@
 use std::fs::create_dir_all;
 use std::fs::metadata;
 use std::io::{self, Write};
-use std::path::Path;
 use std::path::PathBuf;
 use std::println;
 use std::process::Command;
@@ -12,7 +11,7 @@ use glob::glob;
 use super::get_pdfs_directory_from_arg;
 use super::get_scores_directory_from_arg;
 use super::scores::get_found_scores;
-use super::scores::get_matching_scores;
+use super::scores::get_score_ly_file;
 use super::scores::get_selected_items;
 
 fn get_modified(file: &PathBuf) -> Option<SystemTime> {
@@ -75,34 +74,6 @@ pub fn compile_input_file(
     }
 }
 
-fn compile_selected_scores(
-    scores: &Vec<String>,
-    use_all_matches: &bool,
-    scores_directory: &Option<String>,
-    pdfs_directory: &Option<String>,
-) {
-    let matching_scores =
-        get_matching_scores(scores, ".ly", scores_directory, pdfs_directory);
-
-    if !use_all_matches && matching_scores.len() > 1 {
-        let selected_items = get_selected_items(matching_scores, true);
-
-        for item in selected_items.iter() {
-            let path = item.output().to_string();
-            let path = Path::new(&path);
-            compile_input_file(
-                &path.to_path_buf(),
-                scores_directory,
-                pdfs_directory,
-            );
-        }
-    } else {
-        for score in matching_scores {
-            compile_input_file(&score, scores_directory, pdfs_directory);
-        }
-    }
-}
-
 pub fn compile_main(
     search_terms: &Vec<String>,
     search_artist: &bool,
@@ -116,23 +87,38 @@ pub fn compile_main(
         create_dir_all(&pdfs_directory).unwrap();
     }
 
-    if search_terms.is_empty() {
-        let found_scores = get_found_scores(
-            search_terms,
-            search_artist,
-            search_title,
-            scores_directory,
-        );
+    let matching_scores = get_found_scores(
+        search_terms,
+        search_artist,
+        search_title,
+        scores_directory,
+    );
 
-        for score in found_scores {
-            compile_input_file(&score, scores_directory, pdfs_directory);
+    if !use_all_matches && matching_scores.len() > 1 {
+        let selected_items = get_selected_items(matching_scores, true);
+
+        for item in selected_items.iter() {
+            let score = item.output().to_string();
+
+            if let Some(input_file) = get_score_ly_file(&score) {
+                compile_input_file(
+                    &PathBuf::from(input_file),
+                    scores_directory,
+                    pdfs_directory,
+                );
+            }
         }
     } else {
-        compile_selected_scores(
-            search_terms,
-            use_all_matches,
-            scores_directory,
-            pdfs_directory,
-        );
+        for score in matching_scores {
+            let score = score.to_str().unwrap().to_string();
+
+            if let Some(input_file) = get_score_ly_file(&score) {
+                compile_input_file(
+                    &PathBuf::from(input_file),
+                    scores_directory,
+                    pdfs_directory,
+                );
+            }
+        }
     }
 }

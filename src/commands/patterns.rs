@@ -40,21 +40,3 @@ pub fn get_score_file(
 
     None
 }
-
-pub fn get_patterns(
-    scores: &Vec<String>,
-    extension: &str,
-    scores_directory: &Option<String>,
-    pdfs_directory: &Option<String>,
-) -> Vec<String> {
-    let base = get_base(extension, scores_directory, pdfs_directory);
-
-    if !scores.is_empty() {
-        scores
-            .iter()
-            .map(|score| format!("{base}*{score}*{extension}"))
-            .collect()
-    } else {
-        vec![format!("{base}*{extension}")]
-    }
-}

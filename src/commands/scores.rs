@@ -10,36 +10,6 @@ use crate::commands::compile::is_compiled;
 use crate::commands::get_pdfs_directory_from_arg;
 use crate::commands::get_scores_directory_from_arg;
 
-use super::patterns::get_patterns;
-
-pub fn get_matching_scores(
-    scores: &Vec<String>,
-    extension: &str,
-    scores_directory: &Option<String>,
-    pdfs_directory: &Option<String>,
-) -> Vec<PathBuf> {
-    let patterns =
-        get_patterns(scores, extension, scores_directory, pdfs_directory);
-    let mut paths = vec![];
-
-    for pattern in patterns {
-        for entry in glob(&pattern).expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => {
-                    if path.display().to_string().contains("templates") {
-                        continue;
-                    }
-
-                    paths.push(path);
-                }
-                Err(message) => println!("{:?}", message),
-            }
-        }
-    }
-
-    paths
-}
-
 fn get_items(paths: Vec<PathBuf>) -> Option<Receiver<Arc<dyn SkimItem>>> {
     let paths: Vec<&str> =
         paths.iter().map(|path| path.to_str().unwrap()).collect();
