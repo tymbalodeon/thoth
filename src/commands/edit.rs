@@ -17,6 +17,7 @@ use watchexec::{
 use watchexec_signals::Signal;
 
 use crate::commands::patterns::get_score_file;
+use crate::commands::scores::TEMPORARY_DIRECTORY;
 use crate::commands::scores::{get_matching_scores, get_score_ly_file};
 use crate::config::Config;
 
@@ -61,7 +62,7 @@ pub async fn watch(file: PathBuf, is_sketch: &bool) -> Result<()> {
     let config = Config::from_config_file();
 
     let pdfs_directory = if *is_sketch {
-        "/tmp/thoth".to_string()
+        TEMPORARY_DIRECTORY.to_string()
     } else {
         config.pdfs_directory
     };
@@ -93,7 +94,7 @@ pub async fn watch(file: PathBuf, is_sketch: &bool) -> Result<()> {
             match ans {
                 Ok(true) => println!("Saving!"),
                 Ok(false) => {
-                    let _ = remove_dir_all("/tmp/thoth");
+                    let _ = remove_dir_all(TEMPORARY_DIRECTORY);
                 }
                 Err(message) => println!("{message}"),
             }
@@ -144,13 +145,13 @@ pub fn edit_file(
     let score_path = PathBuf::from(&lilypond_file);
 
     let scores_directory = if *is_sketch {
-        Some("/tmp/thoth".to_string())
+        Some(TEMPORARY_DIRECTORY.to_string())
     } else {
         scores_directory.to_owned()
     };
 
     let pdfs_directory = if *is_sketch {
-        Some("/tmp/thoth".to_string())
+        Some(TEMPORARY_DIRECTORY.to_string())
     } else {
         pdfs_directory.to_owned()
     };

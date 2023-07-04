@@ -11,6 +11,8 @@ use crate::commands::compile::is_compiled;
 use crate::commands::get_pdfs_directory_from_arg;
 use crate::commands::get_scores_directory_from_arg;
 
+pub const TEMPORARY_DIRECTORY: &str = "/tmp/thoth";
+
 fn get_items(paths: Vec<PathBuf>) -> Option<Receiver<Arc<dyn SkimItem>>> {
     let paths: Vec<&str> =
         paths.iter().map(|path| path.to_str().unwrap()).collect();

@@ -4,6 +4,7 @@ use std::path::Path;
 
 use super::add_value_to_string_if_some;
 use super::edit::edit_file;
+use super::scores::TEMPORARY_DIRECTORY;
 use crate::commands::edit::edit_main;
 use crate::commands::templates::form::get_form_templates;
 use crate::commands::templates::lead::get_lead_templates;
@@ -107,7 +108,7 @@ pub fn create_score(
     let file_system_title = get_file_system_name(title);
 
     let parent = if *is_sketch {
-        "/tmp/thoth".to_string()
+        TEMPORARY_DIRECTORY.to_string()
     } else {
         let scores_directory = get_scores_directory_from_arg(scores_directory);
         let composer_directory = get_file_system_name(&composer);
@@ -204,7 +205,7 @@ pub fn create_main(
     if *edit {
         if *is_sketch {
             edit_file(
-                "/tmp/thoth/sketch.ly".to_string(),
+                format!("{TEMPORARY_DIRECTORY}/sketch.ly"),
                 is_sketch,
                 &None,
                 &None,
