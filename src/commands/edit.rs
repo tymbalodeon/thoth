@@ -1,8 +1,13 @@
 use std::convert::Infallible;
+use std::fs::create_dir_all;
 use std::fs::remove_dir_all;
+use std::fs::rename;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use chrono::offset::Local;
 use glob::glob;
 use inquire::Confirm;
 use miette::{IntoDiagnostic, Result};
@@ -16,7 +21,9 @@ use watchexec::{
 };
 use watchexec_signals::Signal;
 
+use crate::commands::create::get_file_system_name;
 use crate::commands::patterns::get_score_file;
+use crate::commands::scores::get_temporary_ly_file;
 use crate::commands::scores::TEMPORARY_DIRECTORY;
 use crate::commands::scores::{get_matching_scores, get_score_ly_file};
 use crate::config::Config;
@@ -46,6 +53,54 @@ fn get_watched_files(file: &String) -> Vec<String> {
     watched_files.push(file.to_string());
 
     watched_files
+}
+
+fn exit_sketch(save: bool) {
+    if save {
+        let file =
+            File::open(get_temporary_ly_file()).expect("file not found");
+        let buf_reader = BufReader::new(file);
+        let lines: Vec<String> =
+            buf_reader.lines().collect::<Result<_, _>>().unwrap();
+        let config = Config::from_config_file();
+        let mut composer = config.composer;
+        let mut title = "Sketch".to_string();
+
+        for line in lines {
+            let composer_line = "  composer = ";
+            let title_line = "  title = ";
+
+            if line.starts_with(composer_line) {
+                composer = get_file_system_name(
+                    &line.replace(composer_line, "").replace('"', ""),
+                );
+            }
+
+            if line.starts_with(title_line) {
+                title = get_file_system_name(
+                    &line.replace(title_line, "").replace('"', ""),
+                );
+            }
+        }
+
+        let sketches_directory =
+            format!("{}/scores/{composer}/sketches", config.scores_directory);
+
+        if create_dir_all(&sketches_directory).is_ok() {
+            let saved_file_path = format!(
+                "{sketches_directory}/{}-{title}.ly",
+                Local::now().format("%Y-%m-%d_%H:%M:%S")
+            );
+
+            if let Err(message) =
+                rename(get_temporary_ly_file(), saved_file_path)
+            {
+                println!("{message}");
+            }
+        }
+    }
+
+    let _ = remove_dir_all(TEMPORARY_DIRECTORY);
 }
 
 #[tokio::main]
@@ -92,10 +147,8 @@ pub async fn watch(file: PathBuf, is_sketch: &bool) -> Result<()> {
                 .prompt();
 
             match response {
-                Ok(true) => println!("Saving!"),
-                Ok(false) => {
-                    let _ = remove_dir_all(TEMPORARY_DIRECTORY);
-                }
+                Ok(true) => exit_sketch(true),
+                Ok(false) => exit_sketch(false),
                 Err(message) => println!("{message}"),
             }
             action.outcome(Outcome::Exit);

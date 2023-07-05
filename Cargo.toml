@@ -8,6 +8,7 @@ description = "CLI for managing LilyPond scores repositores"
 
 [dependencies]
 bat = "0.23.0"
+chrono = "0.4.26"
 clap = { version = "4.2.7", features = ["derive"] }
 convert_case = "0.6.0"
 derivative = "2.2.0"

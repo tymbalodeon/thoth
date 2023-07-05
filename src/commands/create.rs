@@ -4,7 +4,7 @@ use std::path::Path;
 
 use super::add_value_to_string_if_some;
 use super::edit::edit_file;
-use super::scores::TEMPORARY_DIRECTORY;
+use super::scores::{get_temporary_ly_file, TEMPORARY_DIRECTORY};
 use crate::commands::edit::edit_main;
 use crate::commands::templates::form::get_form_templates;
 use crate::commands::templates::lead::get_lead_templates;
@@ -204,12 +204,7 @@ pub fn create_main(
 
     if *edit {
         if *is_sketch {
-            edit_file(
-                format!("{TEMPORARY_DIRECTORY}/sketch.ly"),
-                is_sketch,
-                &None,
-                &None,
-            );
+            edit_file(get_temporary_ly_file(), is_sketch, &None, &None);
         } else {
             edit_main(
                 &get_file_system_name(title),

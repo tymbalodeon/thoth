@@ -13,6 +13,10 @@ use crate::commands::get_scores_directory_from_arg;
 
 pub const TEMPORARY_DIRECTORY: &str = "/tmp/thoth";
 
+pub fn get_temporary_ly_file() -> String {
+    format!("{TEMPORARY_DIRECTORY}/sketch.ly")
+}
+
 fn get_items(paths: Vec<PathBuf>) -> Option<Receiver<Arc<dyn SkimItem>>> {
     let paths: Vec<&str> =
         paths.iter().map(|path| path.to_str().unwrap()).collect();
