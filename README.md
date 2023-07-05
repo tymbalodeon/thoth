@@ -1,6 +1,6 @@
 # Thoth
 
-CLI for working with LilyPond files
+CLI for managing LilyPond [scores repositories](https://github.com/tymbalodeon/scores)
 
 Usage: thoth [COMMAND]
 
@@ -13,9 +13,12 @@ Commands:
 |    config | Display config                                                     |
 |    create | Create new score template                                          |
 |      edit | Open <score> in editor and pdf viewer, recompiling on file changes |
+|      info | Display <score> info                                               |
 |      list | List pdf(s)                                                        |
 |      open | Open pdf(s)                                                        |
 | templates | List template types                                                |
+|   helpers | List helper files                                                  |
+|    sketch | Open temporary sketch file                                         |
 |      help | Print this message or the help of the given subcommand(s)          |
 
 Options:

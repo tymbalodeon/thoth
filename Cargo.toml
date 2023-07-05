@@ -2,7 +2,7 @@
 name = "thoth"
 version = "0.1.0"
 edition = "2021"
-description = "CLI for working with LilyPond files"
+description = "CLI for managing LilyPond scores repositores"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
