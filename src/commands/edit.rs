@@ -87,11 +87,11 @@ pub async fn watch(file: PathBuf, is_sketch: &bool) -> Result<()> {
         |action: Action| {
             print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
 
-            let ans = Confirm::new("Do you want to save sketch?")
+            let response = Confirm::new("Do you want to save the sketch?")
                 .with_default(false)
                 .prompt();
 
-            match ans {
+            match response {
                 Ok(true) => println!("Saving!"),
                 Ok(false) => {
                     let _ = remove_dir_all(TEMPORARY_DIRECTORY);
