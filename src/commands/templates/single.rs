@@ -19,6 +19,7 @@ pub fn get_single_template(
         {lilypond_version}
 
         \\include \"helpers/settings.ily\"
+        \\include \"helpers/bar-numbers-left.ily\"
 
         {header}
 
