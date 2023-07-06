@@ -151,8 +151,12 @@ pub fn print_score_info(
         template
     );
 
-    score_info = add_value_to_string_if_some(score_info, "subtitle", subtitle);
-    score_info.push_str(format!("Composer = {composer}\n").as_str());
+    score_info = add_value_to_string_if_some(score_info, "Subtitle", subtitle);
+    score_info = add_value_to_string_if_some(
+        score_info,
+        "Composer",
+        &Some(composer.to_string()),
+    );
     score_info = add_value_to_string_if_some(score_info, "Arranger", arranger);
     score_info =
         add_value_to_string_if_some(score_info, "Instrument", instrument);
