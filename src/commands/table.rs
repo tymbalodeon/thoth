@@ -1,23 +1,16 @@
 use bat::{PagingMode, PrettyPrinter};
-use prettytable::{format, Cell, Row, Table};
-
-fn create_row(values: Vec<String>) -> Row {
-    let cells: Vec<Cell> = values.iter().map(|cell| Cell::new(cell)).collect();
-
-    Row::new(cells)
-}
+use tabled::{builder::Builder, settings::Style};
 
 pub fn print_table(titles: Vec<String>, rows: Vec<Vec<String>>) {
-    let mut table = Table::new();
+    let mut table = Builder::default();
 
-    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-    table.set_titles(create_row(titles));
+    table.set_header(titles);
 
-    for row_values in rows {
-        table.add_row(create_row(row_values));
+    for values in rows {
+        table.push_record(values);
     }
 
-    let table_bytes = table.to_string();
+    let table_bytes = table.build().with(Style::modern()).to_string();
 
     PrettyPrinter::new()
         .input_from_bytes(table_bytes.as_bytes())

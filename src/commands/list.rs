@@ -27,11 +27,7 @@ impl Composition {
             "missing".red().to_string()
         };
 
-        vec![
-            artist.cyan().to_string(),
-            title.bright_white().bold().to_string(),
-            pdf,
-        ]
+        vec![artist.magenta().to_string(), title.bold().to_string(), pdf]
     }
 }
 
