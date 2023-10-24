@@ -5,6 +5,7 @@ use super::compile::is_compiled;
 use super::get_pdfs_directory_from_arg;
 use crate::commands::scores::get_matching_scores;
 use crate::commands::table::print_table;
+use owo_colors::OwoColorize;
 
 struct Composition {
     artist: String,
@@ -20,9 +21,17 @@ impl Composition {
     fn get_row_values(&self) -> Vec<String> {
         let artist = get_display(&self.artist);
         let title = get_display(&self.title);
-        let pdf = self.is_compiled.to_string();
+        let pdf = if self.is_compiled {
+            "compiled".green().to_string()
+        } else {
+            "missing".red().to_string()
+        };
 
-        vec![artist, title, pdf]
+        vec![
+            artist.cyan().to_string(),
+            title.bright_white().bold().to_string(),
+            pdf,
+        ]
     }
 }
 
@@ -123,9 +132,9 @@ pub fn list_main(
         });
 
         let header = vec![
-            "ARTIST".to_string(),
-            "TITLE".to_string(),
-            "STATUS".to_string(),
+            "Artist".yellow().to_string(),
+            "Title".yellow().to_string(),
+            "Status".yellow().to_string(),
         ];
 
         let rows = compositions
