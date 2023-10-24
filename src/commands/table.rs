@@ -10,7 +10,7 @@ pub fn print_table(titles: Vec<String>, rows: Vec<Vec<String>>) {
         table.push_record(values);
     }
 
-    let table_bytes = table.build().with(Style::modern()).to_string();
+    let table_bytes = table.build().with(Style::rounded()).to_string();
 
     PrettyPrinter::new()
         .input_from_bytes(table_bytes.as_bytes())
