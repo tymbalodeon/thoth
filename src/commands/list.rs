@@ -27,7 +27,7 @@ impl Composition {
             "missing".red().to_string()
         };
 
-        vec![artist.magenta().to_string(), title.bold().to_string(), pdf]
+        vec![artist.yellow().to_string(), title.bold().to_string(), pdf]
     }
 }
 
@@ -128,9 +128,9 @@ pub fn list_main(
         });
 
         let header = vec![
-            "Artist".yellow().to_string(),
-            "Title".yellow().to_string(),
-            "Status".yellow().to_string(),
+            "Artist".italic().to_string(),
+            "Title".italic().to_string(),
+            "Status".italic().to_string(),
         ];
 
         let rows = compositions
