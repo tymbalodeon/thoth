@@ -9,6 +9,8 @@ use shellexpand::tilde;
 use toml::{from_str, to_string};
 use users::get_current_username;
 
+use bat::{PagingMode, PrettyPrinter};
+
 use crate::commands::{templates::Template, ConfigKey};
 
 static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
@@ -192,6 +194,7 @@ impl Config {
 
     pub fn display() {
         let config = Config::from_config_file();
+        let mut lines = String::new();
 
         let mut items = vec![
             format!("Composer = {}", &config.composer),
@@ -204,8 +207,17 @@ impl Config {
         items.sort();
 
         for item in items {
-            println!("{item}");
+            lines.push_str(&item);
+            lines.push('\n');
         }
+
+        PrettyPrinter::new()
+            .input_from_bytes(lines.as_bytes())
+            .language("toml")
+            .theme("gruvbox-dark")
+            .paging_mode(PagingMode::QuitIfOneScreen)
+            .print()
+            .unwrap();
     }
 
     pub fn display_path() {
