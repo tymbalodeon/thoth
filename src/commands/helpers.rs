@@ -105,3 +105,8 @@ pub fn helpers_main(command: &Option<HelperCommand>) {
 
     print_table(titles, rows);
 }
+
+pub fn pushln(lines: &mut String, text: String) {
+    lines.push_str(&text);
+    lines.push('\n');
+}

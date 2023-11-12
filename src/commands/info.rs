@@ -1,5 +1,6 @@
 use convert_case::{Case::Title, Casing};
 
+use crate::commands::helpers::pushln;
 use crate::commands::scores::{get_matching_scores, get_score_ly_file};
 
 use super::scores::get_selected_items;
@@ -7,6 +8,8 @@ use std::{
     fs::File,
     io::{BufRead, BufReader},
 };
+
+use bat::{PagingMode, PrettyPrinter};
 
 struct CompositionMetadata {
     lilypond_version: Option<String>,
@@ -20,48 +23,63 @@ struct CompositionMetadata {
 }
 
 fn print_info(composition_metadata: CompositionMetadata) {
+    let mut lines = String::new();
+
     if let Some(lilypond_version) = composition_metadata.lilypond_version {
-        println!("LilyPond version = {lilypond_version}");
+        pushln(
+            &mut lines,
+            format!("LilyPond version = \"{lilypond_version}\""),
+        );
     }
 
     if let Some(title) = composition_metadata.title {
-        println!("Title = {title}");
+        pushln(&mut lines, format!("Title = \"{title}\""));
     }
 
     if let Some(subtitle) = composition_metadata.subtitle {
-        println!("Subtitle = {subtitle}");
+        pushln(&mut lines, format!("Subtitle = \"{subtitle}\""));
     }
 
     if let Some(composer) = composition_metadata.composer {
-        println!("Composer = {composer}");
+        pushln(&mut lines, format!("Composer = \"{composer}\""));
     }
 
     if let Some(arranger) = composition_metadata.arranger {
-        println!("Arranger = {arranger}");
+        pushln(&mut lines, format!("Arranger = \"{arranger}\""));
     }
 
     if let Some(key) = composition_metadata.key {
-        println!("Key = {key}");
+        pushln(&mut lines, format!("Key = \"{key}\""));
     } else {
-        println!("Key = C Major");
+        pushln(&mut lines, format!("Key = C Major"));
     }
 
     if let Some(time) = composition_metadata.time {
-        println!("Time Signature = {time}");
+        pushln(&mut lines, format!("Time Signature = \"{time}\""));
     } else {
-        println!("Time = 4/4");
+        pushln(&mut lines, format!("Time = 4/4"));
     }
 
     let mut instruments = composition_metadata.instruments;
 
     if !instruments.is_empty() {
         instruments.sort();
-        println!("Instrumentation:");
+        pushln(&mut lines, "Instrumentation = [ ".to_string());
 
         for instrument in instruments {
-            println!("    - {instrument}");
+            pushln(&mut lines, format!("    \"{instrument}\""));
         }
+
+        pushln(&mut lines, "]".to_string());
     }
+
+    PrettyPrinter::new()
+        .input_from_bytes(lines.as_bytes())
+        .language("toml")
+        .theme("gruvbox-dark")
+        .paging_mode(PagingMode::QuitIfOneScreen)
+        .print()
+        .unwrap();
 }
 
 fn display_score_info(score: &String) {

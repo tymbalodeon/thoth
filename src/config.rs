@@ -11,7 +11,7 @@ use users::get_current_username;
 
 use bat::{PagingMode, PrettyPrinter};
 
-use crate::commands::{templates::Template, ConfigKey};
+use crate::commands::{helpers::pushln, templates::Template, ConfigKey};
 
 static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
 
@@ -197,18 +197,17 @@ impl Config {
         let mut lines = String::new();
 
         let mut items = vec![
-            format!("Composer = {}", &config.composer),
-            format!("Scores directory = {}", &config.scores_directory),
-            format!("PDFs directory = {}", &config.pdfs_directory),
-            format!("Template = {:?}", &config.template),
-            format!("Instrument = {}", &config.instrument),
+            format!("Composer = \"{}\"", &config.composer),
+            format!("Scores directory = \"{}\"", &config.scores_directory),
+            format!("PDFs directory = \"{}\"", &config.pdfs_directory),
+            format!("Template = \"{:?}\"", &config.template),
+            format!("Instrument = \"{}\"", &config.instrument),
         ];
 
         items.sort();
 
         for item in items {
-            lines.push_str(&item);
-            lines.push('\n');
+            pushln(&mut lines, item);
         }
 
         PrettyPrinter::new()
