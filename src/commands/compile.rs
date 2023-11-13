@@ -39,7 +39,7 @@ pub fn compile_input_file(
 
     if let Some(file) = input_file.to_str() {
         let output_file_pattern = format!(
-            "{pdfs_directory}/*{}*.pdf",
+            "{pdfs_directory}/{}*.pdf",
             input_file.file_stem().unwrap().to_str().unwrap()
         );
 
