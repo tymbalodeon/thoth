@@ -20,6 +20,7 @@ regex = "1.7.3"
 serde = { version = "1.0.156", features = ["derive"] }
 shellexpand = "3.0.0"
 skim = "0.10.4"
+struct_iterable = "0.1.1"
 tabled = { version = "0.14.0", features = ["color"] }
 titlecase = "2.2.1"
 tokio = "1.28.2"

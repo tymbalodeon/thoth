@@ -14,6 +14,10 @@ try *args:
     #!/usr/bin/env zsh
     cargo run -- {{args}} {{ if args == "" { "|| exit 0" } else { "" } }}
 
+# Add a dependency.
+@add dependency:
+    cargo add {{dependency}}
+
 # Install the application.
 @install:
     cargo install --path .
