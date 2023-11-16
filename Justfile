@@ -18,6 +18,10 @@ try *args:
 @install:
     cargo install --path .
 
+# List the dependencies.
+@list:
+    cargo tree --depth 1
+
 # Update the dependencies.
 @update:
     cargo update
