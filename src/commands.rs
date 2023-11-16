@@ -5,6 +5,7 @@ pub mod create;
 pub mod edit;
 pub mod helpers;
 pub mod info;
+pub mod lilypond;
 pub mod list;
 pub mod open;
 mod patterns;
@@ -46,6 +47,18 @@ pub enum ScoreFileType {
     Both,
     Lilypond,
     Pdf,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum LilypondCommand {
+    /// Show or set the global lilypond version
+    Global { version: Option<String> },
+
+    /// Install lilypond version(s)
+    Install { version: Option<String> },
+
+    /// List lilypond version(s)
+    List { version_regex: Option<String> },
 }
 
 #[derive(Subcommand)]
@@ -195,6 +208,12 @@ pub enum Command {
 
         #[arg(long)]
         scores_directory: Option<String>,
+    },
+
+    /// Manage lilypond installation(s)
+    Lilypond {
+        #[command(subcommand)]
+        command: Option<LilypondCommand>,
     },
 
     /// List pdf(s)

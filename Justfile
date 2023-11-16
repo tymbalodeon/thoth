@@ -17,3 +17,7 @@ try *args:
 # Install the application.
 @install:
     cargo install --path .
+
+# Update the dependencies.
+@update:
+    cargo update

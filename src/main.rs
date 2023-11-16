@@ -11,6 +11,7 @@ use commands::create::{create_main, ScoreFileSettings};
 use commands::edit::edit_main;
 use commands::helpers::helpers_main;
 use commands::info::info_main;
+use commands::lilypond::lilypond_main;
 use commands::list::list_main;
 use commands::open::open_main;
 use commands::sketch::sketch_main;
@@ -120,6 +121,9 @@ fn main() {
             scores_directory,
         }) => {
             info_main(search_term, artist, title, all, scores_directory);
+        }
+        Some(Command::Lilypond { command }) => {
+            lilypond_main(command);
         }
         Some(Command::List {
             search_terms,
