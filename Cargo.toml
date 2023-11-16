@@ -4,8 +4,6 @@ version = "0.1.0"
 edition = "2021"
 description = "CLI for managing LilyPond scores repositores"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 bat = "0.23.0"
 chrono = "0.4.26"
