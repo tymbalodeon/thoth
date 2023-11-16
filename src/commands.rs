@@ -11,7 +11,7 @@ pub mod open;
 mod patterns;
 mod scores;
 pub mod sketch;
-mod table;
+pub mod table;
 pub mod templates;
 
 use std::fmt::{Display, Formatter, Result};

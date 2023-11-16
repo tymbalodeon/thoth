@@ -4,14 +4,13 @@ use std::{
     process::Command,
 };
 
+use crate::commands::table::print_table;
+use crate::commands::{templates::Template, ConfigKey};
+use owo_colors::OwoColorize;
 use serde::{Deserialize, Serialize};
 use shellexpand::tilde;
 use toml::{from_str, to_string};
 use users::get_current_username;
-
-use bat::{PagingMode, PrettyPrinter};
-
-use crate::commands::{helpers::pushln, templates::Template, ConfigKey};
 
 static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
 
@@ -194,29 +193,34 @@ impl Config {
 
     pub fn display() {
         let config = Config::from_config_file();
-        let mut lines = String::new();
 
-        let mut items = vec![
-            format!("Composer = \"{}\"", &config.composer),
-            format!("Scores directory = \"{}\"", &config.scores_directory),
-            format!("PDFs directory = \"{}\"", &config.pdfs_directory),
-            format!("Template = \"{:?}\"", &config.template),
-            format!("Instrument = \"{}\"", &config.instrument),
+        let header =
+            vec!["Key".italic().to_string(), "Value".italic().to_string()];
+
+        let rows = vec![
+            vec![
+                "composer".yellow().to_string(),
+                config.composer.bold().to_string(),
+            ],
+            vec![
+                "instrument".yellow().to_string(),
+                config.instrument.bold().to_string(),
+            ],
+            vec![
+                "scores_directory".yellow().to_string(),
+                config.scores_directory.bold().to_string(),
+            ],
+            vec![
+                "pdfs_directory".yellow().to_string(),
+                config.pdfs_directory.bold().to_string(),
+            ],
+            vec![
+                "template".yellow().to_string(),
+                format!("{:?}", config.template).bold().to_string(),
+            ],
         ];
 
-        items.sort();
-
-        for item in items {
-            pushln(&mut lines, item);
-        }
-
-        PrettyPrinter::new()
-            .input_from_bytes(lines.as_bytes())
-            .language("toml")
-            .theme("gruvbox-dark")
-            .paging_mode(PagingMode::QuitIfOneScreen)
-            .print()
-            .unwrap();
+        print_table(header, rows);
     }
 
     pub fn display_path() {
