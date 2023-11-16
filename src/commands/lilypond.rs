@@ -1,4 +1,5 @@
-use std::path::PathBuf;
+use std::fs::read_to_string;
+use std::fs::write;
 
 use super::LilypondCommand;
 use shellexpand::tilde;
@@ -6,15 +7,16 @@ use shellexpand::tilde;
 static GLOBAL_PATH: &str = "~/.thoth-versions";
 
 fn global(version: &Option<String>) {
+    let global_path = tilde(GLOBAL_PATH).to_string();
+
     if let Some(value) = version {
-        println!("{value:?}");
+        let _ = write(global_path, value);
     } else {
-        let global_path = tilde(GLOBAL_PATH);
-        if PathBuf::from(global_path.to_string()).exists() {
-            println!("{global_path}");
+        if let Ok(version) = read_to_string(&global_path) {
+            println!("lilypond {version}");
         } else {
             println!("No global lilypond version set.");
-        }
+        };
     }
 }
 
