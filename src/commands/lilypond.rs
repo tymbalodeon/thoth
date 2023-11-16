@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use super::LilypondCommand;
 use shellexpand::tilde;
 
@@ -8,7 +10,11 @@ fn global(version: &Option<String>) {
         println!("{value:?}");
     } else {
         let global_path = tilde(GLOBAL_PATH);
-        println!("{global_path}");
+        if PathBuf::from(global_path.to_string()).exists() {
+            println!("{global_path}");
+        } else {
+            println!("No global lilypond version set.");
+        }
     }
 }
 
