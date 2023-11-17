@@ -31,13 +31,8 @@ pub enum Template {
 }
 
 impl Display for Template {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        match self {
-            Template::Form => write!(f, "Form"),
-            Template::Lead => write!(f, "Lead"),
-            Template::Piano => write!(f, "Piano"),
-            Template::Single => write!(f, "Single"),
-        }
+    fn fmt(&self, formatter: &mut Formatter) -> Result {
+        write!(formatter, "{self:?}")
     }
 }
 
