@@ -191,6 +191,18 @@ impl Config {
         Config::from_config_file().template
     }
 
+    fn style_key(key: &str) -> String {
+        key.yellow().to_string()
+    }
+
+    fn style_value(value: String) -> String {
+        value.bold().to_string()
+    }
+
+    fn style_key_value(key: &str, value: String) -> Vec<String> {
+        vec![Self::style_key(key), Self::style_value(value)]
+    }
+
     pub fn display() {
         let config = Config::from_config_file();
 
@@ -198,26 +210,11 @@ impl Config {
             vec!["Key".italic().to_string(), "Value".italic().to_string()];
 
         let rows = vec![
-            vec![
-                "composer".yellow().to_string(),
-                config.composer.bold().to_string(),
-            ],
-            vec![
-                "instrument".yellow().to_string(),
-                config.instrument.bold().to_string(),
-            ],
-            vec![
-                "scores_directory".yellow().to_string(),
-                config.scores_directory.bold().to_string(),
-            ],
-            vec![
-                "pdfs_directory".yellow().to_string(),
-                config.pdfs_directory.bold().to_string(),
-            ],
-            vec![
-                "template".yellow().to_string(),
-                format!("{:?}", config.template).bold().to_string(),
-            ],
+            Self::style_key_value("composer", config.composer),
+            Self::style_key_value("instrument", config.instrument),
+            Self::style_key_value("scores_directory", config.scores_directory),
+            Self::style_key_value("pdfs_directory", config.pdfs_directory),
+            Self::style_key_value("template", config.template.to_string()),
         ];
 
         print_table(header, rows);

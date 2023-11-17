@@ -3,6 +3,8 @@ pub mod lead;
 pub mod piano;
 pub mod single;
 
+use fmt::{Display, Formatter, Result};
+use std::fmt;
 use std::process::Command;
 
 use bat::{PagingMode, PrettyPrinter};
@@ -26,6 +28,17 @@ pub enum Template {
     Lead,
     Piano,
     Single,
+}
+
+impl Display for Template {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        match self {
+            Template::Form => write!(f, "Form"),
+            Template::Lead => write!(f, "Lead"),
+            Template::Piano => write!(f, "Piano"),
+            Template::Single => write!(f, "Single"),
+        }
+    }
 }
 
 #[derive(Debug)]
