@@ -1,11 +1,14 @@
+use super::table::print_table;
+use super::LilypondCommand;
+
 use std::fmt::{Display, Formatter, Result};
 use std::fs::{read_to_string, write};
 
+use itertools::{EitherOrBoth::*, Itertools};
+use owo_colors::OwoColorize;
 use shellexpand::tilde;
 
-use super::LilypondCommand;
-
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum VersionStability {
     Stable,
     Unstable,
@@ -28,7 +31,6 @@ fn get_version_stability(version: &String) -> VersionStability {
         .unwrap()
         .parse::<i32>()
         .unwrap();
-
     if minor_version % 2 == 0 {
         VersionStability::Stable
     } else {
@@ -58,31 +60,70 @@ fn install(version: &Option<String>) {
     println!("{version:?}");
 }
 
-fn list(_version_regex: &Option<String>) {
-    let response = reqwest::blocking::get(
+fn get_versions(
+    versions: &Vec<String>,
+    stability: VersionStability,
+) -> Vec<&String> {
+    versions
+        .iter()
+        .filter(|version| get_version_stability(version) == stability)
+        .collect()
+}
+
+fn list_remote(_version_regex: &Option<String>) {
+    let versions: Vec<String> = reqwest::blocking::get(
         "https://gitlab.com/api/v4/projects/18695663/releases",
     )
     .unwrap()
     .json::<serde_json::Value>()
-    .unwrap();
+    .unwrap()
+    .as_array()
+    .unwrap()
+    .iter()
+    .map(|object| {
+        object
+            .as_object()
+            .unwrap()
+            .get("tag_name")
+            .unwrap()
+            .to_string()
+            .replace('v', "")
+            .replace('"', "")
+            .bold()
+            .to_string()
+    })
+    .collect();
 
-    let array = response.as_array().unwrap();
-    let versions: Vec<String> = array
-        .iter()
-        .map(|object| {
-            object
-                .as_object()
-                .unwrap()
-                .get("tag_name")
-                .unwrap()
-                .to_string()
-                .replace('v', "")
-                .replace('"', "")
-        })
-        .collect();
+    let stable = get_versions(&versions, VersionStability::Stable);
+    let unstable = get_versions(&versions, VersionStability::Unstable);
 
-    for version in versions.iter() {
-        println!("{version}");
+    let titles = vec![
+        "Stable".italic().green().to_string(),
+        "Unstable".italic().yellow().to_string(),
+    ];
+
+    let mut rows: Vec<Vec<String>> = vec![];
+
+    for pair in stable.iter().zip_longest(unstable.iter()) {
+        match pair {
+            Both(stable, unstable) => {
+                rows.push(vec![stable.to_string(), unstable.to_string()])
+            }
+            Left(stable) => {
+                rows.push(vec![stable.to_string(), "".to_string()])
+            }
+            Right(unstable) => {
+                rows.push(vec!["".to_string(), unstable.to_string()])
+            }
+        }
+    }
+
+    print_table(titles, rows);
+}
+
+fn list(remote: &bool, version_regex: &Option<String>) {
+    if *remote {
+        list_remote(version_regex)
     }
 }
 
@@ -91,7 +132,10 @@ pub fn lilypond_main(command: &Option<LilypondCommand>) {
         match command {
             LilypondCommand::Global { version } => global(&version),
             LilypondCommand::Install { version } => install(&version),
-            LilypondCommand::List { version_regex } => list(version_regex),
+            LilypondCommand::List {
+                remote,
+                version_regex,
+            } => list(remote, version_regex),
         }
     } else {
         println!("{command:?}")

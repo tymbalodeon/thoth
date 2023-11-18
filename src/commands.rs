@@ -58,7 +58,13 @@ pub enum LilypondCommand {
     Install { version: Option<String> },
 
     /// List lilypond version(s)
-    List { version_regex: Option<String> },
+    List {
+        /// List all versions available for download
+        #[arg(long)]
+        remote: bool,
+
+        version_regex: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
