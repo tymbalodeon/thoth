@@ -3023,6 +3023,7 @@ dependencies = [
  "regex",
  "reqwest",
  "serde",
+ "serde_json",
  "shellexpand",
  "skim",
  "struct_iterable",

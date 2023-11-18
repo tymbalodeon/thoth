@@ -1,7 +1,7 @@
-use shellexpand::tilde;
-use std::collections::HashMap;
 use std::fmt::{Display, Formatter, Result};
 use std::fs::{read_to_string, write};
+
+use shellexpand::tilde;
 
 use super::LilypondCommand;
 
@@ -63,8 +63,10 @@ fn list(_version_regex: &Option<String>) {
         "https://gitlab.com/api/v4/projects/18695663/releases",
     )
     .unwrap()
-    .json::<HashMap<String, String>>();
-    println!("{:#?}", response);
+    .json::<serde_json::Value>()
+    .unwrap();
+
+    println!("{response}");
 }
 
 pub fn lilypond_main(command: &Option<LilypondCommand>) {

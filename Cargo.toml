@@ -19,6 +19,7 @@ owo-colors = "3.5.0"
 regex = "1.7.3"
 reqwest = { version = "0.11.22", features = ["json", "blocking"] }
 serde = { version = "1.0.156", features = ["derive"] }
+serde_json = "1.0.108"
 shellexpand = "3.0.0"
 skim = "0.10.4"
 struct_iterable = "0.1.1"
