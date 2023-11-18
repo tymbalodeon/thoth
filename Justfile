@@ -15,8 +15,12 @@ try *args:
     cargo run -- {{args}} {{ if args == "" { "|| exit 0" } else { "" } }}
 
 # Add a dependency.
-@add dependency:
-    cargo add {{dependency}}
+@add +dependencies:
+    cargo add {{dependencies}}
+
+# Remove a dependency.
+@remove +dependencies:
+    cargo remove {{dependencies}}
 
 # Install the application.
 @install:
