@@ -14,6 +14,8 @@ enum VersionStability {
     Unstable,
 }
 
+static GLOBAL_PATH: &str = "~/.thoth-versions";
+
 impl Display for VersionStability {
     fn fmt(&self, formatter: &mut Formatter) -> Result {
         let display = format!("{self:?}").to_lowercase();
@@ -39,7 +41,7 @@ fn get_version_stability(version: &String) -> VersionStability {
 }
 
 fn global(version: &Option<String>) {
-    let global_path = tilde("~/.thoth-versions").to_string();
+    let global_path = tilde(GLOBAL_PATH).to_string();
 
     if let Some(value) = version {
         let stability = get_version_stability(value);
@@ -121,10 +123,10 @@ fn list_remote(_version_regex: &Option<String>) {
     print_table(titles, rows);
 }
 
-fn list(remote: &bool, version_regex: &Option<String>) {
-    if *remote {
-        list_remote(version_regex)
-    }
+fn list(_version_regex: &Option<String>) {
+    let contents = read_to_string(&tilde(GLOBAL_PATH).as_ref())
+        .expect("Should have been able to read the file");
+    println!("{contents}")
 }
 
 pub fn lilypond_main(command: &Option<LilypondCommand>) {
@@ -132,10 +134,10 @@ pub fn lilypond_main(command: &Option<LilypondCommand>) {
         match command {
             LilypondCommand::Global { version } => global(&version),
             LilypondCommand::Install { version } => install(&version),
-            LilypondCommand::List {
-                remote,
-                version_regex,
-            } => list(remote, version_regex),
+            LilypondCommand::List { version_regex } => list(version_regex),
+            LilypondCommand::ListRemote { version_regex } => {
+                list_remote(version_regex)
+            }
         }
     } else {
         println!("{command:?}")
