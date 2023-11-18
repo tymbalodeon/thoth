@@ -1,4 +1,5 @@
 use shellexpand::tilde;
+use std::collections::HashMap;
 use std::fmt::{Display, Formatter, Result};
 use std::fs::{read_to_string, write};
 
@@ -53,14 +54,25 @@ fn global(version: &Option<String>) {
     }
 }
 
+fn install(version: &Option<String>) {
+    println!("{version:?}");
+}
+
+fn list(_version_regex: &Option<String>) {
+    let response = reqwest::blocking::get(
+        "https://gitlab.com/api/v4/projects/18695663/releases",
+    )
+    .unwrap()
+    .json::<HashMap<String, String>>();
+    println!("{:#?}", response);
+}
+
 pub fn lilypond_main(command: &Option<LilypondCommand>) {
     if let Some(command) = command {
         match command {
             LilypondCommand::Global { version } => global(&version),
-            LilypondCommand::Install { version } => println!("{version:?}"),
-            LilypondCommand::List { version_regex } => {
-                println!("{version_regex:?}")
-            }
+            LilypondCommand::Install { version } => install(&version),
+            LilypondCommand::List { version_regex } => list(version_regex),
         }
     } else {
         println!("{command:?}")
