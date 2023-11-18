@@ -66,7 +66,24 @@ fn list(_version_regex: &Option<String>) {
     .json::<serde_json::Value>()
     .unwrap();
 
-    println!("{response}");
+    let array = response.as_array().unwrap();
+    let versions: Vec<String> = array
+        .iter()
+        .map(|object| {
+            object
+                .as_object()
+                .unwrap()
+                .get("tag_name")
+                .unwrap()
+                .to_string()
+                .replace('v', "")
+                .replace('"', "")
+        })
+        .collect();
+
+    for version in versions.iter() {
+        println!("{version}");
+    }
 }
 
 pub fn lilypond_main(command: &Option<LilypondCommand>) {
