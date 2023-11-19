@@ -139,11 +139,11 @@ fn list_remote(
                 }
             }
         }
-    } else if stable.is_empty() {
+    } else if !stable.is_empty() {
         for version in stable.iter() {
             rows.push(vec![version.to_string()]);
         }
-    } else if unstable.is_empty() {
+    } else if !unstable.is_empty() {
         for version in unstable.iter() {
             rows.push(vec![version.to_string()]);
         }
