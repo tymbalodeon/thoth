@@ -6,6 +6,7 @@ use std::fs::{read_to_string, write};
 
 use itertools::{EitherOrBoth::*, Itertools};
 use owo_colors::OwoColorize;
+use regex::Regex;
 use shellexpand::tilde;
 
 #[derive(Debug, PartialEq)]
@@ -72,8 +73,8 @@ fn get_versions(
         .collect()
 }
 
-fn list_remote(_version_regex: &Option<String>) {
-    let versions: Vec<String> = reqwest::blocking::get(
+fn list_remote(version_regex: &Option<String>) {
+    let mut versions: Vec<String> = reqwest::blocking::get(
         "https://gitlab.com/api/v4/projects/18695663/releases",
     )
     .unwrap()
@@ -96,27 +97,52 @@ fn list_remote(_version_regex: &Option<String>) {
     })
     .collect();
 
+    if let Some(regex) = version_regex {
+        let re = Regex::new(regex).unwrap();
+
+        versions = versions
+            .iter()
+            .filter(|version| re.is_match(version))
+            .map(|version| version.to_string())
+            .collect();
+    }
+
     let stable = get_versions(&versions, VersionStability::Stable);
     let unstable = get_versions(&versions, VersionStability::Unstable);
 
-    let titles = vec![
-        "Stable".italic().green().to_string(),
-        "Unstable".italic().yellow().to_string(),
-    ];
+    let mut titles = vec![];
+
+    if stable.len() > 0 {
+        titles.push("Stable".italic().green().to_string())
+    }
+
+    if unstable.len() > 0 {
+        titles.push("Unstable".italic().yellow().to_string())
+    }
 
     let mut rows: Vec<Vec<String>> = vec![];
 
-    for pair in stable.iter().zip_longest(unstable.iter()) {
-        match pair {
-            Both(stable, unstable) => {
-                rows.push(vec![stable.to_string(), unstable.to_string()])
+    if stable.len() > 0 && unstable.len() > 0 {
+        for pair in stable.iter().zip_longest(unstable.iter()) {
+            match pair {
+                Both(stable, unstable) => {
+                    rows.push(vec![stable.to_string(), unstable.to_string()])
+                }
+                Left(stable) => {
+                    rows.push(vec![stable.to_string(), "".to_string()])
+                }
+                Right(unstable) => {
+                    rows.push(vec!["".to_string(), unstable.to_string()])
+                }
             }
-            Left(stable) => {
-                rows.push(vec![stable.to_string(), "".to_string()])
-            }
-            Right(unstable) => {
-                rows.push(vec!["".to_string(), unstable.to_string()])
-            }
+        }
+    } else if stable.len() > 0 {
+        for version in stable.iter() {
+            rows.push(vec![version.to_string()]);
+        }
+    } else if unstable.len() > 0 {
+        for version in unstable.iter() {
+            rows.push(vec![version.to_string()]);
         }
     }
 
