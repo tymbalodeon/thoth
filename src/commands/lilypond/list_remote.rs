@@ -15,7 +15,6 @@ struct Release {
     tag_name: String,
 }
 
-#[derive(Debug)]
 struct LilypondReleases {
     project_id: String,
     releases: <Vec<Release> as IntoIterator>::IntoIter,
@@ -53,13 +52,18 @@ impl LilypondReleases {
             self.page,
             self.per_page
         );
-        self.releases = self
-            .client
-            .get(url)
-            .send()?
-            .json::<Vec<Release>>()?
-            .into_iter();
-        self.total = 44;
+
+        let response = self.client.get(url).send()?;
+        self.total = response
+            .headers()
+            .get("x-total")
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .parse::<u32>()
+            .unwrap()
+            .to_owned();
+        self.releases = response.json::<Vec<Release>>()?.into_iter();
 
         Ok(self.releases.next())
     }
@@ -77,44 +81,33 @@ impl Iterator for LilypondReleases {
     }
 }
 
-fn get_releases() -> reqwest::Result<()> {
-    for release in LilypondReleases::get()? {
-        println!("{release:?}");
-        println!("{}", release?.tag_name);
+fn get_releases() -> Vec<String> {
+    let mut releases = vec![];
+
+    for release in LilypondReleases::get().unwrap() {
+        releases.push(release.unwrap().tag_name.to_string());
     }
-    Ok(())
+
+    releases
 }
 
 pub fn list_remote(
     version_regex: &Option<String>,
     stability: &Option<VersionStability>,
 ) {
-    let _ = get_releases();
-
-    let mut versions: Vec<String> = reqwest::blocking::get(
-        "https://gitlab.com/api/v4/projects/18695663/releases",
-    )
-    .unwrap()
-    .json::<serde_json::Value>()
-    .unwrap()
-    .as_array()
-    .unwrap()
-    .iter()
-    .map(|object| {
-        object
-            .as_object()
-            .unwrap()
-            .get("tag_name")
-            .unwrap()
-            .to_string()
-            .replace(['v', '"'], "")
-            .bold()
-            .to_string()
-    })
-    .collect();
+    let mut releases: Vec<String> = get_releases()
+        .iter()
+        .map(|object| {
+            object
+                .replace(['v', '"'], "")
+                .replace("release/", "")
+                .bold()
+                .to_string()
+        })
+        .collect();
 
     if let Some(stability) = stability {
-        versions = versions
+        releases = releases
             .iter()
             .filter(|version| get_version_stability(version) == *stability)
             .map(|version| version.to_string())
@@ -124,15 +117,15 @@ pub fn list_remote(
     if let Some(regex) = version_regex {
         let re = Regex::new(regex).unwrap();
 
-        versions = versions
+        releases = releases
             .iter()
             .filter(|version| re.is_match(version))
             .map(|version| version.to_string())
             .collect();
     }
 
-    let stable = get_versions(&versions, VersionStability::Stable);
-    let unstable = get_versions(&versions, VersionStability::Unstable);
+    let stable = get_versions(&releases, VersionStability::Stable);
+    let unstable = get_versions(&releases, VersionStability::Unstable);
 
     let mut titles = vec![];
 
