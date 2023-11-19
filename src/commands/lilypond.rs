@@ -19,9 +19,9 @@ impl Display for VersionStability {
     }
 }
 
-fn get_version_stability(version: &String) -> VersionStability {
+fn get_version_stability(version: &str) -> VersionStability {
     let minor_version = version
-        .split(".")
+        .split('.')
         .enumerate()
         .filter(|(index, _)| index == &1usize)
         .map(|(_, value)| value)
@@ -45,13 +45,11 @@ fn global(version: &Option<String>) {
         println!("{stability} {value}");
 
         let _ = write(global_path, value);
+    } else if let Ok(version) = read_to_string(&global_path) {
+        println!("lilypond {version}");
     } else {
-        if let Ok(version) = read_to_string(&global_path) {
-            println!("lilypond {version}");
-        } else {
-            println!("No global lilypond version set.");
-        };
-    }
+        println!("No global lilypond version set.");
+    };
 }
 
 fn install(version: &Option<String>) {
@@ -59,7 +57,7 @@ fn install(version: &Option<String>) {
 }
 
 fn get_versions(
-    versions: &Vec<String>,
+    versions: &[String],
     stability: VersionStability,
 ) -> Vec<&String> {
     versions
@@ -88,8 +86,7 @@ fn list_remote(
             .get("tag_name")
             .unwrap()
             .to_string()
-            .replace('v', "")
-            .replace('"', "")
+            .replace(['v', '"'], "")
             .bold()
             .to_string()
     })
@@ -118,17 +115,17 @@ fn list_remote(
 
     let mut titles = vec![];
 
-    if stable.len() > 0 {
+    if !stable.is_empty() {
         titles.push("Stable".italic().green().to_string())
     }
 
-    if unstable.len() > 0 {
+    if !unstable.is_empty() {
         titles.push("Unstable".italic().yellow().to_string())
     }
 
     let mut rows: Vec<Vec<String>> = vec![];
 
-    if stable.len() > 0 && unstable.len() > 0 {
+    if !stable.is_empty() && !unstable.is_empty() {
         for pair in stable.iter().zip_longest(unstable.iter()) {
             match pair {
                 Both(stable, unstable) => {
@@ -142,11 +139,11 @@ fn list_remote(
                 }
             }
         }
-    } else if stable.len() > 0 {
+    } else if stable.is_empty() {
         for version in stable.iter() {
             rows.push(vec![version.to_string()]);
         }
-    } else if unstable.len() > 0 {
+    } else if unstable.is_empty() {
         for version in unstable.iter() {
             rows.push(vec![version.to_string()]);
         }
@@ -156,7 +153,7 @@ fn list_remote(
 }
 
 fn list(_version_regex: &Option<String>) {
-    let contents = read_to_string(&tilde(GLOBAL_PATH).as_ref())
+    let contents = read_to_string(tilde(GLOBAL_PATH).as_ref())
         .expect("Should have been able to read the file");
     println!("{contents}")
 }
@@ -164,8 +161,8 @@ fn list(_version_regex: &Option<String>) {
 pub fn lilypond_main(command: &Option<LilypondCommand>) {
     if let Some(command) = command {
         match command {
-            LilypondCommand::Global { version } => global(&version),
-            LilypondCommand::Install { version } => install(&version),
+            LilypondCommand::Global { version } => global(version),
+            LilypondCommand::Install { version } => install(version),
             LilypondCommand::List { version_regex } => list(version_regex),
             LilypondCommand::ListRemote {
                 version_regex,

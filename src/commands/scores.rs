@@ -43,7 +43,7 @@ pub fn get_selected_items(
 
     Ok(selected_items
         .map(|output| output.selected_items)
-        .unwrap_or_else(Vec::new))
+        .unwrap_or_default())
 }
 
 fn convert_path_to_string(path: &DirEntry) -> String {

@@ -84,7 +84,7 @@ pub fn compile_main(
 ) {
     {
         let pdfs_directory = get_pdfs_directory_from_arg(pdfs_directory);
-        create_dir_all(&pdfs_directory).unwrap();
+        create_dir_all(pdfs_directory).unwrap();
     }
 
     let matching_scores = get_matching_scores(

@@ -51,13 +51,13 @@ fn print_info(composition_metadata: CompositionMetadata) {
     if let Some(key) = composition_metadata.key {
         pushln(&mut lines, format!("Key = \"{key}\""));
     } else {
-        pushln(&mut lines, format!("Key = C Major"));
+        pushln(&mut lines, "Key = C Major".to_string());
     }
 
     if let Some(time) = composition_metadata.time {
         pushln(&mut lines, format!("Time Signature = \"{time}\""));
     } else {
-        pushln(&mut lines, format!("Time = 4/4"));
+        pushln(&mut lines, "Time = 4/4".to_string());
     }
 
     let mut instruments = composition_metadata.instruments;

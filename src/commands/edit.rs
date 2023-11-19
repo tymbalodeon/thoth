@@ -218,7 +218,7 @@ pub fn edit_file(
     )
     .unwrap();
 
-    for file in vec![&score_path, &pdf_file].iter() {
+    for file in [&score_path, &pdf_file].iter() {
         open_file(file.to_path_buf());
     }
 

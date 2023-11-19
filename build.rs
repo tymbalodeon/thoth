@@ -9,7 +9,7 @@ use std::{
 fn main() -> Result<(), Box<dyn Error>> {
     let out_directory = env::var("OUT_DIR")?;
     let destination_path = Path::new(&out_directory).join("helper_files.rs");
-    let mut helper_files = File::create(&destination_path)?;
+    let mut helper_files = File::create(destination_path)?;
 
     writeln!(&mut helper_files, r##"["##,)?;
 

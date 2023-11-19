@@ -165,7 +165,7 @@ pub fn templates_main(command: &Option<TemplateCommand>) {
     }
 
     let titles = vec!["NAME".to_string(), "DESCRIPTION".to_string()];
-    let rows = vec![
+    let rows = [
         [
             "Form",
             "Form chart with separate sections and form summary at the bottom",
