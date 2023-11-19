@@ -1,13 +1,11 @@
-use super::table::print_table;
-use super::LilypondCommand;
-use super::VersionStability;
+pub mod list_remote;
+use self::list_remote::list_remote;
+
+use super::{LilypondCommand, VersionStability};
 
 use std::fmt::{Display, Formatter, Result};
 use std::fs::{read_to_string, write};
 
-use itertools::{EitherOrBoth::*, Itertools};
-use owo_colors::OwoColorize;
-use regex::Regex;
 use shellexpand::tilde;
 
 static GLOBAL_PATH: &str = "~/.thoth-versions";
@@ -64,92 +62,6 @@ fn get_versions(
         .iter()
         .filter(|version| get_version_stability(version) == stability)
         .collect()
-}
-
-fn list_remote(
-    version_regex: &Option<String>,
-    stability: &Option<VersionStability>,
-) {
-    let mut versions: Vec<String> = reqwest::blocking::get(
-        "https://gitlab.com/api/v4/projects/18695663/releases",
-    )
-    .unwrap()
-    .json::<serde_json::Value>()
-    .unwrap()
-    .as_array()
-    .unwrap()
-    .iter()
-    .map(|object| {
-        object
-            .as_object()
-            .unwrap()
-            .get("tag_name")
-            .unwrap()
-            .to_string()
-            .replace(['v', '"'], "")
-            .bold()
-            .to_string()
-    })
-    .collect();
-
-    if let Some(stability) = stability {
-        versions = versions
-            .iter()
-            .filter(|version| get_version_stability(version) == *stability)
-            .map(|version| version.to_string())
-            .collect();
-    }
-
-    if let Some(regex) = version_regex {
-        let re = Regex::new(regex).unwrap();
-
-        versions = versions
-            .iter()
-            .filter(|version| re.is_match(version))
-            .map(|version| version.to_string())
-            .collect();
-    }
-
-    let stable = get_versions(&versions, VersionStability::Stable);
-    let unstable = get_versions(&versions, VersionStability::Unstable);
-
-    let mut titles = vec![];
-
-    if !stable.is_empty() {
-        titles.push("Stable".italic().green().to_string())
-    }
-
-    if !unstable.is_empty() {
-        titles.push("Unstable".italic().yellow().to_string())
-    }
-
-    let mut rows: Vec<Vec<String>> = vec![];
-
-    if !stable.is_empty() && !unstable.is_empty() {
-        for pair in stable.iter().zip_longest(unstable.iter()) {
-            match pair {
-                Both(stable, unstable) => {
-                    rows.push(vec![stable.to_string(), unstable.to_string()])
-                }
-                Left(stable) => {
-                    rows.push(vec![stable.to_string(), "".to_string()])
-                }
-                Right(unstable) => {
-                    rows.push(vec!["".to_string(), unstable.to_string()])
-                }
-            }
-        }
-    } else if !stable.is_empty() {
-        for version in stable.iter() {
-            rows.push(vec![version.to_string()]);
-        }
-    } else if !unstable.is_empty() {
-        for version in unstable.iter() {
-            rows.push(vec![version.to_string()]);
-        }
-    }
-
-    print_table(titles, rows);
 }
 
 fn list(_version_regex: &Option<String>) {
