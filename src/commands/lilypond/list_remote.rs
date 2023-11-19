@@ -11,19 +11,8 @@ use regex::Regex;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-struct Meta {
-    total: u32,
-}
-
-#[derive(Debug, Deserialize)]
 struct Release {
     tag_name: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct ApiResponse {
-    meta: Meta,
-    releases: Vec<Release>,
 }
 
 #[derive(Debug)]
@@ -64,9 +53,13 @@ impl LilypondReleases {
             self.page,
             self.per_page
         );
-        let response = self.client.get(url).send()?.json::<ApiResponse>()?;
-        self.releases = response.releases.into_iter();
-        self.total = response.meta.total;
+        self.releases = self
+            .client
+            .get(url)
+            .send()?
+            .json::<Vec<Release>>()?
+            .into_iter();
+        self.total = 44;
 
         Ok(self.releases.next())
     }
