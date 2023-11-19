@@ -1,5 +1,6 @@
 use super::table::print_table;
 use super::LilypondCommand;
+use super::VersionStability;
 
 use std::fmt::{Display, Formatter, Result};
 use std::fs::{read_to_string, write};
@@ -8,12 +9,6 @@ use itertools::{EitherOrBoth::*, Itertools};
 use owo_colors::OwoColorize;
 use regex::Regex;
 use shellexpand::tilde;
-
-#[derive(Debug, PartialEq)]
-enum VersionStability {
-    Stable,
-    Unstable,
-}
 
 static GLOBAL_PATH: &str = "~/.thoth-versions";
 
@@ -73,7 +68,10 @@ fn get_versions(
         .collect()
 }
 
-fn list_remote(version_regex: &Option<String>) {
+fn list_remote(
+    version_regex: &Option<String>,
+    stability: &Option<VersionStability>,
+) {
     let mut versions: Vec<String> = reqwest::blocking::get(
         "https://gitlab.com/api/v4/projects/18695663/releases",
     )
@@ -96,6 +94,14 @@ fn list_remote(version_regex: &Option<String>) {
             .to_string()
     })
     .collect();
+
+    if let Some(stability) = stability {
+        versions = versions
+            .iter()
+            .filter(|version| get_version_stability(version) == *stability)
+            .map(|version| version.to_string())
+            .collect();
+    }
 
     if let Some(regex) = version_regex {
         let re = Regex::new(regex).unwrap();
@@ -161,9 +167,10 @@ pub fn lilypond_main(command: &Option<LilypondCommand>) {
             LilypondCommand::Global { version } => global(&version),
             LilypondCommand::Install { version } => install(&version),
             LilypondCommand::List { version_regex } => list(version_regex),
-            LilypondCommand::ListRemote { version_regex } => {
-                list_remote(version_regex)
-            }
+            LilypondCommand::ListRemote {
+                version_regex,
+                stability,
+            } => list_remote(version_regex, stability),
         }
     } else {
         println!("{command:?}")

@@ -49,6 +49,12 @@ pub enum ScoreFileType {
     Pdf,
 }
 
+#[derive(Clone, Debug, PartialEq, ValueEnum)]
+pub enum VersionStability {
+    Stable,
+    Unstable,
+}
+
 #[derive(Debug, Subcommand)]
 pub enum LilypondCommand {
     /// Show or set the global lilypond version
@@ -61,7 +67,13 @@ pub enum LilypondCommand {
     List { version_regex: Option<String> },
 
     /// List all versions available for download
-    ListRemote { version_regex: Option<String> },
+    ListRemote {
+        version_regex: Option<String>,
+
+        /// List only stable or unstbale versions
+        #[arg(long)]
+        stability: Option<VersionStability>,
+    },
 }
 
 #[derive(Subcommand)]
