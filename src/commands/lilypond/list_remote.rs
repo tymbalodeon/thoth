@@ -109,7 +109,9 @@ pub fn list_remote(
     if let Some(stability) = stability {
         releases = releases
             .iter()
-            .filter(|version| get_version_stability(version) == *stability)
+            .filter(|version| {
+                get_version_stability(version).unwrap() == *stability
+            })
             .map(|version| version.to_string())
             .collect();
     }
