@@ -2,17 +2,9 @@ use std::fs::{read_to_string, write};
 
 use shellexpand::tilde;
 
-use super::{get_releases, get_version_stability, is_latest_version};
+use super::{get_version_stability, is_latest_version, is_valid_version};
 
 static GLOBAL_PATH: &str = "~/.thoth-versions";
-
-pub fn is_valid_version(version: &String) -> bool {
-    let mut versions =
-        vec!["latest-stable".to_string(), "latest-unstable".to_string()];
-    versions.append(&mut get_releases());
-
-    versions.contains(version)
-}
 
 fn print_version(version: &String) {
     match get_version_stability(version) {

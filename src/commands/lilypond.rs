@@ -1,9 +1,9 @@
 pub mod global;
+pub mod install;
 pub mod list_remote;
 
-use crate::commands::lilypond::global::read_global_version;
-
 use self::global::global;
+use self::install::install;
 use self::list_remote::{list_remote, LilypondReleases};
 
 use super::{LilypondCommand, VersionStability};
@@ -73,21 +73,6 @@ pub fn get_releases() -> Vec<String> {
         .iter()
         .map(|release| release.replace(['v', '"'], "").replace("release/", ""))
         .collect()
-}
-
-fn install(version: &Option<String>) {
-    let value = if let Some(value) = version {
-        value.to_string()
-    } else {
-        read_global_version()
-    };
-
-    if !is_valid_version(&value) {
-        println!("invalid version specifier");
-        return;
-    }
-
-    println!("Downloading lilypond version {value}...");
 }
 
 fn list(_version_regex: &Option<String>) {
