@@ -18,10 +18,14 @@ impl Display for VersionStability {
     }
 }
 
+fn is_latest_version(version: &str) -> bool {
+    version.chars().all(|char| !char.is_numeric())
+}
+
 fn get_version_stability(
     version: &str,
 ) -> Result<VersionStability, &'static str> {
-    if version.chars().all(|char| !char.is_numeric()) {
+    if is_latest_version(version) {
         match version {
             "latest-stable" => Ok(VersionStability::Stable),
             "latest-unstable" => Ok(VersionStability::Unstable),
@@ -48,7 +52,12 @@ fn get_version_stability(
 fn print_version(version: &String) {
     match get_version_stability(version) {
         Ok(stability) => {
-            let formatted_version = format!("{version} ({stability})");
+            let value = if is_latest_version(version) {
+                "latest"
+            } else {
+                version
+            };
+            let formatted_version = format!("{value} ({stability})");
             println!("{formatted_version}");
         }
         Err(err) => println!("{err}"),
