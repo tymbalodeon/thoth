@@ -39,12 +39,11 @@ fn global(version: &Option<String>) {
 
     if let Some(value) = version {
         let stability = get_version_stability(value);
-
-        println!("{stability} {value}");
-
-        let _ = write(global_path, value);
+        let formatted_version = format!("{value} ({stability})");
+        println!("{formatted_version}");
+        let _ = write(global_path, formatted_version);
     } else if let Ok(version) = read_to_string(&global_path) {
-        println!("lilypond {version}");
+        println!("{version}");
     } else {
         println!("No global lilypond version set.");
     };
