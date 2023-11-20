@@ -82,6 +82,6 @@ pub fn lilypond_main(command: &Option<LilypondCommand>) {
             } => list_remote(version_regex, stability),
         }
     } else {
-        println!("{command:?}")
+        list(&None);
     }
 }
