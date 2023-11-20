@@ -64,11 +64,19 @@ fn print_version(version: &String) {
     }
 }
 
+fn is_valid_version(version: &String) -> bool {
+    let mut versions =
+        vec!["latest-stable".to_string(), "latest-unstable".to_string()];
+    versions.append(&mut get_releases());
+
+    versions.contains(version)
+}
+
 fn global(version: &Option<String>) -> Result<(), &'static str> {
     let global_path = tilde(GLOBAL_PATH).to_string();
 
     if let Some(value) = version {
-        if get_releases().contains(&value) {
+        if is_valid_version(value) {
             let _ = write(global_path, value);
         }
 

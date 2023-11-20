@@ -90,13 +90,7 @@ pub fn get_releases() -> Vec<String> {
 
     releases
         .iter()
-        .map(|object| {
-            object
-                .replace(['v', '"'], "")
-                .replace("release/", "")
-                .bold()
-                .to_string()
-        })
+        .map(|release| release.replace(['v', '"'], "").replace("release/", ""))
         .collect()
 }
 
@@ -104,7 +98,10 @@ pub fn list_remote(
     version_regex: &Option<String>,
     stability: &Option<VersionStability>,
 ) {
-    let mut releases: Vec<String> = get_releases();
+    let mut releases: Vec<String> = get_releases()
+        .iter()
+        .map(|release| release.bold().to_string())
+        .collect();
 
     if let Some(stability) = stability {
         releases = releases
