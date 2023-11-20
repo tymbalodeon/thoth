@@ -1,5 +1,5 @@
 pub mod list_remote;
-use self::list_remote::list_remote;
+use self::list_remote::{get_releases, list_remote};
 
 use super::{LilypondCommand, VersionStability};
 
@@ -68,7 +68,10 @@ fn global(version: &Option<String>) -> Result<(), &'static str> {
     let global_path = tilde(GLOBAL_PATH).to_string();
 
     if let Some(value) = version {
-        let _ = write(global_path, value);
+        if get_releases().contains(&value) {
+            let _ = write(global_path, value);
+        }
+
         print_version(value);
     } else if let Ok(version) = read_to_string(&global_path) {
         print_version(&version);

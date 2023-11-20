@@ -81,7 +81,7 @@ impl Iterator for LilypondReleases {
     }
 }
 
-fn get_releases() -> Vec<String> {
+pub fn get_releases() -> Vec<String> {
     let mut releases = vec![];
 
     for release in LilypondReleases::get().unwrap() {
@@ -89,13 +89,6 @@ fn get_releases() -> Vec<String> {
     }
 
     releases
-}
-
-pub fn list_remote(
-    version_regex: &Option<String>,
-    stability: &Option<VersionStability>,
-) {
-    let mut releases: Vec<String> = get_releases()
         .iter()
         .map(|object| {
             object
@@ -104,7 +97,14 @@ pub fn list_remote(
                 .bold()
                 .to_string()
         })
-        .collect();
+        .collect()
+}
+
+pub fn list_remote(
+    version_regex: &Option<String>,
+    stability: &Option<VersionStability>,
+) {
+    let mut releases: Vec<String> = get_releases();
 
     if let Some(stability) = stability {
         releases = releases
