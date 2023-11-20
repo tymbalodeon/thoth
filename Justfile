@@ -35,12 +35,13 @@ try *args:
     cargo update
 
 @direct-asset-url:
-    curl \
-        'https://gitlab.com/api/v4/projects/18695663/releases/v2.24.3' \
-    | jq \
-        '.assets.links | .[] | select(.name | contains("darwin")) | .direct_asset_url'
-
-download:
     #!/usr/bin/env zsh
-    direct_asset_url="$(just direct-asset-url)"
-    curl -L "${direct_asset_url//\"/}" -o ~/Desktop/lilypond.tar.gz
+    url="$(curl \
+            'https://gitlab.com/api/v4/projects/18695663/releases/v2.24.3' \
+        | jq \
+            '.assets.links | .[] | select(.name | contains("darwin")) | .direct_asset_url'
+    )"
+    printf "${url//\"/}"
+
+@download:
+    curl -L "$(just direct-asset-url)" -o ~/Desktop/lilypond.tar.gz
