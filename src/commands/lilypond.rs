@@ -1,6 +1,8 @@
 pub mod global;
 pub mod list_remote;
 
+use crate::commands::lilypond::global::read_global_version;
+
 use self::global::global;
 use self::list_remote::{list_remote, LilypondReleases};
 
@@ -19,6 +21,14 @@ impl Display for VersionStability {
         let display = format!("{self:?}").to_lowercase();
         write!(formatter, "{display}")
     }
+}
+
+pub fn is_valid_version(version: &String) -> bool {
+    let mut versions =
+        vec!["latest-stable".to_string(), "latest-unstable".to_string()];
+    versions.append(&mut get_releases());
+
+    versions.contains(version)
 }
 
 fn is_latest_version(version: &str) -> bool {
@@ -66,7 +76,18 @@ pub fn get_releases() -> Vec<String> {
 }
 
 fn install(version: &Option<String>) {
-    println!("{version:?}");
+    let value = if let Some(value) = version {
+        value.to_string()
+    } else {
+        read_global_version()
+    };
+
+    if !is_valid_version(&value) {
+        println!("invalid version specifier");
+        return;
+    }
+
+    println!("Downloading lilypond version {value}...");
 }
 
 fn list(_version_regex: &Option<String>) {

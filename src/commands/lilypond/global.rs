@@ -6,7 +6,7 @@ use super::{get_releases, get_version_stability, is_latest_version};
 
 static GLOBAL_PATH: &str = "~/.thoth-versions";
 
-fn is_valid_version(version: &String) -> bool {
+pub fn is_valid_version(version: &String) -> bool {
     let mut versions =
         vec!["latest-stable".to_string(), "latest-unstable".to_string()];
     versions.append(&mut get_releases());
@@ -29,6 +29,10 @@ fn print_version(version: &String) {
     }
 }
 
+pub fn read_global_version() -> String {
+    read_to_string(tilde(GLOBAL_PATH).to_string()).unwrap()
+}
+
 pub fn global(version: &Option<String>) -> Result<(), &'static str> {
     let global_path = tilde(GLOBAL_PATH).to_string();
 
@@ -38,11 +42,14 @@ pub fn global(version: &Option<String>) -> Result<(), &'static str> {
         }
 
         print_version(value);
-    } else if let Ok(version) = read_to_string(&global_path) {
-        print_version(&version);
     } else {
-        println!("No global lilypond version set.");
-    };
+        let version = read_global_version();
+        if is_valid_version(&version) {
+            print_version(&version);
+        } else {
+            println!("No global lilypond version set.");
+        }
+    }
 
     Ok(())
 }
