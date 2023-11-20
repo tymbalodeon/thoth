@@ -1,11 +1,14 @@
+pub mod global;
 pub mod list_remote;
-use self::list_remote::{get_releases, list_remote};
+
+use self::global::global;
+use self::list_remote::{list_remote, LilypondReleases};
 
 use super::{LilypondCommand, VersionStability};
 
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::fs::{read_to_string, write};
+use std::fs::read_to_string;
 
 use shellexpand::tilde;
 
@@ -49,59 +52,21 @@ fn get_version_stability(
     }
 }
 
-fn print_version(version: &String) {
-    match get_version_stability(version) {
-        Ok(stability) => {
-            let value = if is_latest_version(version) {
-                "latest"
-            } else {
-                version
-            };
-            let formatted_version = format!("{value} ({stability})");
-            println!("{formatted_version}");
-        }
-        Err(err) => println!("{err}"),
+pub fn get_releases() -> Vec<String> {
+    let mut releases = vec![];
+
+    for release in LilypondReleases::get().unwrap() {
+        releases.push(release.unwrap().tag_name.to_string());
     }
-}
 
-fn is_valid_version(version: &String) -> bool {
-    let mut versions =
-        vec!["latest-stable".to_string(), "latest-unstable".to_string()];
-    versions.append(&mut get_releases());
-
-    versions.contains(version)
-}
-
-fn global(version: &Option<String>) -> Result<(), &'static str> {
-    let global_path = tilde(GLOBAL_PATH).to_string();
-
-    if let Some(value) = version {
-        if is_valid_version(value) {
-            let _ = write(global_path, value);
-        }
-
-        print_version(value);
-    } else if let Ok(version) = read_to_string(&global_path) {
-        print_version(&version);
-    } else {
-        println!("No global lilypond version set.");
-    };
-
-    Ok(())
+    releases
+        .iter()
+        .map(|release| release.replace(['v', '"'], "").replace("release/", ""))
+        .collect()
 }
 
 fn install(version: &Option<String>) {
     println!("{version:?}");
-}
-
-fn get_versions(
-    versions: &[String],
-    stability: VersionStability,
-) -> Vec<&String> {
-    versions
-        .iter()
-        .filter(|version| get_version_stability(version).unwrap() == stability)
-        .collect()
 }
 
 fn list(_version_regex: &Option<String>) {

@@ -1,9 +1,6 @@
-use crate::commands::{
-    lilypond::{get_version_stability, get_versions},
-    table::print_table,
-};
+use crate::commands::{lilypond::get_version_stability, table::print_table};
 
-use super::VersionStability;
+use super::{get_releases, VersionStability};
 
 use itertools::{EitherOrBoth::*, Itertools};
 use owo_colors::OwoColorize;
@@ -11,11 +8,11 @@ use regex::Regex;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-struct Release {
-    tag_name: String,
+pub struct Release {
+    pub tag_name: String,
 }
 
-struct LilypondReleases {
+pub struct LilypondReleases {
     project_id: String,
     releases: <Vec<Release> as IntoIterator>::IntoIter,
     client: reqwest::blocking::Client,
@@ -25,7 +22,7 @@ struct LilypondReleases {
 }
 
 impl LilypondReleases {
-    fn get() -> reqwest::Result<Self> {
+    pub fn get() -> reqwest::Result<Self> {
         Ok(LilypondReleases {
             project_id: "18695663".to_string(),
             releases: vec![].into_iter(),
@@ -81,16 +78,13 @@ impl Iterator for LilypondReleases {
     }
 }
 
-pub fn get_releases() -> Vec<String> {
-    let mut releases = vec![];
-
-    for release in LilypondReleases::get().unwrap() {
-        releases.push(release.unwrap().tag_name.to_string());
-    }
-
-    releases
+fn get_versions(
+    versions: &[String],
+    stability: VersionStability,
+) -> Vec<&String> {
+    versions
         .iter()
-        .map(|release| release.replace(['v', '"'], "").replace("release/", ""))
+        .filter(|version| get_version_stability(version).unwrap() == stability)
         .collect()
 }
 
