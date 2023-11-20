@@ -45,20 +45,24 @@ fn get_version_stability(
     }
 }
 
+fn print_version(version: &String) {
+    match get_version_stability(version) {
+        Ok(stability) => {
+            let formatted_version = format!("{version} ({stability})");
+            println!("{formatted_version}");
+        }
+        Err(err) => println!("{err}"),
+    }
+}
+
 fn global(version: &Option<String>) -> Result<(), &'static str> {
     let global_path = tilde(GLOBAL_PATH).to_string();
 
     if let Some(value) = version {
-        match get_version_stability(value) {
-            Ok(stability) => {
-                let formatted_version = format!("{value} ({stability})");
-                println!("{formatted_version}");
-                let _ = write(global_path, formatted_version);
-            }
-            Err(err) => println!("{err}"),
-        }
+        let _ = write(global_path, value);
+        print_version(value);
     } else if let Ok(version) = read_to_string(&global_path) {
-        println!("{version}");
+        print_version(&version);
     } else {
         println!("No global lilypond version set.");
     };
