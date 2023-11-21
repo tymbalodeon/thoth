@@ -66,7 +66,6 @@ pub fn get_tag_names() -> Vec<String> {
     let mut releases = vec![];
 
     for release in LilypondReleases::get().unwrap() {
-        dbg!(&release);
         releases.push(release.unwrap().tag_name.to_string());
     }
 
