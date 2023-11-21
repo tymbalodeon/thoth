@@ -1,6 +1,6 @@
 use crate::commands::{lilypond::get_version_stability, table::print_table};
 
-use super::{get_releases, VersionStability};
+use super::{get_versions, VersionStability};
 
 use itertools::{EitherOrBoth::*, Itertools};
 use owo_colors::OwoColorize;
@@ -78,7 +78,7 @@ impl Iterator for LilypondReleases {
     }
 }
 
-fn get_versions(
+fn filter_versions(
     versions: &[String],
     stability: VersionStability,
 ) -> Vec<&String> {
@@ -92,7 +92,7 @@ pub fn list_remote(
     version_regex: &Option<String>,
     stability: &Option<VersionStability>,
 ) {
-    let mut releases: Vec<String> = get_releases()
+    let mut releases: Vec<String> = get_versions()
         .iter()
         .map(|release| release.bold().to_string())
         .collect();
@@ -117,8 +117,8 @@ pub fn list_remote(
             .collect();
     }
 
-    let stable = get_versions(&releases, VersionStability::Stable);
-    let unstable = get_versions(&releases, VersionStability::Unstable);
+    let stable = filter_versions(&releases, VersionStability::Stable);
+    let unstable = filter_versions(&releases, VersionStability::Unstable);
 
     let mut titles = vec![];
 

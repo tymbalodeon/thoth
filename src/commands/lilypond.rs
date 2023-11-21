@@ -26,7 +26,7 @@ impl Display for VersionStability {
 pub fn is_valid_version(version: &String) -> bool {
     let mut versions =
         vec!["latest-stable".to_string(), "latest-unstable".to_string()];
-    versions.append(&mut get_releases());
+    versions.append(&mut get_versions());
 
     versions.contains(version)
 }
@@ -62,7 +62,7 @@ fn get_version_stability(
     }
 }
 
-pub fn get_releases() -> Vec<String> {
+pub fn get_tag_names() -> Vec<String> {
     let mut releases = vec![];
 
     for release in LilypondReleases::get().unwrap() {
@@ -70,6 +70,10 @@ pub fn get_releases() -> Vec<String> {
     }
 
     releases
+}
+
+pub fn get_versions() -> Vec<String> {
+    get_tag_names()
         .iter()
         .map(|release| release.replace(['v', '"'], "").replace("release/", ""))
         .collect()
