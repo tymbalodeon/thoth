@@ -77,7 +77,7 @@ impl Iterator for LilypondReleases {
     }
 }
 
-fn filter_versions(
+pub fn filter_versions(
     versions: &[String],
     stability: VersionStability,
 ) -> Vec<&String> {

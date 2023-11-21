@@ -1,10 +1,13 @@
-use crate::commands::lilypond::{
-    get_tag_names, global::read_global_version, is_valid_version,
+use crate::commands::{
+    lilypond::{get_tag_names, global::read_global_version, is_valid_version},
+    VersionStability,
 };
 
 use regex::Regex;
 use reqwest::blocking::get;
 use serde::Deserialize;
+
+use super::{get_versions, list_remote::filter_versions};
 
 #[derive(Deserialize)]
 struct DirectAssetUrl {
@@ -21,8 +24,40 @@ struct Response {
     assets: Links,
 }
 
-fn get_direct_asset_url(version_regex: &str) -> Option<String> {
-    let re = Regex::new(version_regex).unwrap();
+fn get_latest_version_by_stability(stability: VersionStability) -> String {
+    let versions = get_versions();
+
+    filter_versions(&versions, stability)
+        .first()
+        .unwrap()
+        .to_string()
+}
+
+fn get_latest_version(version: &str) -> Option<String> {
+    match version {
+        "latest-stable" => {
+            Some(get_latest_version_by_stability(VersionStability::Stable))
+        }
+        "latest-unstable" => {
+            Some(get_latest_version_by_stability(VersionStability::Unstable))
+        }
+        _ => None,
+    }
+}
+
+fn parse_version(version: &str) -> String {
+    let latest_version = get_latest_version(version);
+
+    if let Some(version) = latest_version {
+        version
+    } else {
+        version.to_string()
+    }
+}
+
+fn get_direct_asset_url(version: &str) -> Option<String> {
+    let version_regex = parse_version(version);
+    let re = Regex::new(&version_regex).unwrap();
     let tag_name = get_tag_names()
         .iter()
         .find(|tag_name| re.is_match(tag_name))
