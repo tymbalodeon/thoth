@@ -1,13 +1,14 @@
 use crate::commands::{
-    lilypond::{get_tag_names, global::read_global_version, is_valid_version},
+    lilypond::{
+        get_tag_names, get_versions, global::read_global_version,
+        is_valid_version, list_remote::filter_versions,
+    },
     VersionStability,
 };
 
 use regex::Regex;
 use reqwest::blocking::get;
 use serde::Deserialize;
-
-use super::{get_versions, list_remote::filter_versions};
 
 #[derive(Deserialize)]
 struct DirectAssetUrl {
