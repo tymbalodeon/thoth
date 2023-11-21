@@ -15,18 +15,9 @@ use serde::Deserialize;
 use shellexpand::tilde;
 
 #[derive(Deserialize)]
-struct DirectAssetUrl {
+struct AssetLink {
     direct_asset_url: String,
-}
-
-#[derive(Deserialize)]
-struct Links {
-    links: Vec<DirectAssetUrl>,
-}
-
-#[derive(Deserialize)]
-struct Response {
-    assets: Links,
+    name: String,
 }
 
 fn get_latest_version_by_stability(stability: VersionStability) -> String {
@@ -60,7 +51,7 @@ fn parse_version(version: &str) -> String {
     }
 }
 
-fn get_direct_asset_url(version: &str) -> Option<String> {
+fn get_asset_link(version: &str) -> Option<AssetLink> {
     let version_regex = parse_version(version);
     let re = Regex::new(&version_regex).unwrap();
     let tag_name = get_tag_names()
@@ -70,18 +61,19 @@ fn get_direct_asset_url(version: &str) -> Option<String> {
         .unwrap()
         .replace("release/", "release%2F");
     let url = format!(
-        "https://gitlab.com/api/v4/projects/18695663/releases/{tag_name}"
+        "https://gitlab.com/api/v4/projects/18695663/releases/{tag_name}/assets/links"
     );
 
     get(url)
         .unwrap()
-        .json::<Response>()
+        .json::<Vec<AssetLink>>()
         .unwrap()
-        .assets
-        .links
         .iter()
-        .find(|url| url.direct_asset_url.contains("darwin"))
-        .map(|url| url.direct_asset_url.to_string())
+        .find(|link| link.direct_asset_url.contains("darwin"))
+        .map(|link| AssetLink {
+            direct_asset_url: link.direct_asset_url.to_string(),
+            name: link.name.to_string(),
+        })
 }
 
 pub fn install(version: &Option<String>) {
@@ -96,12 +88,12 @@ pub fn install(version: &Option<String>) {
         return;
     }
 
-    if let Some(direct_asset_url) = get_direct_asset_url(&value) {
-        println!("Downloading from {direct_asset_url}...");
+    if let Some(asset_link) = get_asset_link(&value) {
+        let direct_asset_url = &asset_link.direct_asset_url;
+        println!("Downloading from {}...", direct_asset_url);
         let content = get(direct_asset_url).unwrap().bytes().unwrap();
-        let mut output =
-            File::create(tilde("~/Desktop/testing.tar.gz").to_string())
-                .unwrap();
+        let filename = format!("~/Desktop/{}", asset_link.name);
+        let mut output = File::create(tilde(&filename).to_string()).unwrap();
         io::copy(&mut content.as_ref(), &mut output).unwrap();
     } else {
         println!("No assets found.")
