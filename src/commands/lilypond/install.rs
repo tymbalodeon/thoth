@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io;
+
 use crate::commands::{
     lilypond::{
         get_tag_names, get_versions, global::read_global_version,
@@ -9,6 +12,7 @@ use crate::commands::{
 use regex::Regex;
 use reqwest::blocking::get;
 use serde::Deserialize;
+use shellexpand::tilde;
 
 #[derive(Deserialize)]
 struct DirectAssetUrl {
@@ -94,6 +98,11 @@ pub fn install(version: &Option<String>) {
 
     if let Some(direct_asset_url) = get_direct_asset_url(&value) {
         println!("Downloading from {direct_asset_url}...");
+        let content = get(direct_asset_url).unwrap().bytes().unwrap();
+        let mut output =
+            File::create(tilde("~/Desktop/testing.tar.gz").to_string())
+                .unwrap();
+        io::copy(&mut content.as_ref(), &mut output).unwrap();
     } else {
         println!("No assets found.")
     }
