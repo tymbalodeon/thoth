@@ -8,8 +8,19 @@ use regex::Regex;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
+pub struct DirectAssetUrl {
+    pub direct_asset_url: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Links {
+    pub links: Vec<DirectAssetUrl>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Release {
     pub tag_name: String,
+    pub assets: Links,
 }
 
 pub struct LilypondReleases {
@@ -49,7 +60,6 @@ impl LilypondReleases {
             self.page,
             self.per_page
         );
-
         let response = self.client.get(url).send()?;
         self.total = response
             .headers()
