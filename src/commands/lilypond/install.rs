@@ -1,5 +1,5 @@
-use std::fs::File;
-use std::io;
+use std::fs::{create_dir_all, File};
+use std::io::copy;
 
 use crate::commands::{
     lilypond::{
@@ -13,6 +13,8 @@ use regex::Regex;
 use reqwest::blocking::get;
 use serde::Deserialize;
 use shellexpand::tilde;
+
+static INSTALL_PATH: &str = "~/.local/share/thoth";
 
 #[derive(Deserialize)]
 struct AssetLink {
@@ -76,6 +78,20 @@ fn get_asset_link(version: &str) -> Option<AssetLink> {
         })
 }
 
+fn download_asset(asset_link: AssetLink) {
+    println!("Downloading {}...", asset_link.name);
+
+    let content = get(asset_link.direct_asset_url).unwrap().bytes().unwrap();
+    let install_path = tilde(INSTALL_PATH).to_string();
+
+    create_dir_all(&install_path).unwrap();
+
+    let filename = format!("{}/{}", install_path, asset_link.name);
+    let mut output = File::create(tilde(&filename).to_string()).unwrap();
+
+    copy(&mut content.as_ref(), &mut output).unwrap();
+}
+
 pub fn install(version: &Option<String>) {
     let value = if let Some(value) = version {
         value.to_string()
@@ -85,17 +101,13 @@ pub fn install(version: &Option<String>) {
 
     if !is_valid_version(&value) {
         println!("invalid version specifier");
+
         return;
     }
 
     if let Some(asset_link) = get_asset_link(&value) {
-        let direct_asset_url = &asset_link.direct_asset_url;
-        println!("Downloading from {}...", direct_asset_url);
-        let content = get(direct_asset_url).unwrap().bytes().unwrap();
-        let filename = format!("~/Desktop/{}", asset_link.name);
-        let mut output = File::create(tilde(&filename).to_string()).unwrap();
-        io::copy(&mut content.as_ref(), &mut output).unwrap();
+        download_asset(asset_link);
     } else {
-        println!("No assets found.")
+        println!("No assets found.");
     }
 }

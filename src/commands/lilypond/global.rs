@@ -2,9 +2,9 @@ use std::fs::{read_to_string, write};
 
 use shellexpand::tilde;
 
-use super::{get_version_stability, is_latest_version, is_valid_version};
-
-static GLOBAL_PATH: &str = "~/.thoth-versions";
+use super::{
+    get_version_stability, is_latest_version, is_valid_version, GLOBAL_PATH,
+};
 
 fn print_version(version: &String) {
     match get_version_stability(version) {
