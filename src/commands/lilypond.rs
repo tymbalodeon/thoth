@@ -143,10 +143,10 @@ pub fn list_versions(
                     rows.push(vec![stable.to_string(), unstable.to_string()])
                 }
                 Left(stable) => {
-                    rows.push(vec![stable.to_string(), "".to_string()])
+                    rows.push(vec![stable.to_string(), String::new()])
                 }
                 Right(unstable) => {
-                    rows.push(vec!["".to_string(), unstable.to_string()])
+                    rows.push(vec![String::new(), unstable.to_string()])
                 }
             }
         }

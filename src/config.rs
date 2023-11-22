@@ -58,7 +58,7 @@ fn load_config_file() -> ConfigFile {
     let config = if let Ok(config_path) = read_to_string(config_path_name) {
         config_path
     } else {
-        "".to_owned()
+        String::new()
     };
 
     if let Ok(config_file) = from_str(&config) {
@@ -100,7 +100,7 @@ impl Default for Config {
         let user_name = if let Some(user_name) = get_current_username() {
             user_name.to_str().unwrap().to_string()
         } else {
-            "".to_string()
+            String::new()
         };
 
         Config {
@@ -132,7 +132,7 @@ impl Config {
         } else if let Some(username) = get_current_username() {
             username.to_str().unwrap().to_string()
         } else {
-            "".to_string()
+            String::new()
         };
 
         let scores_directory =

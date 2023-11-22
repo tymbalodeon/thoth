@@ -53,7 +53,7 @@ fn update_path() {
         path = path.replace(&format!("{value}:"), "");
     }
 
-    let mut new_path = "".to_string();
+    let mut new_path = String::new();
 
     new_path.push_str(&format!("{}:", global_version_path));
     new_path.push_str(&path);

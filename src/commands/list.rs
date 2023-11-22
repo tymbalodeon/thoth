@@ -97,7 +97,7 @@ pub fn list_main(
                 .to_string();
 
             let pattern = format!("{}/*.ly", score.display());
-            let mut title = "".to_string();
+            let mut title = String::new();
 
             for ly_file in glob(&pattern)
                 .expect("Failed to read glob pattern")
