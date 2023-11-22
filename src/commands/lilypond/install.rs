@@ -44,7 +44,7 @@ fn get_latest_version(version: &str) -> Option<String> {
     }
 }
 
-fn parse_version(version: &str) -> String {
+pub fn parse_version(version: &str) -> String {
     let latest_version = get_latest_version(version);
 
     if let Some(version) = latest_version {
@@ -79,8 +79,12 @@ fn get_asset_link(version: &str) -> Option<AssetLink> {
         })
 }
 
+pub fn get_install_path() -> String {
+    tilde(INSTALL_PATH).to_string()
+}
+
 fn download_asset(asset_link: AssetLink) {
-    let install_path = tilde(INSTALL_PATH).to_string();
+    let install_path = get_install_path();
     let file_path = format!("{}/{}", install_path, asset_link.name);
     let version_path = format!(
         "{}/{}",
