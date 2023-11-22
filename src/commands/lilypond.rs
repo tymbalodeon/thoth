@@ -2,11 +2,13 @@ pub mod global;
 pub mod install;
 pub mod list;
 pub mod list_remote;
+pub mod uninstall;
 
 use self::global::global;
 use self::install::install;
 use self::list::list;
 use self::list_remote::{list_remote, LilypondReleases};
+use self::uninstall::uninstall;
 
 use super::{LilypondCommand, VersionStability};
 
@@ -84,6 +86,7 @@ pub fn lilypond_main(command: &Option<LilypondCommand>) {
         match command {
             LilypondCommand::Global { version } => global(version).unwrap(),
             LilypondCommand::Install { version } => install(version),
+            LilypondCommand::Uninstall { version } => uninstall(version),
             LilypondCommand::List { version_regex } => list(version_regex),
             LilypondCommand::ListRemote {
                 version_regex,
