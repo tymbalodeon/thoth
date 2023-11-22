@@ -5,7 +5,7 @@ use std::path::Path;
 use crate::commands::{
     lilypond::{
         get_tag_names, get_versions, global::read_global_version,
-        is_valid_version, list_remote::filter_versions,
+        is_valid_version, list_remote::filter_versions, INSTALL_PATH,
     },
     VersionStability,
 };
@@ -16,8 +16,6 @@ use reqwest::blocking::get;
 use serde::Deserialize;
 use shellexpand::tilde;
 use tar::Archive;
-
-static INSTALL_PATH: &str = "~/.local/share/thoth";
 
 #[derive(Deserialize)]
 struct AssetLink {

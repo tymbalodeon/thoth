@@ -1,20 +1,20 @@
 pub mod global;
 pub mod install;
+pub mod list;
 pub mod list_remote;
 
 use self::global::global;
 use self::install::install;
+use self::list::list;
 use self::list_remote::{list_remote, LilypondReleases};
 
 use super::{LilypondCommand, VersionStability};
 
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::fs::read_to_string;
-
-use shellexpand::tilde;
 
 static GLOBAL_PATH: &str = "~/.thoth-versions";
+static INSTALL_PATH: &str = "~/.local/share/thoth";
 
 impl Display for VersionStability {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
@@ -77,12 +77,6 @@ pub fn get_versions() -> Vec<String> {
         .iter()
         .map(|release| release.replace(['v', '"'], "").replace("release/", ""))
         .collect()
-}
-
-fn list(_version_regex: &Option<String>) {
-    let contents = read_to_string(tilde(GLOBAL_PATH).as_ref())
-        .expect("Should have been able to read the file");
-    println!("{contents}")
 }
 
 pub fn lilypond_main(command: &Option<LilypondCommand>) {
