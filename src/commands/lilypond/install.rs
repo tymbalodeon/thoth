@@ -1,5 +1,6 @@
 use std::fs::{create_dir_all, File};
 use std::io::copy;
+use std::path::Path;
 
 use crate::commands::{
     lilypond::{
@@ -79,14 +80,18 @@ fn get_asset_link(version: &str) -> Option<AssetLink> {
 }
 
 fn download_asset(asset_link: AssetLink) {
-    println!("Downloading {}...", asset_link.name);
-
-    let content = get(asset_link.direct_asset_url).unwrap().bytes().unwrap();
     let install_path = tilde(INSTALL_PATH).to_string();
+    let filename = format!("{}/{}", install_path, asset_link.name);
+
+    if Path::new(&filename).exists() {
+        return;
+    }
 
     create_dir_all(&install_path).unwrap();
 
-    let filename = format!("{}/{}", install_path, asset_link.name);
+    println!("Downloading {}...", asset_link.name);
+
+    let content = get(asset_link.direct_asset_url).unwrap().bytes().unwrap();
     let mut output = File::create(tilde(&filename).to_string()).unwrap();
 
     copy(&mut content.as_ref(), &mut output).unwrap();
