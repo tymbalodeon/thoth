@@ -100,7 +100,7 @@ fn download_asset(asset_link: AssetLink) {
 
     create_dir_all(&install_path).unwrap();
 
-    println!("Downloading {}...", asset_link.name);
+    println!("Downloading {}...", asset_link.direct_asset_url);
 
     let content = get(asset_link.direct_asset_url).unwrap().bytes().unwrap();
     let mut file = File::create(tilde(&file_path).to_string()).unwrap();
@@ -109,6 +109,8 @@ fn download_asset(asset_link: AssetLink) {
 
     let mut archive =
         Archive::new(GzDecoder::new(File::open(&file_path).unwrap()));
+
+    println!("Unpacking {}...", asset_link.name);
 
     archive.unpack(install_path).unwrap();
     remove_file(file_path).unwrap();
