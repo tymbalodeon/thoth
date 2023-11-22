@@ -1,4 +1,4 @@
-use std::fs::{create_dir_all, File};
+use std::fs::{create_dir_all, remove_file, File};
 use std::io::copy;
 use std::path::Path;
 
@@ -10,10 +10,12 @@ use crate::commands::{
     VersionStability,
 };
 
+use flate2::read::GzDecoder;
 use regex::Regex;
 use reqwest::blocking::get;
 use serde::Deserialize;
 use shellexpand::tilde;
+use tar::Archive;
 
 static INSTALL_PATH: &str = "~/.local/share/thoth";
 
@@ -81,9 +83,20 @@ fn get_asset_link(version: &str) -> Option<AssetLink> {
 
 fn download_asset(asset_link: AssetLink) {
     let install_path = tilde(INSTALL_PATH).to_string();
-    let filename = format!("{}/{}", install_path, asset_link.name);
+    let file_path = format!("{}/{}", install_path, asset_link.name);
+    let version_path = format!(
+        "{}/{}",
+        install_path,
+        &file_path
+            .split("thoth/")
+            .last()
+            .unwrap()
+            .split("-darwin")
+            .next()
+            .unwrap()
+    );
 
-    if Path::new(&filename).exists() {
+    if Path::new(&version_path).exists() {
         return;
     }
 
@@ -92,9 +105,15 @@ fn download_asset(asset_link: AssetLink) {
     println!("Downloading {}...", asset_link.name);
 
     let content = get(asset_link.direct_asset_url).unwrap().bytes().unwrap();
-    let mut output = File::create(tilde(&filename).to_string()).unwrap();
+    let mut file = File::create(tilde(&file_path).to_string()).unwrap();
 
-    copy(&mut content.as_ref(), &mut output).unwrap();
+    copy(&mut content.as_ref(), &mut file).unwrap();
+
+    let mut archive =
+        Archive::new(GzDecoder::new(File::open(&file_path).unwrap()));
+
+    archive.unpack(install_path).unwrap();
+    remove_file(file_path).unwrap();
 }
 
 pub fn install(version: &Option<String>) {
