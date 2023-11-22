@@ -91,6 +91,6 @@ pub fn lilypond_main(command: &Option<LilypondCommand>) {
             } => list_remote(version_regex, stability),
         }
     } else {
-        list(&None);
+        global(&None).unwrap();
     }
 }
