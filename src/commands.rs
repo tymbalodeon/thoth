@@ -57,9 +57,6 @@ pub enum VersionStability {
 
 #[derive(Debug, Subcommand)]
 pub enum LilypondCommand {
-    /// Show or set the global lilypond version
-    Global { version: Option<String> },
-
     /// Install lilypond version(s)
     Install { version: Option<String> },
 
@@ -234,8 +231,11 @@ pub enum Command {
         scores_directory: Option<String>,
     },
 
-    /// Manage lilypond installation(s)
+    /// Show or manage lilypond installation(s)
     Lilypond {
+        /// Set the global lilypond version
+        version: Option<String>,
+
         #[command(subcommand)]
         command: Option<LilypondCommand>,
     },

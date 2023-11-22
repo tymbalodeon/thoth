@@ -122,8 +122,8 @@ fn main() {
         }) => {
             info_main(search_term, artist, title, all, scores_directory);
         }
-        Some(Command::Lilypond { command }) => {
-            lilypond_main(command);
+        Some(Command::Lilypond { version, command }) => {
+            lilypond_main(version, command);
         }
         Some(Command::List {
             search_terms,

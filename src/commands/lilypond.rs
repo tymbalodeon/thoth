@@ -163,10 +163,12 @@ pub fn list_versions(
     print_table(titles, rows);
 }
 
-pub fn lilypond_main(command: &Option<LilypondCommand>) {
+pub fn lilypond_main(
+    version: &Option<String>,
+    command: &Option<LilypondCommand>,
+) {
     if let Some(command) = command {
         match command {
-            LilypondCommand::Global { version } => global(version).unwrap(),
             LilypondCommand::Install { version } => install(version),
             LilypondCommand::Uninstall { version } => uninstall(version),
             LilypondCommand::List {
@@ -179,6 +181,6 @@ pub fn lilypond_main(command: &Option<LilypondCommand>) {
             } => list_remote(version_regex, stability),
         }
     } else {
-        global(&None).unwrap();
+        global(version).unwrap();
     }
 }
