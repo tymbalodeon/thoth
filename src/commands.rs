@@ -67,7 +67,13 @@ pub enum LilypondCommand {
     Uninstall { version: String },
 
     /// List installed lilypond version(s)
-    List { version_regex: Option<String> },
+    List {
+        version_regex: Option<String>,
+
+        /// List only stable or unstbale versions
+        #[arg(long)]
+        stability: Option<VersionStability>,
+    },
 
     /// List all versions available for download
     ListRemote {

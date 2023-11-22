@@ -1,10 +1,6 @@
-use crate::commands::{lilypond::get_version_stability, table::print_table};
+use super::{get_versions, list_versions, VersionStability};
 
-use super::{get_versions, VersionStability};
-
-use itertools::{EitherOrBoth::*, Itertools};
 use owo_colors::OwoColorize;
-use regex::Regex;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -77,83 +73,14 @@ impl Iterator for LilypondReleases {
     }
 }
 
-pub fn filter_versions(
-    versions: &[String],
-    stability: VersionStability,
-) -> Vec<&String> {
-    versions
-        .iter()
-        .filter(|version| get_version_stability(version).unwrap() == stability)
-        .collect()
-}
-
 pub fn list_remote(
     version_regex: &Option<String>,
     stability: &Option<VersionStability>,
 ) {
-    let mut releases: Vec<String> = get_versions()
+    let versions: Vec<String> = get_versions()
         .iter()
         .map(|release| release.bold().to_string())
         .collect();
 
-    if let Some(stability) = stability {
-        releases = releases
-            .iter()
-            .filter(|version| {
-                get_version_stability(version).unwrap() == *stability
-            })
-            .map(|version| version.to_string())
-            .collect();
-    }
-
-    if let Some(regex) = version_regex {
-        let re = Regex::new(regex).unwrap();
-
-        releases = releases
-            .iter()
-            .filter(|version| re.is_match(version))
-            .map(|version| version.to_string())
-            .collect();
-    }
-
-    let stable = filter_versions(&releases, VersionStability::Stable);
-    let unstable = filter_versions(&releases, VersionStability::Unstable);
-
-    let mut titles = vec![];
-
-    if !stable.is_empty() {
-        titles.push("Stable".italic().green().to_string())
-    }
-
-    if !unstable.is_empty() {
-        titles.push("Unstable".italic().yellow().to_string())
-    }
-
-    let mut rows: Vec<Vec<String>> = vec![];
-
-    if !stable.is_empty() && !unstable.is_empty() {
-        for pair in stable.iter().zip_longest(unstable.iter()) {
-            match pair {
-                Both(stable, unstable) => {
-                    rows.push(vec![stable.to_string(), unstable.to_string()])
-                }
-                Left(stable) => {
-                    rows.push(vec![stable.to_string(), "".to_string()])
-                }
-                Right(unstable) => {
-                    rows.push(vec!["".to_string(), unstable.to_string()])
-                }
-            }
-        }
-    } else if !stable.is_empty() {
-        for version in stable.iter() {
-            rows.push(vec![version.to_string()]);
-        }
-    } else if !unstable.is_empty() {
-        for version in unstable.iter() {
-            rows.push(vec![version.to_string()]);
-        }
-    }
-
-    print_table(titles, rows);
+    list_versions(versions, version_regex, stability);
 }

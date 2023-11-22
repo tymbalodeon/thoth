@@ -4,8 +4,8 @@ use std::path::Path;
 
 use crate::commands::{
     lilypond::{
-        get_tag_names, get_versions, global::read_global_version,
-        is_valid_version, list_remote::filter_versions, INSTALL_PATH,
+        filter_versions, get_tag_names, get_versions,
+        global::read_global_version, is_valid_version, INSTALL_PATH,
     },
     VersionStability,
 };
