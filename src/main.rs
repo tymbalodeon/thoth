@@ -4,6 +4,7 @@ mod config;
 use std::println;
 
 use clap::Parser;
+use commands::activate::activate_main;
 use commands::clean::clean_main;
 use commands::compile::compile_main;
 use commands::config::config_main;
@@ -31,6 +32,7 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
+        Some(Command::Activate) => activate_main(),
         Some(Command::Clean {
             search_terms,
             artist,

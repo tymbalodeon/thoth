@@ -1,4 +1,5 @@
 pub mod clean;
+pub mod activate;
 pub mod compile;
 pub mod config;
 pub mod create;
@@ -96,6 +97,7 @@ pub enum HelperCommand {
 
 #[derive(Subcommand)]
 pub enum Command {
+    Activate,
     /// Remove pdf(s)
     Clean {
         search_terms: Vec<String>,
@@ -304,7 +306,7 @@ pub enum Command {
     },
 
     /// Open temporary sketch file
-    Sketch {},
+    Sketch,
 }
 
 pub fn add_value_to_string_if_some(
