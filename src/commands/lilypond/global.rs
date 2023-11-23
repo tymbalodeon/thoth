@@ -1,16 +1,9 @@
-use std::{
-    env,
-    fs::{read_to_string, write},
-    path::Path,
-};
+use std::fs::{read_to_string, write};
 
 use shellexpand::tilde;
 
-use crate::commands::lilypond::install::parse_version;
-
 use super::{
-    get_version_stability, install::get_install_path, is_latest_version,
-    is_valid_version, GLOBAL_PATH,
+    get_version_stability, is_latest_version, is_valid_version, GLOBAL_PATH,
 };
 
 fn print_version(version: &String) {
@@ -32,35 +25,6 @@ pub fn read_global_version() -> String {
     read_to_string(tilde(GLOBAL_PATH).to_string()).unwrap()
 }
 
-fn update_path() {
-    let install_path = get_install_path();
-    let global_version = parse_version(&read_global_version());
-    let global_version_path =
-        format!("{}/lilypond-{}/bin", &install_path, &global_version);
-
-    if !Path::new(&global_version_path).exists() {
-        return;
-    }
-
-    let mut path = env::var("PATH").unwrap();
-    let values: &Vec<String> = &path
-        .split(':')
-        .filter(|value| value.contains("lilypond"))
-        .map(|value| value.to_string())
-        .collect();
-
-    for value in values {
-        path = path.replace(&format!("{value}:"), "");
-    }
-
-    let mut new_path = String::new();
-
-    new_path.push_str(&format!("{}:", global_version_path));
-    new_path.push_str(&path);
-
-    env::set_var("PATH", new_path);
-}
-
 pub fn global(version: &Option<String>) -> Result<(), &'static str> {
     let global_path = tilde(GLOBAL_PATH).to_string();
 
@@ -78,8 +42,6 @@ pub fn global(version: &Option<String>) -> Result<(), &'static str> {
             println!("No global lilypond version set.");
         }
     }
-
-    update_path();
 
     Ok(())
 }

@@ -1,5 +1,5 @@
-pub mod clean;
 pub mod activate;
+pub mod clean;
 pub mod compile;
 pub mod config;
 pub mod create;
@@ -14,6 +14,7 @@ mod scores;
 pub mod sketch;
 pub mod table;
 pub mod templates;
+pub mod update_path;
 
 use std::fmt::{Display, Formatter, Result};
 
@@ -98,6 +99,7 @@ pub enum HelperCommand {
 #[derive(Subcommand)]
 pub enum Command {
     Activate,
+    UpdatePath,
     /// Remove pdf(s)
     Clean {
         search_terms: Vec<String>,

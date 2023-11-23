@@ -17,6 +17,7 @@ use commands::list::list_main;
 use commands::open::open_main;
 use commands::sketch::sketch_main;
 use commands::templates::templates_main;
+use commands::update_path::update_path_main;
 use commands::Command;
 
 #[derive(Parser)]
@@ -33,6 +34,7 @@ fn main() {
 
     match &cli.command {
         Some(Command::Activate) => activate_main(),
+        Some(Command::UpdatePath) => update_path_main(),
         Some(Command::Clean {
             search_terms,
             artist,
