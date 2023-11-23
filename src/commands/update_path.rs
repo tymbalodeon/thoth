@@ -1,3 +1,4 @@
+use std::io::{self, Write};
 use std::{env, path::Path};
 
 use crate::commands::lilypond::global::read_global_version;
@@ -30,5 +31,6 @@ pub fn update_path_main() {
     new_path.push_str(&format!("{}:", global_version_path));
     new_path.push_str(&path);
 
-    env::set_var("PATH", new_path);
+    let path_command = format!("PATH={new_path}");
+    io::stdout().write_all(path_command.as_bytes()).unwrap();
 }

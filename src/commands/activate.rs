@@ -6,7 +6,7 @@ pub fn activate_main() {
         formatdoc!(
             "
 _thoth_update_path() {{
-    \"${{HOME}}\"/.cargo/bin/thoth update-path
+    eval \"$(\"${{HOME}}\"/.cargo/bin/thoth update-path)\"
 }}
 
 typeset -ag precmd_functions;
