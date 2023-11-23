@@ -169,7 +169,7 @@ pub fn lilypond_main(
 ) {
     if let Some(command) = command {
         match command {
-            LilypondCommand::Install { version } => install(version),
+            LilypondCommand::Install { version } => install(version).unwrap(),
             LilypondCommand::Uninstall { version } => uninstall(version),
             LilypondCommand::List {
                 version_regex,

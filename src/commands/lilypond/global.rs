@@ -1,4 +1,8 @@
-use std::fs::{read_to_string, write};
+use std::{
+    fs::{read_to_string, write, File},
+    io::{self, prelude::*},
+    path::Path,
+};
 
 use shellexpand::tilde;
 
@@ -22,29 +26,39 @@ fn print_version(version: &String) {
     }
 }
 
-pub fn read_global_version() -> String {
-    read_to_string(tilde(GLOBAL_PATH).to_string()).unwrap()
+pub fn read_global_version() -> io::Result<String> {
+    read_to_string(get_global_path()?)
 }
 
-pub fn global(version: &Option<String>) -> Result<(), &'static str> {
+fn get_global_path() -> io::Result<String> {
     let global_path = tilde(GLOBAL_PATH).to_string();
+
+    if !Path::new(&global_path).exists() {
+        let mut file = File::create(&global_path)?;
+        file.write_all(b"latest-stable")?;
+    }
+
+    Ok(global_path)
+}
+
+pub fn global(version: &Option<String>) -> io::Result<()> {
+    let global_path = get_global_path()?;
 
     if let Some(value) = version {
         if is_valid_version(value) {
-            let _ = write(global_path, value);
+            write(global_path, value)?;
+            install(version)?;
         }
 
         print_version(value);
     } else {
-        let version = read_global_version();
+        let version = read_global_version()?;
         if is_valid_version(&version) {
             print_version(&version);
         } else {
             println!("No global lilypond version set.");
         }
     }
-
-    install(version);
 
     Ok(())
 }

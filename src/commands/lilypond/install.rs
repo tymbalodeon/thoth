@@ -1,5 +1,5 @@
 use std::fs::{create_dir_all, remove_file, File};
-use std::io::copy;
+use std::io::{self, copy};
 use std::path::Path;
 
 use crate::commands::{
@@ -120,17 +120,17 @@ fn download_asset(asset_link: AssetLink) {
     remove_file(file_path).unwrap();
 }
 
-pub fn install(version: &Option<String>) {
+pub fn install(version: &Option<String>) -> io::Result<()> {
     let value = if let Some(value) = version {
         value.to_string()
     } else {
-        read_global_version()
+        read_global_version()?
     };
 
     if !is_valid_version(&value) {
         println!("invalid version specifier");
 
-        return;
+        return Ok(());
     }
 
     if let Some(asset_link) = get_asset_link(&value) {
@@ -138,4 +138,6 @@ pub fn install(version: &Option<String>) {
     } else {
         println!("No assets found.");
     }
+
+    Ok(())
 }
