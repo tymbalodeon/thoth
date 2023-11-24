@@ -1,15 +1,25 @@
-use super::{get_versions, list_versions, VersionStability};
+use super::{get_versions, list_versions, VersionStability, GITLAB_URL};
 
 use owo_colors::OwoColorize;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
+pub struct DirectAssetUrl {
+    pub direct_asset_url: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Link {
+    pub links: Vec<DirectAssetUrl>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Release {
     pub tag_name: String,
+    pub assets: Link,
 }
 
 pub struct LilypondReleases {
-    project_id: String,
     releases: <Vec<Release> as IntoIterator>::IntoIter,
     client: reqwest::blocking::Client,
     page: u32,
@@ -20,7 +30,6 @@ pub struct LilypondReleases {
 impl LilypondReleases {
     pub fn get() -> reqwest::Result<Self> {
         Ok(LilypondReleases {
-            project_id: "18695663".to_string(),
             releases: vec![].into_iter(),
             client: reqwest::blocking::Client::new(),
             page: 0,
@@ -40,10 +49,8 @@ impl LilypondReleases {
 
         self.page += 1;
         let url = format!(
-            "https://gitlab.com/api/v4/projects/{}/releases?page={}&per_page={}",
-            self.project_id,
-            self.page,
-            self.per_page
+            "{GITLAB_URL}?page={}&per_page={}",
+            self.page, self.per_page
         );
         let response = self.client.get(url).send()?;
         self.total = response

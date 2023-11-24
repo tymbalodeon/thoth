@@ -22,6 +22,8 @@ use regex::Regex;
 
 static GLOBAL_PATH: &str = "~/.thoth-versions";
 static INSTALL_PATH: &str = "~/.local/share/thoth";
+static GITLAB_URL: &str =
+    "https://gitlab.com/api/v4/projects/18695663/releases";
 
 impl Display for VersionStability {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
@@ -73,7 +75,10 @@ pub fn get_tag_names() -> Vec<String> {
     let mut releases = vec![];
 
     for release in LilypondReleases::get().unwrap() {
-        releases.push(release.unwrap().tag_name.to_string());
+        let release = release.unwrap();
+        if !release.assets.links.is_empty() {
+            releases.push(release.tag_name.to_string());
+        }
     }
 
     releases

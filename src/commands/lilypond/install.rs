@@ -17,6 +17,8 @@ use serde::Deserialize;
 use shellexpand::tilde;
 use tar::Archive;
 
+use super::GITLAB_URL;
+
 #[derive(Deserialize)]
 struct AssetLink {
     direct_asset_url: String,
@@ -63,9 +65,7 @@ fn get_asset_link(version: &str) -> Option<AssetLink> {
         .map(|tag_name| tag_name.to_string())
         .unwrap()
         .replace("release/", "release%2F");
-    let url = format!(
-        "https://gitlab.com/api/v4/projects/18695663/releases/{tag_name}/assets/links"
-    );
+    let url = format!("{GITLAB_URL}/{tag_name}/assets/links");
 
     get(url)
         .unwrap()
