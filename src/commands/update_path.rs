@@ -19,11 +19,19 @@ fn clear_lilypond(mut path: String) -> String {
     path
 }
 
-pub fn update_path_main() -> io::Result<()> {
+fn get_new_version(version: &Option<String>) -> String {
+    if let Some(version) = version {
+        version.to_string()
+    } else {
+        parse_version(&read_global_version().unwrap())
+    }
+}
+
+pub fn update_path_main(version: &Option<String>) -> io::Result<()> {
     let install_path = get_install_path();
-    let global_version = parse_version(&read_global_version()?);
+    let new_version = get_new_version(version);
     let global_version_path =
-        format!("{}/lilypond-{}/bin", &install_path, &global_version);
+        format!("{}/lilypond-{}/bin", &install_path, &new_version);
     let path = env::var("PATH").unwrap();
 
     if !Path::new(&global_version_path).exists()

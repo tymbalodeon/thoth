@@ -34,7 +34,9 @@ fn main() {
 
     match &cli.command {
         Some(Command::Activate) => activate_main(),
-        Some(Command::UpdatePath) => update_path_main().unwrap(),
+        Some(Command::UpdatePath { version }) => {
+            update_path_main(version).unwrap()
+        }
         Some(Command::Clean {
             search_terms,
             artist,

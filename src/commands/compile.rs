@@ -1,15 +1,17 @@
-use std::fs::create_dir_all;
-use std::fs::metadata;
-use std::io::{self, Write};
-use std::path::PathBuf;
+use std::fs::{create_dir_all, metadata, File};
+use std::io::{self, BufRead, BufReader, Write};
+use std::path::{Path, PathBuf};
 use std::println;
 use std::process::Command;
 use std::time::SystemTime;
 
 use glob::glob;
 
+use crate::commands::lilypond::global::read_global_version;
+
 use super::get_pdfs_directory_from_arg;
 use super::get_scores_directory_from_arg;
+use super::lilypond::install::{get_install_path, install, parse_version};
 use super::scores::get_matching_scores;
 use super::scores::get_score_ly_file;
 use super::scores::get_selected_items;
@@ -27,6 +29,22 @@ pub fn is_compiled(input_file: &PathBuf, output_file: &PathBuf) -> bool {
     let output_modified = get_modified(output_file);
 
     input_modified <= output_modified
+}
+
+fn get_binary(version: String) -> Option<String> {
+    let global_version = parse_version(&read_global_version().unwrap());
+    let install_path = get_install_path();
+    let version_path = format!("{}/lilypond-{}/bin", &install_path, &version);
+
+    if global_version != version {
+        if !Path::new(&version_path).exists() {
+            install(&Some(version)).unwrap();
+        }
+
+        Some(version_path)
+    } else {
+        None
+    }
 }
 
 pub fn compile_input_file(
@@ -52,7 +70,24 @@ pub fn compile_input_file(
             }
         }
 
-        match Command::new("lilypond")
+        let mut version = String::new();
+
+        for line in BufReader::new(File::open(file).unwrap()).lines() {
+            let line = line.unwrap();
+
+            if line.contains("\\version") {
+                version = line.replace("\\version ", "").replace('"', "");
+                break;
+            }
+        }
+
+        let command = if let Some(command) = get_binary(version) {
+            command
+        } else {
+            "lilypond".to_string()
+        };
+
+        match Command::new(command)
             .args(["--include", scores_directory])
             .args(["--output", pdfs_directory])
             .arg(file)

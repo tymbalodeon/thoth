@@ -26,10 +26,6 @@ fn print_version(version: &String) {
     }
 }
 
-pub fn read_global_version() -> io::Result<String> {
-    read_to_string(get_global_path()?)
-}
-
 fn get_global_path() -> io::Result<String> {
     let global_path = tilde(GLOBAL_PATH).to_string();
 
@@ -39,6 +35,10 @@ fn get_global_path() -> io::Result<String> {
     }
 
     Ok(global_path)
+}
+
+pub fn read_global_version() -> io::Result<String> {
+    read_to_string(get_global_path()?)
 }
 
 pub fn global(version: &Option<String>) -> io::Result<()> {

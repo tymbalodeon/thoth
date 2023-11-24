@@ -99,7 +99,10 @@ pub enum HelperCommand {
 #[derive(Subcommand)]
 pub enum Command {
     Activate,
-    UpdatePath,
+    UpdatePath {
+        version: Option<String>,
+    },
+
     /// Remove pdf(s)
     Clean {
         search_terms: Vec<String>,
