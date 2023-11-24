@@ -82,7 +82,7 @@ pub fn compile_input_file(
         }
 
         let command = if let Some(command) = get_binary(version) {
-            command
+            format!("{command}/lilypond")
         } else {
             "lilypond".to_string()
         };
