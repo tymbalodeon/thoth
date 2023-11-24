@@ -1,3 +1,4 @@
+use human_sort::sort;
 use shellexpand::tilde;
 use std::fs::read_dir;
 
@@ -10,7 +11,7 @@ pub fn list(
     stability: &Option<VersionStability>,
 ) {
     let install_path = tilde(INSTALL_PATH).to_string();
-    let mut versions: Vec<String> = read_dir(&install_path)
+    let versions: Vec<String> = read_dir(&install_path)
         .unwrap()
         .map(|path| {
             path.unwrap()
@@ -21,7 +22,16 @@ pub fn list(
         })
         .collect();
 
-    versions.sort();
+    let mut versions: Vec<&str> =
+        versions.iter().map(|version| version.as_str()).collect();
+
+    sort(&mut versions);
+
+    let versions: Vec<String> = versions
+        .iter()
+        .rev()
+        .map(|version| version.to_string())
+        .collect();
 
     list_versions(versions, version_regex, stability)
 }
