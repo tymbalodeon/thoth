@@ -10,7 +10,7 @@ pub fn list(
     stability: &Option<VersionStability>,
 ) {
     let install_path = tilde(INSTALL_PATH).to_string();
-    let versions: Vec<String> = read_dir(&install_path)
+    let mut versions: Vec<String> = read_dir(&install_path)
         .unwrap()
         .map(|path| {
             path.unwrap()
@@ -20,6 +20,8 @@ pub fn list(
                 .replace(&format!("{}/lilypond-", &install_path), "")
         })
         .collect();
+
+    versions.sort();
 
     list_versions(versions, version_regex, stability)
 }
