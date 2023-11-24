@@ -1,9 +1,8 @@
 use std::io::{self, Write};
 use std::{env, path::Path};
 
-use crate::commands::lilypond::global::read_global_version;
-
 use super::lilypond::install::{get_install_path, parse_version};
+use crate::commands::lilypond::global::read_global_version;
 
 fn clear_lilypond(mut path: String) -> String {
     let values: &Vec<String> = &path

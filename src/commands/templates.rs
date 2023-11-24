@@ -3,12 +3,12 @@ pub mod lead;
 pub mod piano;
 pub mod single;
 
-use fmt::{Display, Formatter, Result};
 use std::fmt;
 use std::process::Command;
 
 use bat::{PagingMode, PrettyPrinter};
 use clap::ValueEnum;
+use fmt::{Display, Formatter, Result};
 use indoc::formatdoc;
 use regex::Regex;
 use serde::{Deserialize, Serialize};

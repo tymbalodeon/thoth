@@ -98,10 +98,11 @@ pub enum HelperCommand {
 
 #[derive(Subcommand)]
 pub enum Command {
+    #[command(hide = true)]
     Activate,
-    UpdatePath {
-        version: Option<String>,
-    },
+
+    #[command(hide = true)]
+    UpdatePath { version: Option<String> },
 
     /// Remove pdf(s)
     Clean {

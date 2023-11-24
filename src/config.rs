@@ -4,13 +4,14 @@ use std::{
     process::Command,
 };
 
-use crate::commands::table::print_table;
-use crate::commands::{templates::Template, ConfigKey};
 use owo_colors::OwoColorize;
 use serde::{Deserialize, Serialize};
 use shellexpand::tilde;
 use toml::{from_str, to_string};
 use users::get_current_username;
+
+use crate::commands::table::print_table;
+use crate::commands::{templates::Template, ConfigKey};
 
 static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
 

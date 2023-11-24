@@ -2,14 +2,6 @@ use std::fs::{create_dir_all, remove_file, File};
 use std::io::{self, copy};
 use std::path::Path;
 
-use crate::commands::{
-    lilypond::{
-        filter_versions, get_tag_names, get_versions,
-        global::read_global_version, is_valid_version, INSTALL_PATH,
-    },
-    VersionStability,
-};
-
 use flate2::read::GzDecoder;
 use regex::Regex;
 use reqwest::blocking::get;
@@ -18,6 +10,13 @@ use shellexpand::tilde;
 use tar::Archive;
 
 use super::GITLAB_URL;
+use crate::commands::{
+    lilypond::{
+        filter_versions, get_tag_names, get_versions,
+        global::read_global_version, is_valid_version, INSTALL_PATH,
+    },
+    VersionStability,
+};
 
 #[derive(Deserialize)]
 struct AssetLink {

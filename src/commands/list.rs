@@ -1,11 +1,11 @@
 use glob::glob;
+use owo_colors::OwoColorize;
 use titlecase::titlecase;
 
 use super::compile::is_compiled;
 use super::get_pdfs_directory_from_arg;
 use crate::commands::scores::get_matching_scores;
 use crate::commands::table::print_table;
-use owo_colors::OwoColorize;
 
 struct Composition {
     artist: String,

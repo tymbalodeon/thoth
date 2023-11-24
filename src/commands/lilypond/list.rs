@@ -1,10 +1,10 @@
-use human_sort::sort;
-use shellexpand::tilde;
 use std::fs::read_dir;
 
-use crate::commands::{lilypond::INSTALL_PATH, VersionStability};
+use human_sort::sort;
+use shellexpand::tilde;
 
 use super::list_versions;
+use crate::commands::{lilypond::INSTALL_PATH, VersionStability};
 
 pub fn list(
     version_regex: &Option<String>,

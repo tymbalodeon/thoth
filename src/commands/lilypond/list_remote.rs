@@ -1,7 +1,7 @@
-use super::{get_versions, list_versions, VersionStability, GITLAB_URL};
-
 use owo_colors::OwoColorize;
 use serde::Deserialize;
+
+use super::{get_versions, list_versions, VersionStability, GITLAB_URL};
 
 #[derive(Debug, Deserialize)]
 pub struct DirectAssetUrl {

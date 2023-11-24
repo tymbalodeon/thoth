@@ -30,9 +30,7 @@ struct Cli {
 }
 
 fn main() {
-    let cli = Cli::parse();
-
-    match &cli.command {
+    match &Cli::parse().command {
         Some(Command::Activate) => activate_main(),
         Some(Command::UpdatePath { version }) => {
             update_path_main(version).unwrap()

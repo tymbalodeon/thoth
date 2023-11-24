@@ -4,21 +4,20 @@ pub mod list;
 pub mod list_remote;
 pub mod uninstall;
 
-use self::global::global;
-use self::install::install;
-use self::list::list;
-use self::list_remote::{list_remote, LilypondReleases};
-use self::uninstall::uninstall;
-
-use super::table::print_table;
-use super::{LilypondCommand, VersionStability};
-
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
 use itertools::{EitherOrBoth::*, Itertools};
 use owo_colors::OwoColorize;
 use regex::Regex;
+
+use self::global::global;
+use self::install::install;
+use self::list::list;
+use self::list_remote::{list_remote, LilypondReleases};
+use self::uninstall::uninstall;
+use super::table::print_table;
+use super::{LilypondCommand, VersionStability};
 
 static GLOBAL_PATH: &str = "~/.thoth-versions";
 static INSTALL_PATH: &str = "~/.local/share/thoth";

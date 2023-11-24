@@ -7,8 +7,6 @@ use std::time::SystemTime;
 
 use glob::glob;
 
-use crate::commands::lilypond::global::read_global_version;
-
 use super::get_pdfs_directory_from_arg;
 use super::get_scores_directory_from_arg;
 use super::lilypond::install::{get_install_path, install, parse_version};
@@ -16,6 +14,7 @@ use super::lilypond::is_valid_version;
 use super::scores::get_matching_scores;
 use super::scores::get_score_ly_file;
 use super::scores::get_selected_items;
+use crate::commands::lilypond::global::read_global_version;
 
 fn get_modified(file: &PathBuf) -> Option<SystemTime> {
     if let Ok(file_metadata) = metadata(file) {

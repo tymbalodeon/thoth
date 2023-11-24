@@ -1,15 +1,15 @@
-use convert_case::{Case::Title, Casing};
-
-use crate::commands::helpers::pushln;
-use crate::commands::scores::{get_matching_scores, get_score_ly_file};
-
-use super::scores::get_selected_items;
 use std::{
     fs::File,
     io::{BufRead, BufReader},
 };
 
 use bat::{PagingMode, PrettyPrinter};
+use convert_case::{Case::Title, Casing};
+
+use super::helpers::pushln;
+use super::scores::{
+    get_matching_scores, get_score_ly_file, get_selected_items,
+};
 
 struct CompositionMetadata {
     lilypond_version: Option<String>,

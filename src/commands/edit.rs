@@ -21,15 +21,14 @@ use watchexec::{
 };
 use watchexec_signals::Signal;
 
+use super::compile::compile_input_file;
+use super::scores::get_selected_items;
 use crate::commands::create::get_file_system_name;
 use crate::commands::patterns::get_score_file;
 use crate::commands::scores::get_temporary_ly_file;
 use crate::commands::scores::TEMPORARY_DIRECTORY;
 use crate::commands::scores::{get_matching_scores, get_score_ly_file};
 use crate::config::Config;
-
-use super::compile::compile_input_file;
-use super::scores::get_selected_items;
 
 fn get_ily_files(pattern: String) -> Vec<String> {
     glob(&pattern)
