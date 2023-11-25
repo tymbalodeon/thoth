@@ -10,6 +10,7 @@ use bat::{PagingMode, PrettyPrinter};
 use clap::ValueEnum;
 use fmt::{Display, Formatter, Result};
 use indoc::formatdoc;
+use owo_colors::OwoColorize;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -164,15 +165,28 @@ pub fn templates_main(command: &Option<TemplateCommand>) {
         return;
     }
 
-    let titles = vec!["NAME".to_string(), "DESCRIPTION".to_string()];
+    let titles = vec![
+        "Name".italic().to_string(),
+        "Description".italic().to_string(),
+    ];
     let rows = [
         [
-            "Form",
-            "Form chart with separate sections and form summary at the bottom",
+            "Form".yellow().to_string(),
+            "Form chart with separate sections and form summary at the bottom"
+                .to_string(),
         ],
-        ["Lead", "Lead sheet showing melody and chords"],
-        ["Piano", "Piano staff score"],
-        ["Single", "Score for a single staff instrument"],
+        [
+            "Lead".yellow().to_string(),
+            "Lead sheet showing melody and chords".to_string(),
+        ],
+        [
+            "Piano".yellow().to_string(),
+            "Piano staff score".to_string(),
+        ],
+        [
+            "Single".yellow().to_string(),
+            "Score for a single staff instrumenta".to_string(),
+        ],
     ];
 
     let rows = rows
