@@ -207,8 +207,8 @@ impl Config {
     pub fn display() {
         let config = Config::from_config_file();
 
-        let header =
-            vec!["Key".italic().to_string(), "Value".italic().to_string()];
+        // let header =
+        //     vec!["Key".italic().to_string(), "Value".italic().to_string()];
 
         let rows = vec![
             Self::style_key_value("composer", config.composer),
@@ -218,7 +218,7 @@ impl Config {
             Self::style_key_value("template", config.template.to_string()),
         ];
 
-        print_table(header, rows);
+        print_table(vec![], rows);
     }
 
     pub fn display_path() {
