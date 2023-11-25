@@ -5,6 +5,7 @@ use std::println;
 
 use clap::Parser;
 use commands::activate::activate_main;
+use commands::bump_version::bump_version_main;
 use commands::clean::clean_main;
 use commands::compile::compile_main;
 use commands::config::config_main;
@@ -35,6 +36,11 @@ fn main() {
         Some(Command::UpdatePath { version }) => {
             update_path_main(version).unwrap()
         }
+        Some(Command::BumpVersion {
+            search_terms,
+            version,
+            scores_directory,
+        }) => bump_version_main(search_terms, version, scores_directory),
         Some(Command::Clean {
             search_terms,
             artist,

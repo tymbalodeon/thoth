@@ -33,7 +33,7 @@ fn get_latest_version_by_stability(stability: VersionStability) -> String {
         .to_string()
 }
 
-fn get_latest_version(version: &str) -> Option<String> {
+pub fn get_latest_version(version: &str) -> Option<String> {
     match version {
         "latest-stable" => {
             Some(get_latest_version_by_stability(VersionStability::Stable))
