@@ -1,5 +1,4 @@
 pub mod activate;
-pub mod bump_version;
 pub mod clean;
 pub mod compile;
 pub mod config;
@@ -16,6 +15,7 @@ pub mod sketch;
 pub mod table;
 pub mod templates;
 pub mod update_path;
+pub mod update_version;
 
 use std::fmt::{Display, Formatter, Result};
 
@@ -104,18 +104,6 @@ pub enum Command {
 
     #[command(hide = true)]
     UpdatePath { version: Option<String> },
-
-    /// Update lilypond version for score(s)
-    BumpVersion {
-        search_terms: Vec<String>,
-
-        /// Lilypond version to update to
-        #[arg(long)]
-        version: Option<String>,
-
-        #[arg(long)]
-        scores_directory: Option<String>,
-    },
 
     /// Remove pdf(s)
     Clean {
@@ -326,6 +314,18 @@ pub enum Command {
 
     /// Open temporary sketch file
     Sketch,
+
+    /// Update lilypond version for score(s)
+    UpdateVersion {
+        search_terms: Vec<String>,
+
+        /// Lilypond version to update to
+        #[arg(long)]
+        version: Option<String>,
+
+        #[arg(long)]
+        scores_directory: Option<String>,
+    },
 }
 
 pub fn add_value_to_string_if_some(

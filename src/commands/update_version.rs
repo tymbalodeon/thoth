@@ -15,11 +15,11 @@ fn get_new_version(version: &Option<String>) -> String {
     }
 }
 
-fn is_outdated(version: &String, new_version: &String) -> bool {
+fn is_outdated(version: &str, new_version: &str) -> bool {
     compare(version, new_version) == Ordering::Less
 }
 
-pub fn bump_version_main(
+pub fn update_version_main(
     search_terms: &Vec<String>,
     version: &Option<String>,
     scores_directory: &Option<String>,
