@@ -10,6 +10,7 @@ use super::{
     get_version_stability, install, is_latest_version, is_valid_version,
     GLOBAL_PATH,
 };
+use crate::commands::lilypond::install::parse_version;
 
 fn print_version(version: &String) {
     match get_version_stability(version) {
@@ -39,6 +40,10 @@ fn get_global_path() -> io::Result<String> {
 
 pub fn read_global_version() -> io::Result<String> {
     read_to_string(get_global_path()?)
+}
+
+pub fn get_global_version() -> String {
+    parse_version(&read_global_version().unwrap())
 }
 
 pub fn global(version: &Option<String>) -> io::Result<()> {

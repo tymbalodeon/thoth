@@ -1,8 +1,8 @@
 use std::io::{self, Write};
 use std::{env, path::Path};
 
-use super::lilypond::install::{get_install_path, parse_version};
-use crate::commands::lilypond::global::read_global_version;
+use super::lilypond::global::get_global_version;
+use super::lilypond::install::get_install_path;
 
 fn clear_lilypond(mut path: String) -> String {
     let values: &Vec<String> = &path
@@ -22,7 +22,7 @@ fn get_new_version(version: &Option<String>) -> String {
     if let Some(version) = version {
         version.to_string()
     } else {
-        parse_version(&read_global_version().unwrap())
+        get_global_version()
     }
 }
 

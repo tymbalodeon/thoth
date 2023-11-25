@@ -9,12 +9,12 @@ use glob::glob;
 
 use super::get_pdfs_directory_from_arg;
 use super::get_scores_directory_from_arg;
-use super::lilypond::install::{get_install_path, install, parse_version};
+use super::lilypond::global::get_global_version;
+use super::lilypond::install::{get_install_path, install};
 use super::lilypond::is_valid_version;
 use super::scores::get_matching_scores;
 use super::scores::get_score_ly_file;
 use super::scores::get_selected_items;
-use crate::commands::lilypond::global::read_global_version;
 
 fn get_modified(file: &PathBuf) -> Option<SystemTime> {
     if let Ok(file_metadata) = metadata(file) {
@@ -32,7 +32,7 @@ pub fn is_compiled(input_file: &PathBuf, output_file: &PathBuf) -> bool {
 }
 
 fn get_binary(version: String) -> Option<String> {
-    let global_version = parse_version(&read_global_version().unwrap());
+    let global_version = get_global_version();
     let install_path = get_install_path();
     let version_path = format!("{}/lilypond-{}/bin", &install_path, &version);
 

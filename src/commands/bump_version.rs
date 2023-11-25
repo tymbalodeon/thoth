@@ -1,20 +1,24 @@
 use std::fs::{rename, File};
 use std::io::{BufRead, BufReader, Write as IoWrite};
 
+use super::lilypond::global::get_global_version;
 use super::scores::get_found_ly_files;
-use crate::commands::lilypond::install::get_latest_version;
+
+fn get_new_version(version: &Option<String>) -> String {
+    if let Some(new_version) = version {
+        new_version.to_owned()
+    } else {
+        get_global_version()
+    }
+}
 
 pub fn bump_version_main(
     search_terms: &Vec<String>,
     version: &Option<String>,
     scores_directory: &Option<String>,
 ) {
-    let new_version = if let Some(new_version) = version {
-        new_version.to_owned()
-    } else {
-        get_latest_version("latest-unstable").unwrap()
-    };
-
+    let new_version = get_new_version(version);
+    dbg!(&new_version);
     let ly_files =
         get_found_ly_files(search_terms, &false, &false, scores_directory);
 
