@@ -56,9 +56,9 @@ fn update_version(
 pub fn update_version_main(
     search_terms: &Vec<String>,
     version: &Option<String>,
-    use_all_matches: &bool,
     search_artist: &bool,
     search_title: &bool,
+    use_all_matches: &bool,
     scores_directory: &Option<String>,
 ) {
     if search_terms.is_empty()
