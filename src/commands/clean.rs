@@ -1,20 +1,8 @@
 use std::fs::remove_file;
-use std::io::{stdin, stdout, Write};
 use std::path::Path;
 
 use super::scores::{get_found_pdfs, get_selected_items};
-
-fn received_confirmation() -> bool {
-    print!("Are you sure you want to remove all pdfs? [y/n] ");
-    stdout().flush().unwrap();
-    let mut response = String::new();
-    let stdin = stdin();
-    stdin
-        .read_line(&mut response)
-        .expect("Failed to read input.");
-
-    response.replace('\n', "").to_lowercase().eq("y")
-}
+use crate::commands::received_confirmation;
 
 fn remove_score(path: &Path) {
     if let Err(message) = remove_file(path) {
@@ -34,7 +22,11 @@ pub fn clean_main(
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    if search_terms.is_empty() && !received_confirmation() {
+    if search_terms.is_empty()
+        && !received_confirmation(
+            "Are you sure you want to remove all pdfs? [y/n]",
+        )
+    {
         return;
     };
 

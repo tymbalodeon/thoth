@@ -18,6 +18,7 @@ pub mod update_path;
 pub mod update_version;
 
 use std::fmt::{Display, Formatter, Result};
+use std::io::{stdin, stdout, Write};
 
 use clap::Subcommand;
 use clap::ValueEnum;
@@ -323,6 +324,18 @@ pub enum Command {
         #[arg(long)]
         version: Option<String>,
 
+        /// Match search terms against artist field only
+        #[arg(long)]
+        artist: bool,
+
+        /// Match search terms against title field only
+        #[arg(long)]
+        title: bool,
+
+        /// Use all matching scores without prompting
+        #[arg(long)]
+        all: bool,
+
         #[arg(long)]
         scores_directory: Option<String>,
     },
@@ -373,4 +386,16 @@ pub fn get_pdfs_directory_from_arg(pdfs_directory: &Option<String>) -> String {
     } else {
         Config::get_pdfs_directory()
     }
+}
+
+pub fn received_confirmation(message: &str) -> bool {
+    println!("{message}");
+    stdout().flush().unwrap();
+    let mut response = String::new();
+    let stdin = stdin();
+    stdin
+        .read_line(&mut response)
+        .expect("Failed to read input.");
+
+    response.replace('\n', "").to_lowercase().eq("y")
 }

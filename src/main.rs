@@ -39,8 +39,18 @@ fn main() {
         Some(Command::UpdateVersion {
             search_terms,
             version,
+            artist,
+            title,
+            all,
             scores_directory,
-        }) => update_version_main(search_terms, version, scores_directory),
+        }) => update_version_main(
+            search_terms,
+            version,
+            artist,
+            title,
+            all,
+            scores_directory,
+        ),
         Some(Command::Clean {
             search_terms,
             artist,
