@@ -32,7 +32,7 @@ pub struct ScoreFileSettings {
 
 impl Default for ScoreFileSettings {
     fn default() -> Self {
-        ScoreFileSettings {
+        Self {
             title: "Sketch".to_string(),
             subtitle: None,
             composer: None,

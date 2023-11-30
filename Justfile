@@ -8,6 +8,7 @@
 # Check code for issues using "clippy".
 @clippy:
     just check --clippy
+    # cargo clippy --fix -- -W clippy::pedantic/nursery/unwrap_used
 
 # Run the application, with any provided <args>.
 try *args:

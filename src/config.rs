@@ -26,7 +26,7 @@ struct ConfigFile {
 
 impl ConfigFile {
     pub fn from_config(config: Config) -> Self {
-        ConfigFile {
+        Self {
             composer: Some(config.composer),
             scores_directory: Some(config.scores_directory),
             pdfs_directory: Some(config.pdfs_directory),
@@ -104,7 +104,7 @@ impl Default for Config {
             String::new()
         };
 
-        Config {
+        Self {
             composer: user_name,
             scores_directory: get_default_scores_directory(),
             pdfs_directory: get_default_pdfs_directory(),
@@ -163,7 +163,7 @@ impl Config {
             get_default_instrument()
         };
 
-        Config {
+        Self {
             composer,
             scores_directory,
             pdfs_directory,
@@ -173,23 +173,23 @@ impl Config {
     }
 
     pub fn get_composer() -> String {
-        Config::from_config_file().composer
+        Self::from_config_file().composer
     }
 
     pub fn get_instrument() -> String {
-        Config::from_config_file().instrument
+        Self::from_config_file().instrument
     }
 
     pub fn get_scores_directory() -> String {
-        Config::from_config_file().scores_directory
+        Self::from_config_file().scores_directory
     }
 
     pub fn get_pdfs_directory() -> String {
-        Config::from_config_file().pdfs_directory
+        Self::from_config_file().pdfs_directory
     }
 
     pub fn get_template() -> Template {
-        Config::from_config_file().template
+        Self::from_config_file().template
     }
 
     fn style_key(key: &str) -> String {
@@ -205,7 +205,7 @@ impl Config {
     }
 
     pub fn display() {
-        let config = Config::from_config_file();
+        let config = Self::from_config_file();
 
         // let header =
         //     vec!["Key".italic().to_string(), "Value".italic().to_string()];
@@ -234,25 +234,25 @@ impl Config {
 
     pub fn display_value(key: &ConfigKey) {
         match key.to_string().replace('-', "_").to_lowercase().as_str() {
-            "composer" => println!("{}", Config::get_composer()),
+            "composer" => println!("{}", Self::get_composer()),
             "instrument" => {
-                println!("{}", Config::get_instrument())
+                println!("{}", Self::get_instrument())
             }
             "scores_directory" => {
-                println!("{}", Config::get_scores_directory())
+                println!("{}", Self::get_scores_directory())
             }
             "pdfs_directory" => {
-                println!("{}", Config::get_pdfs_directory())
+                println!("{}", Self::get_pdfs_directory())
             }
             "template" => {
-                println!("{:?}", Config::get_template())
+                println!("{:?}", Self::get_template())
             }
             _ => println!("\"{key}\" is not a recognized config key"),
         };
     }
 
     pub fn set_value(key: &ConfigKey, value: String) {
-        let mut config = Config::from_config_file();
+        let mut config = Self::from_config_file();
 
         match key {
             ConfigKey::Composer => config.composer = value,
@@ -271,6 +271,6 @@ impl Config {
         let config_path_name = get_config_path();
         let config_path = Path::new(&config_path_name);
         write(config_path, contents).expect("Unable to write config");
-        Config::display();
+        Self::display();
     }
 }

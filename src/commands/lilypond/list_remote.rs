@@ -29,7 +29,7 @@ pub struct LilypondReleases {
 
 impl LilypondReleases {
     pub fn get() -> reqwest::Result<Self> {
-        Ok(LilypondReleases {
+        Ok(Self {
             releases: vec![].into_iter(),
             client: reqwest::blocking::Client::new(),
             page: 0,

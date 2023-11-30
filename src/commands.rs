@@ -53,7 +53,7 @@ pub enum ScoreFileType {
     Pdf,
 }
 
-#[derive(Clone, Debug, PartialEq, ValueEnum)]
+#[derive(Clone, Debug, PartialEq, Eq, ValueEnum)]
 pub enum VersionStability {
     Stable,
     Unstable,
