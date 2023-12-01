@@ -1,9 +1,5 @@
-use std::cmp::Ordering;
-use std::fs::{remove_file, rename, File};
-use std::io::{BufRead, BufReader, Write as IoWrite};
 use std::path::PathBuf;
-
-use human_sort::compare;
+use std::process::Command;
 
 use super::lilypond::global::get_global_version;
 use super::scores::{get_found_ly_files, get_selected_items};
@@ -17,47 +13,17 @@ fn get_new_version(version: &Option<String>) -> String {
     }
 }
 
-fn is_outdated(version: &str, new_version: &str) -> bool {
-    compare(version, new_version) == Ordering::Less
-}
-
-fn update_version(
-    file: PathBuf,
-    version: &Option<String>,
-    new_version: &String,
-) {
-    let output_file =
-        format!("/tmp/{}", file.file_name().unwrap().to_str().unwrap());
-    let mut output = File::create(&output_file).unwrap();
-    let mut changed = false;
-
-    for line in BufReader::new(File::open(&file).unwrap()).lines() {
-        let mut line = line.unwrap();
-        let version_regex = "\\version ";
-
-        if line.contains(version_regex) {
-            let file_version =
-                line.replace(version_regex, "").replace('"', "");
-
-            if version.is_some() || is_outdated(&file_version, new_version) {
-                line = line.replace(&file_version, new_version);
-                changed = true;
-                println!(
-                    "Updated {} to lilypond {}",
-                    &file.display(),
-                    &new_version
-                );
-            }
+fn update_version(file: PathBuf, new_version: &String) {
+    match Command::new("convert-ly")
+        .args(["--to", new_version])
+        .arg("--edit")
+        .arg(&file.display().to_string())
+        .output()
+    {
+        Ok(result) => {
+            println!("{}", String::from_utf8(result.stderr).unwrap(),)
         }
-
-        line = format!("{line}\n");
-        output.write(line.as_bytes()).ok();
-    }
-
-    if changed {
-        rename(output_file, file).ok();
-    } else {
-        remove_file(output_file).ok();
+        Err(err) => println!("{err}"),
     }
 }
 
@@ -90,12 +56,12 @@ pub fn update_version_main(
             for item in selected_items.iter() {
                 let path = item.output().to_string();
                 let path = PathBuf::from(path);
-                update_version(path, version, &new_version);
+                update_version(path, &new_version);
             }
         }
     } else {
         for file in matching_files {
-            update_version(file, version, &new_version);
+            update_version(file, &new_version);
         }
     }
 }
