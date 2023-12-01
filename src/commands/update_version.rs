@@ -1,5 +1,5 @@
 use std::cmp::Ordering;
-use std::fs::{rename, File};
+use std::fs::{remove_file, rename, File};
 use std::io::{BufRead, BufReader, Write as IoWrite};
 use std::path::PathBuf;
 
@@ -29,15 +29,19 @@ fn update_version(
     let output_file =
         format!("/tmp/{}", file.file_name().unwrap().to_str().unwrap());
     let mut output = File::create(&output_file).unwrap();
+    let mut changed = false;
 
     for line in BufReader::new(File::open(&file).unwrap()).lines() {
         let mut line = line.unwrap();
+        let version_regex = "\\version ";
 
-        if line.contains("\\version") {
-            let file_version = line.replace("\\version ", "").replace('"', "");
+        if line.contains(version_regex) {
+            let file_version =
+                line.replace(version_regex, "").replace('"', "");
 
             if version.is_some() || is_outdated(&file_version, new_version) {
-                line = line.replace(&file_version, new_version.as_str());
+                line = line.replace(&file_version, new_version);
+                changed = true;
                 println!(
                     "Updated {} to lilypond {}",
                     &file.display(),
@@ -50,7 +54,11 @@ fn update_version(
         output.write(line.as_bytes()).ok();
     }
 
-    rename(output_file, file).ok();
+    if changed {
+        rename(output_file, file).ok();
+    } else {
+        remove_file(output_file).ok();
+    }
 }
 
 pub fn update_version_main(
