@@ -1,5 +1,3 @@
-#![allow(clippy::module_name_repetitions)]
-
 use std::{
     path::{Path, PathBuf},
     process::Command,

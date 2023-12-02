@@ -1,4 +1,3 @@
-#![allow(clippy::module_name_repetitions)]
 
 use std::convert::Infallible;
 use std::fs::create_dir_all;

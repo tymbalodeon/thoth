@@ -12,6 +12,7 @@ clippy:
         -W clippy::pedantic \
         -A clippy::too_many_lines \
         -A clippy::fn_params_excessive_bools  \
+        -A clippy::module_name_repetitions \
         -W clippy::nursery \
         -W clippy::unwrap_used
 

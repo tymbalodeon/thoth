@@ -1,5 +1,3 @@
-#![allow(clippy::module_name_repetitions)]
-
 use std::fs::{create_dir_all, metadata, File};
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};

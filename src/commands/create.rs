@@ -1,5 +1,3 @@
-#![allow(clippy::module_name_repetitions)]
-
 use std::fs::{create_dir_all, File};
 use std::io::prelude::*;
 use std::path::Path;

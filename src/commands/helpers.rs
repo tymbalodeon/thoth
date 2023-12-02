@@ -1,5 +1,3 @@
-#![allow(clippy::module_name_repetitions)]
-
 use std::fmt::{Display, Formatter, Result};
 
 use bat::{PagingMode, PrettyPrinter};
