@@ -7,7 +7,10 @@ pub mod uninstall;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
-use itertools::{EitherOrBoth::*, Itertools};
+use itertools::{
+    EitherOrBoth::{Both, Left, Right},
+    Itertools,
+};
 use owo_colors::OwoColorize;
 use regex::Regex;
 
@@ -75,7 +78,7 @@ pub fn get_tag_names() -> Vec<String> {
     let mut releases = vec![];
     let err = "Failed to parse lilypond release.";
 
-    for release in LilypondReleases::get().expect(err) {
+    for release in LilypondReleases::get() {
         let release = release.expect(err);
         if !release.assets.links.is_empty() {
             releases.push(release.tag_name.to_string());

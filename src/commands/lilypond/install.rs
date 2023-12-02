@@ -24,52 +24,49 @@ struct AssetLink {
     name: String,
 }
 
-fn get_latest_version_by_stability(stability: VersionStability) -> String {
+fn get_latest_version_by_stability(stability: &VersionStability) -> String {
     let versions = get_versions();
 
-    filter_versions(&versions, &stability)
+    (*filter_versions(&versions, stability)
         .first()
-        .unwrap()
-        .to_string()
+        .expect("Failed to get latest version."))
+    .to_string()
 }
 
 pub fn get_latest_version(version: &str) -> Option<String> {
     match version {
         "latest-stable" => {
-            Some(get_latest_version_by_stability(VersionStability::Stable))
+            Some(get_latest_version_by_stability(&VersionStability::Stable))
         }
         "latest-unstable" => {
-            Some(get_latest_version_by_stability(VersionStability::Unstable))
+            Some(get_latest_version_by_stability(&VersionStability::Unstable))
         }
         _ => None,
     }
 }
 
 pub fn parse_version(version: &str) -> String {
-    let latest_version = get_latest_version(version);
-
-    if let Some(version) = latest_version {
-        version
-    } else {
-        version.to_string()
-    }
+    get_latest_version(version)
+        .map_or_else(|| version.to_string(), |version| version)
 }
 
 fn get_asset_link(version: &str) -> Option<AssetLink> {
     let version_regex = parse_version(version);
-    let re = Regex::new(&version_regex).unwrap();
+    let re = Regex::new(&version_regex)
+        .expect("Failed to parse lilypond version regex.");
     let tag_name = get_tag_names()
         .iter()
         .find(|tag_name| re.is_match(tag_name))
-        .map(|tag_name| tag_name.to_string())
-        .unwrap()
+        .map(ToString::to_string)
+        .expect("Failed to get lilypond release tag name.")
         .replace("release/", "release%2F");
     let url = format!("{GITLAB_URL}/{tag_name}/assets/links");
+    let err = "Failed to GET lilypond version asset link from GitLab.";
 
     get(url)
-        .unwrap()
+        .expect(err)
         .json::<Vec<AssetLink>>()
-        .unwrap()
+        .expect(err)
         .iter()
         .find(|link| link.direct_asset_url.contains("darwin"))
         .map(|link| AssetLink {
@@ -85,38 +82,49 @@ pub fn get_install_path() -> String {
 fn download_asset(asset_link: AssetLink) {
     let install_path = get_install_path();
     let file_path = format!("{}/{}", install_path, asset_link.name);
+    let err = "Failed to get version path.";
+
     let version_path = format!(
-        "{}/{}",
-        install_path,
+        "{install_path}/{}",
         &file_path
             .split("thoth/")
             .last()
-            .unwrap()
+            .expect(err)
             .split("-darwin")
             .next()
-            .unwrap()
+            .expect(err)
     );
 
     if Path::new(&version_path).exists() {
         return;
     }
 
-    create_dir_all(&install_path).unwrap();
+    create_dir_all(&install_path)
+        .expect("Failed to create lilypond installations folder. ");
 
     println!("Downloading {}...", asset_link.direct_asset_url);
 
-    let content = get(asset_link.direct_asset_url).unwrap().bytes().unwrap();
-    let mut file = File::create(tilde(&file_path).to_string()).unwrap();
+    let err = "Failed to download lilypond.";
+    let content = get(asset_link.direct_asset_url)
+        .expect(err)
+        .bytes()
+        .expect(err);
+    let mut file = File::create(tilde(&file_path).to_string())
+        .expect("Failed to create download file.");
 
-    copy(&mut content.as_ref(), &mut file).unwrap();
+    copy(&mut content.as_ref(), &mut file)
+        .expect("Failed to save contents to file.");
 
-    let mut archive =
-        Archive::new(GzDecoder::new(File::open(&file_path).unwrap()));
+    let mut archive = Archive::new(GzDecoder::new(
+        File::open(&file_path).expect("Failed to read lilypond zip."),
+    ));
 
     println!("Unpacking {}...", asset_link.name);
 
-    archive.unpack(install_path).unwrap();
-    remove_file(file_path).unwrap();
+    archive
+        .unpack(install_path)
+        .expect("Failed to lilypond zip.");
+    remove_file(file_path).expect("Failed to remove file.");
 }
 
 pub fn install(version: &Option<String>) -> io::Result<()> {
@@ -132,11 +140,14 @@ pub fn install(version: &Option<String>) -> io::Result<()> {
         return Ok(());
     }
 
-    if let Some(asset_link) = get_asset_link(&value) {
-        download_asset(asset_link);
-    } else {
-        println!("No assets found.");
-    }
+    get_asset_link(&value).map_or_else(
+        || {
+            println!("No assets found.");
+        },
+        |asset_link| {
+            download_asset(asset_link);
+        },
+    );
 
     Ok(())
 }

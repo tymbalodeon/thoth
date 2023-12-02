@@ -11,10 +11,12 @@ pub fn list(
     stability: &Option<VersionStability>,
 ) {
     let install_path = tilde(INSTALL_PATH).to_string();
+    let err = "Failed to parse installed lilypond version.";
+
     let versions: Vec<String> = read_dir(&install_path)
-        .unwrap()
+        .expect(err)
         .map(|path| {
-            path.unwrap()
+            path.expect(err)
                 .path()
                 .display()
                 .to_string()
@@ -23,15 +25,12 @@ pub fn list(
         .collect();
 
     let mut versions: Vec<&str> =
-        versions.iter().map(|version| version.as_str()).collect();
+        versions.iter().map(String::as_str).collect();
 
     sort(&mut versions);
 
-    let versions: Vec<String> = versions
-        .iter()
-        .rev()
-        .map(|version| version.to_string())
-        .collect();
+    let versions: Vec<String> =
+        versions.iter().rev().map(ToString::to_string).collect();
 
-    list_versions(versions, version_regex, stability)
+    list_versions(versions, version_regex, stability);
 }

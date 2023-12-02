@@ -28,14 +28,14 @@ pub struct LilypondReleases {
 }
 
 impl LilypondReleases {
-    pub fn get() -> reqwest::Result<Self> {
-        Ok(Self {
+    pub fn get() -> Self {
+        Self {
             releases: vec![].into_iter(),
             client: reqwest::blocking::Client::new(),
             page: 0,
             per_page: 100,
             total: 0,
-        })
+        }
     }
 
     fn try_next(&mut self) -> reqwest::Result<Option<Release>> {
@@ -53,14 +53,15 @@ impl LilypondReleases {
             self.page, self.per_page
         );
         let response = self.client.get(url).send()?;
+        let err = "Failed to GET lilypond releases from GitLab.";
         self.total = response
             .headers()
             .get("x-total")
-            .unwrap()
+            .expect(err)
             .to_str()
-            .unwrap()
+            .expect(err)
             .parse::<u32>()
-            .unwrap()
+            .expect(err)
             .to_owned();
         self.releases = response.json::<Vec<Release>>()?.into_iter();
 
