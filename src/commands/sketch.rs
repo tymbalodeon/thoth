@@ -1,5 +1,5 @@
-use super::create::{create_main, ScoreFileSettings};
+use super::create::{self, ScoreFileSettings};
 
-pub fn sketch_main() {
-    create_main(ScoreFileSettings::default(), true, true, &None, &None);
+pub fn main() {
+    create::main(ScoreFileSettings::default(), true, true, &None, &None);
 }

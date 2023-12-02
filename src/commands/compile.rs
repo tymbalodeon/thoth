@@ -109,7 +109,7 @@ pub fn compile_input_file(
     }
 }
 
-pub fn compile_main(
+pub fn main(
     search_terms: &Vec<String>,
     search_artist: bool,
     search_title: bool,

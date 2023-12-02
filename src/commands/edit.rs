@@ -224,7 +224,7 @@ pub fn edit_file(
     watch(score_path, is_sketch).unwrap();
 }
 
-pub fn edit_main(
+pub fn main(
     search_term: &String,
     search_artist: bool,
     search_title: bool,

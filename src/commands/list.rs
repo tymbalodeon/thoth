@@ -49,7 +49,7 @@ fn remove_leading_articles(mut value: String) -> String {
     value
 }
 
-pub fn list_main(
+pub fn main(
     search_terms: &Vec<String>,
     outdated: bool,
     compiled: bool,

@@ -169,7 +169,7 @@ fn display_score_info(score: &String) {
     print_info(metadata);
 }
 
-pub fn info_main(
+pub fn main(
     search_term: &String,
     search_artist: bool,
     search_title: bool,

@@ -167,10 +167,7 @@ pub fn list_versions(
     print_table(titles, rows);
 }
 
-pub fn lilypond_main(
-    version: &Option<String>,
-    command: &Option<LilypondCommand>,
-) {
+pub fn main(version: &Option<String>, command: &Option<LilypondCommand>) {
     if let Some(command) = command {
         match command {
             LilypondCommand::Install { version } => install(version).unwrap(),

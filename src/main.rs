@@ -4,20 +4,20 @@ mod config;
 use std::println;
 
 use clap::Parser;
-use commands::activate::activate_main;
-use commands::clean::clean_main;
-use commands::compile::compile_main;
-use commands::config::config_main;
-use commands::create::{create_main, ScoreFileSettings};
-use commands::edit::edit_main;
-use commands::helpers::helpers_main;
-use commands::info::info_main;
-use commands::lilypond::lilypond_main;
-use commands::list::list_main;
-use commands::open::open_main;
-use commands::sketch::sketch_main;
-use commands::templates::templates_main;
-use commands::update_path::update_path_main;
+use commands::activate;
+use commands::clean;
+use commands::compile;
+use commands::config as config_command;
+use commands::create::{self, ScoreFileSettings};
+use commands::edit;
+use commands::helpers;
+use commands::info;
+use commands::lilypond;
+use commands::list;
+use commands::open;
+use commands::sketch;
+use commands::templates;
+use commands::update_path;
 use commands::update_version;
 use commands::Command;
 
@@ -32,13 +32,8 @@ struct Cli {
 
 fn main() {
     match &Cli::parse().command {
-        Some(Command::Activate) => activate_main(),
-        Some(Command::UpdatePath { version }) => {
-            match update_path_main(version) {
-                Ok(()) => (),
-                Err(err) => println!("{err}"),
-            }
-        }
+        Some(Command::Activate) => activate::main(),
+        Some(Command::UpdatePath { version }) => update_path::main(version),
         Some(Command::UpdateVersion {
             search_terms,
             version,
@@ -46,7 +41,7 @@ fn main() {
             title,
             all,
             scores_directory,
-        }) => update_version::command(
+        }) => update_version::main(
             search_terms,
             version,
             *artist,
@@ -61,7 +56,7 @@ fn main() {
             all,
             scores_directory,
             pdfs_directory,
-        }) => clean_main(
+        }) => clean::main(
             search_terms,
             *artist,
             *title,
@@ -76,7 +71,7 @@ fn main() {
             all,
             scores_directory,
             pdfs_directory,
-        }) => compile_main(
+        }) => compile::main(
             search_terms,
             *artist,
             *title,
@@ -89,7 +84,7 @@ fn main() {
             path,
             key,
             set,
-        }) => config_main(*edit, *path, key, set),
+        }) => config_command::main(*edit, *path, key, set),
         Some(Command::Create {
             title,
             subtitle,
@@ -110,7 +105,7 @@ fn main() {
                 instrument: instrument.to_owned(),
             };
 
-            create_main(
+            create::main(
                 settings,
                 *edit,
                 false,
@@ -126,7 +121,7 @@ fn main() {
             scores_directory,
             pdfs_directory,
         }) => {
-            edit_main(
+            edit::main(
                 search_terms,
                 *artist,
                 *title,
@@ -143,10 +138,10 @@ fn main() {
             all,
             scores_directory,
         }) => {
-            info_main(search_term, *artist, *title, *all, scores_directory);
+            info::main(search_term, *artist, *title, *all, scores_directory);
         }
         Some(Command::Lilypond { version, command }) => {
-            lilypond_main(version, command);
+            lilypond::main(version, command);
         }
         Some(Command::List {
             search_terms,
@@ -157,7 +152,7 @@ fn main() {
             scores_directory,
             pdfs_directory,
         }) => {
-            list_main(
+            list::main(
                 search_terms,
                 *outdated,
                 *compiled,
@@ -176,7 +171,7 @@ fn main() {
             scores_directory,
             pdfs_directory,
         }) => {
-            open_main(
+            open::main(
                 search_terms,
                 *artist,
                 *title,
@@ -186,9 +181,9 @@ fn main() {
                 pdfs_directory,
             );
         }
-        Some(Command::Templates { command }) => templates_main(command),
-        Some(Command::Helpers { command }) => helpers_main(command),
-        Some(Command::Sketch {}) => sketch_main(),
+        Some(Command::Templates { command }) => templates::main(command),
+        Some(Command::Helpers { command }) => helpers::main(command),
+        Some(Command::Sketch {}) => sketch::main(),
         _ => {
             println!("Please choose a command.");
         }

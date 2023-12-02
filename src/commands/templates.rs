@@ -156,7 +156,7 @@ fn show_template(template: &Template) {
     }
 }
 
-pub fn templates_main(command: &Option<TemplateCommand>) {
+pub fn main(command: &Option<TemplateCommand>) {
     if command.is_some() {
         match command.as_ref().unwrap() {
             TemplateCommand::Show { template } => show_template(template),

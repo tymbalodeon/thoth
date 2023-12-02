@@ -5,7 +5,7 @@ use std::path::Path;
 use super::add_value_to_string_if_some;
 use super::edit::edit_file;
 use super::scores::{get_temporary_ly_file, TEMPORARY_DIRECTORY};
-use crate::commands::edit::edit_main;
+use crate::commands::edit;
 use crate::commands::templates::form::get_form_templates;
 use crate::commands::templates::lead::get_lead_templates;
 use crate::commands::templates::piano::get_piano_template;
@@ -164,7 +164,7 @@ pub fn print_score_info(
     println!("{score_info}");
 }
 
-pub fn create_main(
+pub fn main(
     settings: ScoreFileSettings,
     edit: bool,
     is_sketch: bool,
@@ -210,7 +210,7 @@ pub fn create_main(
         if is_sketch {
             edit_file(get_temporary_ly_file(), is_sketch, &None, &None);
         } else {
-            edit_main(
+            edit::main(
                 &get_file_system_name(title),
                 false,
                 false,

@@ -1,7 +1,7 @@
 use crate::commands::ConfigKey;
 use crate::config::Config;
 
-pub fn config_main(
+pub fn main(
     edit: bool,
     path: bool,
     key: &Option<ConfigKey>,

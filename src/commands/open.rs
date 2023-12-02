@@ -14,7 +14,7 @@ pub fn open_file(file_path: &Path) {
     println!("Opened {file_path}");
 }
 
-pub fn open_main(
+pub fn main(
     search_terms: &Vec<String>,
     search_artist: bool,
     search_title: bool,

@@ -14,7 +14,7 @@ fn remove_score(path: &Path) {
     };
 }
 
-pub fn clean_main(
+pub fn main(
     search_terms: &Vec<String>,
     search_artist: bool,
     search_title: bool,

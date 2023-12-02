@@ -1,6 +1,6 @@
 use indoc::formatdoc;
 
-pub fn activate_main() {
+pub fn main() {
     println!(
         "{}",
         formatdoc!(

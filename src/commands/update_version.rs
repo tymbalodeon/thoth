@@ -81,7 +81,7 @@ fn update_version(
     }
 }
 
-pub fn command(
+pub fn main(
     search_terms: &Vec<String>,
     version: &Option<String>,
     search_artist: bool,

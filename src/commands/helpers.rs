@@ -53,7 +53,7 @@ fn display_helper_file(helper: &Helper) {
     }
 }
 
-pub fn helpers_main(command: &Option<HelperCommand>) {
+pub fn main(command: &Option<HelperCommand>) {
     if command.is_some() {
         match command.as_ref().unwrap() {
             HelperCommand::Show { helper } => display_helper_file(helper),
