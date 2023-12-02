@@ -10,7 +10,7 @@ use shellexpand::tilde;
 use toml::{from_str, to_string};
 use users::get_current_username;
 
-use crate::commands::table::print_table;
+use crate::commands::table;
 use crate::commands::{templates::Template, ConfigKey};
 
 static CONFIG_PATH: &str = "~/.config/thoth/config.toml";
@@ -228,7 +228,7 @@ impl Config {
             ),
         ];
 
-        print_table(vec![], rows);
+        table::print(&[], rows);
     }
 
     pub fn display_path() {

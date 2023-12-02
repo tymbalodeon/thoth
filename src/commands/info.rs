@@ -7,9 +7,7 @@ use bat::{PagingMode, PrettyPrinter};
 use convert_case::{Case::Title, Casing};
 
 use super::helpers::pushln;
-use super::scores::{
-    get_matching_scores, get_score_ly_file, get_selected_items,
-};
+use super::scores::{get_score_ly_file, get_selected_items, search};
 
 struct CompositionMetadata {
     lilypond_version: Option<String>,
@@ -176,7 +174,7 @@ pub fn main(
     use_all_matches: bool,
     scores_directory: &Option<String>,
 ) {
-    let matching_scores = get_matching_scores(
+    let matching_scores = search(
         &vec![search_term.to_string()],
         search_artist,
         search_title,
@@ -184,9 +182,10 @@ pub fn main(
     );
 
     if !use_all_matches && matching_scores.len() > 1 {
-        if let Ok(selected_scores) = get_selected_items(matching_scores, false)
+        if let Ok(selected_scores) =
+            get_selected_items(&matching_scores, false)
         {
-            for score in selected_scores.iter() {
+            for score in &selected_scores {
                 let score = score.output().to_string();
 
                 if let Some(ly_file) = get_score_ly_file(&score) {

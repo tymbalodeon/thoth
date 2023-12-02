@@ -27,7 +27,7 @@ struct AssetLink {
 fn get_latest_version_by_stability(stability: VersionStability) -> String {
     let versions = get_versions();
 
-    filter_versions(&versions, stability)
+    filter_versions(&versions, &stability)
         .first()
         .unwrap()
         .to_string()

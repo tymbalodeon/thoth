@@ -16,7 +16,7 @@ use self::install::install;
 use self::list::list;
 use self::list_remote::{list_remote, LilypondReleases};
 use self::uninstall::uninstall;
-use super::table::print_table;
+use super::table;
 use super::{LilypondCommand, VersionStability};
 
 static GLOBAL_PATH: &str = "~/.thoth-versions";
@@ -53,15 +53,16 @@ fn get_version_stability(
             _ => Err("invalid version specifier"),
         }
     } else {
+        let err = "Failed to parse lilypond minor version.";
         let minor_version = version
             .split('.')
             .enumerate()
             .filter(|(index, _)| index == &1usize)
             .map(|(_, value)| value)
             .next()
-            .unwrap()
+            .expect(err)
             .parse::<i32>()
-            .unwrap();
+            .expect(err);
         if minor_version % 2 == 0 {
             Ok(VersionStability::Stable)
         } else {
@@ -72,9 +73,10 @@ fn get_version_stability(
 
 pub fn get_tag_names() -> Vec<String> {
     let mut releases = vec![];
+    let err = "Failed to parse lilypond release.";
 
-    for release in LilypondReleases::get().unwrap() {
-        let release = release.unwrap();
+    for release in LilypondReleases::get().expect(err) {
+        let release = release.expect(err);
         if !release.assets.links.is_empty() {
             releases.push(release.tag_name.to_string());
         }
@@ -90,13 +92,17 @@ pub fn get_versions() -> Vec<String> {
         .collect()
 }
 
-pub fn filter_versions(
-    versions: &[String],
-    stability: VersionStability,
-) -> Vec<&String> {
+pub fn filter_versions<'a>(
+    versions: &'a [String],
+    stability: &'a VersionStability,
+) -> Vec<&'a String> {
     versions
         .iter()
-        .filter(|version| get_version_stability(version).unwrap() == stability)
+        .filter(|version| {
+            &get_version_stability(version)
+                .expect("Failed to get lilypond version stability.")
+                == stability
+        })
         .collect()
 }
 
@@ -109,33 +115,36 @@ pub fn list_versions(
         versions = versions
             .iter()
             .filter(|version| {
-                get_version_stability(version).unwrap() == *stability
+                get_version_stability(version)
+                    .expect("Failed to get lilypond version stability.")
+                    == *stability
             })
-            .map(|version| version.to_string())
+            .map(ToString::to_string)
             .collect();
     }
 
     if let Some(regex) = version_regex {
-        let re = Regex::new(regex).unwrap();
+        let re = Regex::new(regex)
+            .expect("Failed to parse lilypond version regex.");
 
         versions = versions
             .iter()
             .filter(|version| re.is_match(version))
-            .map(|version| version.to_string())
+            .map(ToString::to_string)
             .collect();
     }
 
-    let stable = filter_versions(&versions, VersionStability::Stable);
-    let unstable = filter_versions(&versions, VersionStability::Unstable);
+    let stable = filter_versions(&versions, &VersionStability::Stable);
+    let unstable = filter_versions(&versions, &VersionStability::Unstable);
 
     let mut titles = vec![];
 
     if !stable.is_empty() {
-        titles.push("Stable".italic().green().to_string())
+        titles.push("Stable".italic().green().to_string());
     }
 
     if !unstable.is_empty() {
-        titles.push("Unstable".italic().yellow().to_string())
+        titles.push("Unstable".italic().yellow().to_string());
     }
 
     let mut rows: Vec<Vec<String>> = vec![];
@@ -143,34 +152,45 @@ pub fn list_versions(
     if !stable.is_empty() && !unstable.is_empty() {
         for pair in stable.iter().zip_longest(unstable.iter()) {
             match pair {
-                Both(stable, unstable) => {
-                    rows.push(vec![stable.to_string(), unstable.to_string()])
-                }
+                Both(stable, unstable) => rows.push(vec![
+                    (*stable).to_string(),
+                    (*unstable).to_string(),
+                ]),
                 Left(stable) => {
-                    rows.push(vec![stable.to_string(), String::new()])
+                    rows.push(vec![(*stable).to_string(), String::new()]);
                 }
                 Right(unstable) => {
-                    rows.push(vec![String::new(), unstable.to_string()])
+                    rows.push(vec![String::new(), (*unstable).to_string()]);
                 }
             }
         }
     } else if !stable.is_empty() {
-        for version in stable.iter() {
-            rows.push(vec![version.to_string()]);
+        for version in &stable {
+            rows.push(vec![(*version).to_string()]);
         }
     } else if !unstable.is_empty() {
-        for version in unstable.iter() {
-            rows.push(vec![version.to_string()]);
+        for version in &unstable {
+            rows.push(vec![(*version).to_string()]);
         }
     }
 
-    print_table(titles, rows);
+    table::print(&titles, rows);
 }
 
 pub fn main(version: &Option<String>, command: &Option<LilypondCommand>) {
-    if let Some(command) = command {
-        match command {
-            LilypondCommand::Install { version } => install(version).unwrap(),
+    command.as_ref().map_or_else(
+        || {
+            global(version).unwrap_or_else(|err| {
+                panic!(
+                    "{}",
+                    format!("Failed to get global lilypond version ({err})")
+                )
+            });
+        },
+        |command| match command {
+            LilypondCommand::Install { version } => {
+                install(version).expect("Failed to install lilypond.");
+            }
             LilypondCommand::Uninstall { version } => uninstall(version),
             LilypondCommand::List {
                 version_regex,
@@ -180,8 +200,6 @@ pub fn main(version: &Option<String>, command: &Option<LilypondCommand>) {
                 version_regex,
                 stability,
             } => list_remote(version_regex, stability),
-        }
-    } else {
-        global(version).unwrap();
-    }
+        },
+    );
 }

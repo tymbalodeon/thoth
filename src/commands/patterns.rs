@@ -33,7 +33,7 @@ pub fn get_score_file(
         match entry {
             Ok(path) => return Some(path),
             Err(message) => {
-                println!("{:?}", message);
+                println!("{message:?}");
             }
         }
     }

@@ -18,7 +18,7 @@ use self::form::get_form_templates;
 use self::lead::get_lead_templates;
 use self::piano::get_piano_template;
 use self::single::get_single_template;
-use super::{table::print_table, TemplateCommand};
+use super::{table, TemplateCommand};
 use crate::commands::{
     add_value_to_string_if_some, create::get_file_system_name,
 };
@@ -198,5 +198,5 @@ pub fn main(command: &Option<TemplateCommand>) {
         .map(|row| row.iter().map(ToString::to_string).collect())
         .collect();
 
-    print_table(titles, rows);
+    table::print(&titles, rows);
 }

@@ -1,3 +1,5 @@
+#![allow(clippy::module_name_repetitions)]
+
 use std::{
     path::{Path, PathBuf},
     process::Command,
@@ -9,8 +11,14 @@ use super::{
 };
 
 pub fn open_file(file_path: &Path) {
-    let file_path = file_path.to_str().unwrap().to_string();
-    Command::new("open").arg(&file_path).output().unwrap();
+    let file_path = file_path
+        .to_str()
+        .expect("Failed to parse file path.")
+        .to_string();
+    Command::new("open")
+        .arg(&file_path)
+        .output()
+        .expect("Failed to run `open` command.");
     println!("Opened {file_path}");
 }
 
@@ -60,8 +68,8 @@ pub fn main(
     };
 
     if !use_all_matches && matching_files.len() > 1 {
-        if let Ok(selected_items) = get_selected_items(matching_files, true) {
-            for item in selected_items.iter() {
+        if let Ok(selected_items) = get_selected_items(&matching_files, true) {
+            for item in &selected_items {
                 let path = item.output().to_string();
                 let path = PathBuf::from(path);
                 open_file(&path);

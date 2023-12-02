@@ -1,11 +1,11 @@
 use bat::{PagingMode, PrettyPrinter};
 use tabled::{builder::Builder, settings::Style};
 
-pub fn print_table(titles: Vec<String>, rows: Vec<Vec<String>>) {
+pub fn print(titles: &[String], rows: Vec<Vec<String>>) {
     let mut builder = Builder::default();
 
     if !titles.is_empty() {
-        builder.set_header(&titles);
+        builder.set_header(titles);
     }
 
     for values in rows {
@@ -27,5 +27,5 @@ pub fn print_table(titles: Vec<String>, rows: Vec<Vec<String>>) {
         .colored_output(false)
         .paging_mode(PagingMode::QuitIfOneScreen)
         .print()
-        .unwrap();
+        .expect("Failed to print table.");
 }

@@ -5,7 +5,7 @@ use clap::ValueEnum;
 use convert_case::{Case::Kebab, Casing};
 use serde::{Deserialize, Serialize};
 
-use super::{table::print_table, HelperCommand};
+use super::{table, HelperCommand};
 
 const HELPER_FILES: &[(&str, &[u8])] =
     &include!(concat!(env!("OUT_DIR"), "/helper_files.rs"));
@@ -103,7 +103,7 @@ pub fn main(command: &Option<HelperCommand>) {
         .map(|row| row.iter().map(|value| value.to_string()).collect())
         .collect();
 
-    print_table(titles, rows);
+    table::print(&titles, rows);
 }
 
 pub fn pushln(lines: &mut String, text: String) {

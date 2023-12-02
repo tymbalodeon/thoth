@@ -11,6 +11,7 @@ clippy:
     cargo clippy -- \
         -W clippy::pedantic \
         -A clippy::too_many_lines \
+        -A clippy::fn_params_excessive_bools  \
         -W clippy::nursery \
         -W clippy::unwrap_used
 

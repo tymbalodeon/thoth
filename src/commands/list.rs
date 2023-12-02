@@ -4,8 +4,8 @@ use titlecase::titlecase;
 
 use super::compile::is_compiled;
 use super::get_pdfs_directory_from_arg;
-use crate::commands::scores::get_matching_scores;
-use crate::commands::table::print_table;
+use crate::commands::scores::search;
+use crate::commands::table;
 
 struct Composition {
     artist: String,
@@ -60,18 +60,16 @@ pub fn main(
 ) {
     let mut compositions = vec![];
 
-    let found_scores = get_matching_scores(
-        search_terms,
-        search_artist,
-        search_title,
-        scores_directory,
-    );
+    let found_scores =
+        search(search_terms, search_artist, search_title, scores_directory);
 
     for score in found_scores {
         let mut pdf = false;
-        let path = String::from(score.file_name().unwrap().to_str().unwrap());
+        let err = "Failed to parse score file name.";
+        let path =
+            String::from(score.file_name().expect(err).to_str().expect(err));
         let pdfs_directory = get_pdfs_directory_from_arg(pdfs_directory);
-        let pattern = format!("{pdfs_directory}/{}*.pdf", path);
+        let pattern = format!("{pdfs_directory}/{path}*.pdf");
 
         for pdf_file in glob(&pattern)
             .expect("Failed to read glob pattern")
@@ -87,13 +85,15 @@ pub fn main(
             outdated && !pdf || compiled && pdf || !outdated && !compiled;
 
         if should_display {
+            let err = "Failed to get score artist.";
+
             let artist = score
                 .parent()
-                .unwrap()
+                .expect(err)
                 .file_name()
-                .unwrap()
+                .expect(err)
                 .to_str()
-                .unwrap()
+                .expect(err)
                 .to_string();
 
             let pattern = format!("{}/*.ly", score.display());
@@ -103,8 +103,14 @@ pub fn main(
                 .expect("Failed to read glob pattern")
                 .flatten()
             {
-                title =
-                    ly_file.file_stem().unwrap().to_str().unwrap().to_string();
+                let err = "Failed to get score title.";
+
+                title = ly_file
+                    .file_stem()
+                    .expect(err)
+                    .to_str()
+                    .expect(err)
+                    .to_string();
             }
 
             compositions.push(Composition {
@@ -135,9 +141,9 @@ pub fn main(
 
         let rows = compositions
             .iter()
-            .map(|composition| composition.get_row_values())
+            .map(Composition::get_row_values)
             .collect();
 
-        print_table(header, rows);
+        table::print(&header, rows);
     }
 }

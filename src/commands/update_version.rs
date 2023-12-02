@@ -106,7 +106,7 @@ pub fn main(
     );
 
     if !use_all_matches && matching_files.len() > 1 {
-        if let Ok(selected_items) = get_selected_items(matching_files, true) {
+        if let Ok(selected_items) = get_selected_items(&matching_files, true) {
             for item in &selected_items {
                 let path = item.output().to_string();
                 let path = PathBuf::from(path);

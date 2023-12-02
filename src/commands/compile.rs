@@ -12,9 +12,9 @@ use super::get_scores_directory_from_arg;
 use super::lilypond::global::get_global_version;
 use super::lilypond::install::{get_install_path, install};
 use super::lilypond::is_valid_version;
-use super::scores::get_matching_scores;
 use super::scores::get_score_ly_file;
 use super::scores::get_selected_items;
+use super::scores::search;
 
 fn get_modified(file: &PathBuf) -> Option<SystemTime> {
     if let Ok(file_metadata) = metadata(file) {
@@ -122,19 +122,16 @@ pub fn main(
         create_dir_all(pdfs_directory).unwrap();
     }
 
-    let matching_scores = get_matching_scores(
-        search_terms,
-        search_artist,
-        search_title,
-        scores_directory,
-    );
+    let matching_scores =
+        search(search_terms, search_artist, search_title, scores_directory);
 
     if !search_terms.is_empty()
         && !use_all_matches
         && matching_scores.len() > 1
     {
-        if let Ok(selected_items) = get_selected_items(matching_scores, true) {
-            for item in selected_items.iter() {
+        if let Ok(selected_items) = get_selected_items(&matching_scores, true)
+        {
+            for item in &selected_items {
                 let score = item.output().to_string();
 
                 if let Some(input_file) = get_score_ly_file(&score) {

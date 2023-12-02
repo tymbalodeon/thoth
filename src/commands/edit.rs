@@ -27,7 +27,7 @@ use crate::commands::create::get_file_system_name;
 use crate::commands::patterns::get_score_file;
 use crate::commands::scores::get_temporary_ly_file;
 use crate::commands::scores::TEMPORARY_DIRECTORY;
-use crate::commands::scores::{get_matching_scores, get_score_ly_file};
+use crate::commands::scores::{search, get_score_ly_file};
 use crate::config::Config;
 
 fn get_ily_files(pattern: String) -> Vec<String> {
@@ -217,7 +217,7 @@ pub fn edit_file(
     )
     .unwrap();
 
-    for file in [&score_path, &pdf_file].iter() {
+    for file in [&score_path, &pdf_file] {
         open_file(file.to_path_buf());
     }
 
@@ -233,7 +233,7 @@ pub fn main(
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
-    let matching_scores = get_matching_scores(
+    let matching_scores = search(
         &vec![search_term.to_string()],
         search_artist,
         search_title,
@@ -241,9 +241,9 @@ pub fn main(
     );
 
     if !use_all_matches && matching_scores.len() > 1 {
-        if let Ok(selected_scores) = get_selected_items(matching_scores, false)
+        if let Ok(selected_scores) = get_selected_items(&matching_scores, false)
         {
-            for score in selected_scores.iter() {
+            for score in &selected_scores {
                 let score = score.output().to_string();
 
                 if let Some(ly_file) = get_score_ly_file(&score) {
