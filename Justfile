@@ -2,17 +2,19 @@
     just --list
 
 # Check code for issues, optionally using "clippy".
-@check *clippy:
-    cargo {{ if clippy == "--clippy" { "clippy" } else { "check" } }}
+@check:
+    cargo check
 
 # Check code for issues using "clippy".
-@clippy:
-    just check --clippy
-    # cargo clippy --fix -- -W clippy::pedantic/nursery/unwrap_used
+clippy:
+    #!/usr/bin/env zsh
+    cargo clippy -- \
+        -W clippy::pedantic
+        -W clippy::nursery \
+        -W clippy::unwrap_used
 
 # Run the application, with any provided <args>.
-try *args:
-    #!/usr/bin/env zsh
+@try *args:
     cargo run -- {{args}} {{ if args == "" { "|| exit 0" } else { "" } }}
 
 # Add a dependency.

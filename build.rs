@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     writeln!(&mut helper_files, r##"["##,)?;
 
     let cargo_manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let source_directory = format!("{}/helpers", cargo_manifest_dir);
+    let source_directory = format!("{cargo_manifest_dir}/helpers");
 
     for file in read_dir(source_directory)? {
         let file = file?;
