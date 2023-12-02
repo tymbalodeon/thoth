@@ -106,7 +106,7 @@ fn main() {
             };
 
             create::main(
-                settings,
+                &settings,
                 *edit,
                 false,
                 scores_directory,

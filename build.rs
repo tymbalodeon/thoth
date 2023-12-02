@@ -13,7 +13,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     writeln!(&mut helper_files, r##"["##,)?;
 
-    let cargo_manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let cargo_manifest_dir = env::var("CARGO_MANIFEST_DIR")
+        .expect("Faild to read CARGO_MANIFEST_DIR.");
     let source_directory = format!("{cargo_manifest_dir}/helpers");
 
     for file in read_dir(source_directory)? {

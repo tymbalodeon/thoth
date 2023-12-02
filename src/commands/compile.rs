@@ -1,3 +1,5 @@
+#![allow(clippy::module_name_repetitions)]
+
 use std::fs::{create_dir_all, metadata, File};
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
@@ -17,11 +19,16 @@ use super::scores::get_selected_items;
 use super::scores::search;
 
 fn get_modified(file: &PathBuf) -> Option<SystemTime> {
-    if let Ok(file_metadata) = metadata(file) {
-        Some(file_metadata.modified().unwrap())
-    } else {
-        None
-    }
+    metadata(file).map_or_else(
+        |_| None,
+        |file_metadata| {
+            Some(
+                file_metadata
+                    .modified()
+                    .expect("Failed to read 'last modified' for file."),
+            )
+        },
+    )
 }
 
 pub fn is_compiled(input_file: &PathBuf, output_file: &PathBuf) -> bool {
@@ -38,7 +45,12 @@ fn get_binary(version: String) -> Option<String> {
 
     if global_version != version && is_valid_version(&version) {
         if !Path::new(&version_path).exists() {
-            install(&Some(version)).unwrap();
+            install(&Some(version)).unwrap_or_else(|err| {
+                panic!(
+                    "{}",
+                    format!("Failed to install lilypond version ({err})",)
+                )
+            });
         }
 
         Some(version_path)
@@ -56,9 +68,11 @@ pub fn compile_input_file(
     let scores_directory = &get_scores_directory_from_arg(scores_directory);
 
     if let Some(file) = input_file.to_str() {
+        let err = "Failed to get input file stem.";
+
         let output_file_pattern = format!(
             "{pdfs_directory}/{}*.pdf",
-            input_file.file_stem().unwrap().to_str().unwrap()
+            input_file.file_stem().expect(err).to_str().expect(err)
         );
 
         for entry in glob(&output_file_pattern)
@@ -72,8 +86,11 @@ pub fn compile_input_file(
 
         let mut version = String::new();
 
-        for line in BufReader::new(File::open(file).unwrap()).lines() {
-            let line = line.unwrap();
+        for line in
+            BufReader::new(File::open(file).expect("Failed to open file."))
+                .lines()
+        {
+            let line = line.expect("Failed to read line in file.");
 
             if line.contains("\\version") {
                 version = line.replace("\\version ", "").replace('"', "");
@@ -81,11 +98,10 @@ pub fn compile_input_file(
             }
         }
 
-        let command = if let Some(command) = get_binary(version) {
-            format!("{command}/lilypond")
-        } else {
-            "lilypond".to_string()
-        };
+        let command = get_binary(version).map_or_else(
+            || "lilypond".to_string(),
+            |command| format!("{command}/lilypond"),
+        );
 
         match Command::new(command)
             .args(["--include", scores_directory])
@@ -94,12 +110,19 @@ pub fn compile_input_file(
             .output()
         {
             Ok(output) => {
+                let err = "Failed to parse input file path.";
+
                 if output.status.success() {
-                    let file_name =
-                        input_file.file_stem().unwrap().to_str().unwrap();
-                    println!("Compiled {pdfs_directory}/{}.pdf", file_name);
+                    let file_name = input_file
+                        .file_stem()
+                        .expect(err)
+                        .to_str()
+                        .expect(err);
+                    println!("Compiled {pdfs_directory}/{file_name}.pdf");
                 } else {
-                    io::stdout().write_all(output.stderr.as_ref()).unwrap();
+                    io::stdout()
+                        .write_all(output.stderr.as_ref())
+                        .expect("Failed to print lilypond command output.");
                 }
             }
             Err(error) => {
@@ -119,7 +142,8 @@ pub fn main(
 ) {
     {
         let pdfs_directory = get_pdfs_directory_from_arg(pdfs_directory);
-        create_dir_all(pdfs_directory).unwrap();
+        create_dir_all(pdfs_directory)
+            .expect("Failed to create pdfs directory.");
     }
 
     let matching_scores =
@@ -145,7 +169,10 @@ pub fn main(
         }
     } else {
         for score in matching_scores {
-            let score = score.to_str().unwrap().to_string();
+            let score = score
+                .to_str()
+                .expect("Failed to parse score file name.")
+                .to_string();
 
             if let Some(input_file) = get_score_ly_file(&score) {
                 compile_input_file(

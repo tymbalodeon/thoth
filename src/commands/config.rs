@@ -12,11 +12,12 @@ pub fn main(
     } else if path {
         Config::display_path();
     } else if let Some(key) = key {
-        if let Some(value) = set {
-            Config::set_value(key, value.to_string());
-        } else {
-            Config::display_value(key);
-        }
+        set.as_ref().map_or_else(
+            || {
+                Config::display_value(key);
+            },
+            |value| Config::set_value(key, value.to_string()),
+        );
     } else {
         Config::display();
     }

@@ -26,49 +26,49 @@ fn print_info(composition_metadata: CompositionMetadata) {
     if let Some(lilypond_version) = composition_metadata.lilypond_version {
         pushln(
             &mut lines,
-            format!("LilyPond version = \"{lilypond_version}\""),
+            format!("LilyPond version = \"{lilypond_version}\"").as_str(),
         );
     }
 
     if let Some(title) = composition_metadata.title {
-        pushln(&mut lines, format!("Title = \"{title}\""));
+        pushln(&mut lines, format!("Title = \"{title}\"").as_str());
     }
 
     if let Some(subtitle) = composition_metadata.subtitle {
-        pushln(&mut lines, format!("Subtitle = \"{subtitle}\""));
+        pushln(&mut lines, format!("Subtitle = \"{subtitle}\"").as_str());
     }
 
     if let Some(composer) = composition_metadata.composer {
-        pushln(&mut lines, format!("Composer = \"{composer}\""));
+        pushln(&mut lines, format!("Composer = \"{composer}\"").as_str());
     }
 
     if let Some(arranger) = composition_metadata.arranger {
-        pushln(&mut lines, format!("Arranger = \"{arranger}\""));
+        pushln(&mut lines, format!("Arranger = \"{arranger}\"").as_str());
     }
 
     if let Some(key) = composition_metadata.key {
-        pushln(&mut lines, format!("Key = \"{key}\""));
+        pushln(&mut lines, format!("Key = \"{key}\"").as_str());
     } else {
-        pushln(&mut lines, "Key = C Major".to_string());
+        pushln(&mut lines, "Key = C Major");
     }
 
     if let Some(time) = composition_metadata.time {
-        pushln(&mut lines, format!("Time Signature = \"{time}\""));
+        pushln(&mut lines, format!("Time Signature = \"{time}\"").as_str());
     } else {
-        pushln(&mut lines, "Time = 4/4".to_string());
+        pushln(&mut lines, "Time = 4/4");
     }
 
     let mut instruments = composition_metadata.instruments;
 
     if !instruments.is_empty() {
         instruments.sort();
-        pushln(&mut lines, "Instrumentation = [ ".to_string());
+        pushln(&mut lines, "Instrumentation = [ ");
 
         for instrument in instruments {
-            pushln(&mut lines, format!("    \"{instrument}\""));
+            pushln(&mut lines, format!("    \"{instrument}\"").as_str());
         }
 
-        pushln(&mut lines, "]".to_string());
+        pushln(&mut lines, "]");
     }
 
     PrettyPrinter::new()
@@ -77,14 +77,16 @@ fn print_info(composition_metadata: CompositionMetadata) {
         .theme("gruvbox-dark")
         .paging_mode(PagingMode::QuitIfOneScreen)
         .print()
-        .unwrap();
+        .expect("Failed to print score info.");
 }
 
 fn display_score_info(score: &String) {
     let file = File::open(score).expect("file not found");
     let buf_reader = BufReader::new(file);
-    let lines: Vec<String> =
-        buf_reader.lines().collect::<Result<_, _>>().unwrap();
+    let lines: Vec<String> = buf_reader
+        .lines()
+        .collect::<Result<_, _>>()
+        .expect("Failed to read score file.");
 
     let mut lilypond_version: Option<String> = None;
     let mut title: Option<String> = None;
@@ -195,7 +197,8 @@ pub fn main(
         }
     } else {
         for score in matching_scores {
-            let score = score.to_str().unwrap().to_string();
+            let score =
+                score.to_str().expect("Failed to parse score.").to_string();
 
             if let Some(ly_file) = get_score_ly_file(&score) {
                 display_score_info(&ly_file);

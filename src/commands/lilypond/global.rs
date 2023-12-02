@@ -43,7 +43,10 @@ pub fn read_global_version() -> io::Result<String> {
 }
 
 pub fn get_global_version() -> String {
-    parse_version(&read_global_version().unwrap())
+    parse_version(
+        &read_global_version()
+            .expect("Failed to read global lilypond version."),
+    )
 }
 
 pub fn global(version: &Option<String>) -> io::Result<()> {

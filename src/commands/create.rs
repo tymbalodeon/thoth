@@ -1,3 +1,5 @@
+#![allow(clippy::module_name_repetitions)]
+
 use std::fs::{create_dir_all, File};
 use std::io::prelude::*;
 use std::path::Path;
@@ -69,9 +71,9 @@ pub fn create_file(
     mut title: String,
 ) -> String {
     if let Some(filename) = template.filename {
-        title = format!("{title}-{filename}.ily").as_mut().to_string();
+        title = (*format!("{title}-{filename}.ily")).to_string();
     } else {
-        title = format!("{title}.ly")
+        title = format!("{title}.ly");
     }
 
     let filename = format!("{parent}/{title}");
@@ -115,7 +117,7 @@ pub fn create_score(
         format!("{scores_directory}/scores/{composer_directory}/{file_system_title}")
     };
 
-    create_dir_all(&parent).unwrap();
+    create_dir_all(&parent).expect("Failed to create score parent directory.");
     let config = Config::from_config_file();
 
     let instrument = if let Some(instrument) = instrument {
@@ -132,7 +134,7 @@ pub fn create_score(
 
     for template in templates {
         let file = create_file(template, &parent, file_system_title.clone());
-        files.push(file)
+        files.push(file);
     }
 
     files
@@ -147,8 +149,7 @@ pub fn print_score_info(
     template: &Template,
 ) {
     let mut score_info = format!(
-        "Created score for \"{title}\" using {:?} template:\n",
-        template
+        "Created score for \"{title}\" using {template:?} template:\n"
     );
 
     score_info = add_value_to_string_if_some(score_info, "Subtitle", subtitle);
@@ -165,7 +166,7 @@ pub fn print_score_info(
 }
 
 pub fn main(
-    settings: ScoreFileSettings,
+    settings: &ScoreFileSettings,
     edit: bool,
     is_sketch: bool,
     scores_directory: &Option<String>,
@@ -192,7 +193,7 @@ pub fn main(
         &config.composer
     };
 
-    let files = create_score(&settings, scores_directory, is_sketch);
+    let files = create_score(settings, scores_directory, is_sketch);
 
     print_score_info(
         title, subtitle, composer, arranger, instrument, template,
@@ -208,7 +209,7 @@ pub fn main(
 
     if edit {
         if is_sketch {
-            edit_file(get_temporary_ly_file(), is_sketch, &None, &None);
+            edit_file(&get_temporary_ly_file(), is_sketch, &None, &None);
         } else {
             edit::main(
                 &get_file_system_name(title),

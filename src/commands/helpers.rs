@@ -1,3 +1,5 @@
+#![allow(clippy::module_name_repetitions)]
+
 use std::fmt::{Display, Formatter, Result};
 
 use bat::{PagingMode, PrettyPrinter};
@@ -48,14 +50,14 @@ fn display_helper_file(helper: &Helper) {
                 .line_numbers(true)
                 .paging_mode(PagingMode::QuitIfOneScreen)
                 .print()
-                .unwrap();
+                .expect("Failed to display helper file.");
         }
     }
 }
 
 pub fn main(command: &Option<HelperCommand>) {
     if command.is_some() {
-        match command.as_ref().unwrap() {
+        match command.as_ref().expect("Failed to parse helper command.") {
             HelperCommand::Show { helper } => display_helper_file(helper),
         }
 
@@ -100,13 +102,13 @@ pub fn main(command: &Option<HelperCommand>) {
 
     let rows = rows
         .iter()
-        .map(|row| row.iter().map(|value| value.to_string()).collect())
+        .map(|row| row.iter().map(ToString::to_string).collect())
         .collect();
 
     table::print(&titles, rows);
 }
 
-pub fn pushln(lines: &mut String, text: String) {
-    lines.push_str(&text);
+pub fn pushln(lines: &mut String, text: &str) {
+    lines.push_str(text);
     lines.push('\n');
 }
