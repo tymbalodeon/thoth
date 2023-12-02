@@ -43,8 +43,13 @@ fn get_config_path() -> String {
 fn create_config_file() {
     let config_path = get_config_path();
     let path = Path::new(&config_path);
-    create_dir_all(path.parent().unwrap()).unwrap();
-    let contents = to_string(&ConfigFile::default()).unwrap();
+    create_dir_all(
+        path.parent()
+            .expect("Failed to get config path parent directory."),
+    )
+    .expect("Failed to created config path parent directory.");
+    let contents = to_string(&ConfigFile::default())
+        .expect("Failed to create default config.");
     write(config_path, contents).expect("Unable to write config");
 }
 
@@ -56,19 +61,17 @@ fn load_config_file() -> ConfigFile {
         create_config_file();
     }
 
-    let config = if let Ok(config_path) = read_to_string(config_path_name) {
-        config_path
-    } else {
-        String::new()
-    };
+    let config = read_to_string(config_path_name)
+        .map_or_else(|_| String::new(), |config_path| config_path);
 
-    if let Ok(config_file) = from_str(&config) {
-        config_file
-    } else {
-        create_config_file();
+    from_str(&config).map_or_else(
+        |_| {
+            create_config_file();
 
-        ConfigFile::default()
-    }
+            ConfigFile::default()
+        },
+        |config_file| config_file,
+    )
 }
 
 fn get_default_scores_directory() -> String {
@@ -79,7 +82,7 @@ fn get_default_pdfs_directory() -> String {
     "pdfs".to_string()
 }
 
-fn get_default_template() -> Template {
+const fn get_default_template() -> Template {
     Template::Piano
 }
 
@@ -98,14 +101,16 @@ pub struct Config {
 
 impl Default for Config {
     fn default() -> Self {
-        let user_name = if let Some(user_name) = get_current_username() {
-            user_name.to_str().unwrap().to_string()
-        } else {
-            String::new()
-        };
+        let username =
+            get_current_username().map_or_else(String::new, |username| {
+                username
+                    .to_str()
+                    .expect("Failed to parse username from config.")
+                    .to_string()
+            });
 
         Self {
-            composer: user_name,
+            composer: username,
             scores_directory: get_default_scores_directory(),
             pdfs_directory: get_default_pdfs_directory(),
             template: get_default_template(),
@@ -114,8 +119,8 @@ impl Default for Config {
     }
 }
 
-fn get_template_from_string(value: String) -> Option<Template> {
-    match value.as_str() {
+fn get_template_from_string(value: &str) -> Option<Template> {
+    match value {
         "form" => Some(Template::Form),
         "lead" => Some(Template::Lead),
         "piano" => Some(Template::Piano),
@@ -128,40 +133,39 @@ impl Config {
     pub fn from_config_file() -> Self {
         let config_file = load_config_file();
 
-        let composer = if let Some(composer) = config_file.composer {
-            composer
-        } else if let Some(username) = get_current_username() {
-            username.to_str().unwrap().to_string()
-        } else {
-            String::new()
-        };
+        let composer = config_file.composer.map_or_else(
+            || {
+                get_current_username().map_or_else(String::new, |username| {
+                    username
+                        .to_str()
+                        .expect("Failed to parse username from config.")
+                        .to_string()
+                })
+            },
+            |composer| composer,
+        );
 
-        let scores_directory =
-            if let Some(scores_directory) = config_file.scores_directory {
+        let scores_directory = config_file
+            .scores_directory
+            .map_or_else(get_default_scores_directory, |scores_directory| {
                 tilde(&scores_directory).into_owned()
-            } else {
-                get_default_scores_directory()
-            };
+            });
 
-        let pdfs_directory =
-            if let Some(pdfs_directory) = config_file.pdfs_directory {
-                tilde(&pdfs_directory).into_owned()
-            } else {
+        let pdfs_directory = config_file.pdfs_directory.map_or_else(
+            || {
                 let default_pdfs_directory = get_default_pdfs_directory();
                 format!("{scores_directory}/{default_pdfs_directory}")
-            };
+            },
+            |pdfs_directory| tilde(&pdfs_directory).into_owned(),
+        );
 
-        let template = if let Some(template) = config_file.template {
-            template
-        } else {
-            get_default_template()
-        };
+        let template = config_file
+            .template
+            .map_or_else(get_default_template, |template| template);
 
-        let instrument = if let Some(instrument) = config_file.instrument {
-            instrument
-        } else {
-            get_default_instrument()
-        };
+        let instrument = config_file
+            .instrument
+            .map_or_else(get_default_instrument, |instrument| instrument);
 
         Self {
             composer,
@@ -196,26 +200,32 @@ impl Config {
         key.yellow().to_string()
     }
 
-    fn style_value(value: String) -> String {
+    fn style_value(value: &str) -> String {
         value.bold().to_string()
     }
 
-    fn style_key_value(key: &str, value: String) -> Vec<String> {
+    fn style_key_value(key: &str, value: &str) -> Vec<String> {
         vec![Self::style_key(key), Self::style_value(value)]
     }
 
     pub fn display() {
         let config = Self::from_config_file();
 
-        // let header =
-        //     vec!["Key".italic().to_string(), "Value".italic().to_string()];
-
         let rows = vec![
-            Self::style_key_value("composer", config.composer),
-            Self::style_key_value("instrument", config.instrument),
-            Self::style_key_value("scores_directory", config.scores_directory),
-            Self::style_key_value("pdfs_directory", config.pdfs_directory),
-            Self::style_key_value("template", config.template.to_string()),
+            Self::style_key_value("composer", config.composer.as_str()),
+            Self::style_key_value("instrument", config.instrument.as_str()),
+            Self::style_key_value(
+                "scores_directory",
+                config.scores_directory.as_str(),
+            ),
+            Self::style_key_value(
+                "pdfs_directory",
+                config.pdfs_directory.as_str(),
+            ),
+            Self::style_key_value(
+                "template",
+                config.template.to_string().as_str(),
+            ),
         ];
 
         print_table(vec![], rows);
@@ -229,23 +239,23 @@ impl Config {
         Command::new("open")
             .arg(get_config_path())
             .output()
-            .unwrap();
+            .expect("Failed to open config path.");
     }
 
     pub fn display_value(key: &ConfigKey) {
         match key.to_string().replace('-', "_").to_lowercase().as_str() {
             "composer" => println!("{}", Self::get_composer()),
             "instrument" => {
-                println!("{}", Self::get_instrument())
+                println!("{}", Self::get_instrument());
             }
             "scores_directory" => {
-                println!("{}", Self::get_scores_directory())
+                println!("{}", Self::get_scores_directory());
             }
             "pdfs_directory" => {
-                println!("{}", Self::get_pdfs_directory())
+                println!("{}", Self::get_pdfs_directory());
             }
             "template" => {
-                println!("{:?}", Self::get_template())
+                println!("{:?}", Self::get_template());
             }
             _ => println!("\"{key}\" is not a recognized config key"),
         };
@@ -259,7 +269,7 @@ impl Config {
             ConfigKey::ScoresDirectory => config.scores_directory = value,
             ConfigKey::PDFSDirectory => config.pdfs_directory = value,
             ConfigKey::Template => {
-                let value = get_template_from_string(value);
+                let value = get_template_from_string(&value);
                 if let Some(template) = value {
                     config.template = template;
                 }
@@ -267,10 +277,11 @@ impl Config {
             ConfigKey::Instrument => config.instrument = value,
         };
 
-        let contents = to_string(&ConfigFile::from_config(config)).unwrap();
+        let contents = to_string(&ConfigFile::from_config(config))
+            .expect("Failed to read config.");
         let config_path_name = get_config_path();
         let config_path = Path::new(&config_path_name);
-        write(config_path, contents).expect("Unable to write config");
+        write(config_path, contents).expect("Unable to write config.");
         Self::display();
     }
 }

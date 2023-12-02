@@ -51,10 +51,10 @@ fn remove_leading_articles(mut value: String) -> String {
 
 pub fn list_main(
     search_terms: &Vec<String>,
-    outdated: &bool,
-    compiled: &bool,
-    search_artist: &bool,
-    search_title: &bool,
+    outdated: bool,
+    compiled: bool,
+    search_artist: bool,
+    search_title: bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -84,7 +84,7 @@ pub fn list_main(
         }
 
         let should_display =
-            *outdated && !pdf || *compiled && pdf || !*outdated && !*compiled;
+            outdated && !pdf || compiled && pdf || !outdated && !compiled;
 
         if should_display {
             let artist = score

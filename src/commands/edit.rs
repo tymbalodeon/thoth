@@ -103,7 +103,7 @@ fn exit_sketch(save: bool) {
 }
 
 #[tokio::main]
-pub async fn watch(file: PathBuf, is_sketch: &bool) -> Result<()> {
+pub async fn watch(file: PathBuf, is_sketch: bool) -> Result<()> {
     let mut init_config = InitConfig::default();
 
     init_config.on_error(|error: ErrorHook| async move {
@@ -115,7 +115,7 @@ pub async fn watch(file: PathBuf, is_sketch: &bool) -> Result<()> {
     let file = file.to_str().unwrap().to_string();
     let config = Config::from_config_file();
 
-    let pdfs_directory = if *is_sketch {
+    let pdfs_directory = if is_sketch {
         TEMPORARY_DIRECTORY.to_string()
     } else {
         config.pdfs_directory
@@ -137,7 +137,7 @@ pub async fn watch(file: PathBuf, is_sketch: &bool) -> Result<()> {
 
     let watchexec = Watchexec::new(init_config, runtime_config.clone())?;
 
-    let interrupt_action = if *is_sketch {
+    let interrupt_action = if is_sketch {
         |action: Action| {
             print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
 
@@ -190,13 +190,13 @@ pub fn open_file(file: PathBuf) {
 
 pub fn edit_file(
     lilypond_file: String,
-    is_sketch: &bool,
+    is_sketch: bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
     let score_path = PathBuf::from(&lilypond_file);
 
-    let pdfs_directory = if *is_sketch {
+    let pdfs_directory = if is_sketch {
         Some(TEMPORARY_DIRECTORY.to_string())
     } else {
         pdfs_directory.to_owned()
@@ -226,10 +226,10 @@ pub fn edit_file(
 
 pub fn edit_main(
     search_term: &String,
-    search_artist: &bool,
-    search_title: &bool,
-    use_all_matches: &bool,
-    is_sketch: &bool,
+    search_artist: bool,
+    search_title: bool,
+    use_all_matches: bool,
+    is_sketch: bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {

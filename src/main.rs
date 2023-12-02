@@ -18,7 +18,7 @@ use commands::open::open_main;
 use commands::sketch::sketch_main;
 use commands::templates::templates_main;
 use commands::update_path::update_path_main;
-use commands::update_version::update_version_main;
+use commands::update_version;
 use commands::Command;
 
 #[derive(Parser)]
@@ -34,7 +34,10 @@ fn main() {
     match &Cli::parse().command {
         Some(Command::Activate) => activate_main(),
         Some(Command::UpdatePath { version }) => {
-            update_path_main(version).unwrap()
+            match update_path_main(version) {
+                Ok(()) => (),
+                Err(err) => println!("{err}"),
+            }
         }
         Some(Command::UpdateVersion {
             search_terms,
@@ -43,12 +46,12 @@ fn main() {
             title,
             all,
             scores_directory,
-        }) => update_version_main(
+        }) => update_version::command(
             search_terms,
             version,
-            artist,
-            title,
-            all,
+            *artist,
+            *title,
+            *all,
             scores_directory,
         ),
         Some(Command::Clean {
@@ -60,9 +63,9 @@ fn main() {
             pdfs_directory,
         }) => clean_main(
             search_terms,
-            artist,
-            title,
-            all,
+            *artist,
+            *title,
+            *all,
             scores_directory,
             pdfs_directory,
         ),
@@ -75,9 +78,9 @@ fn main() {
             pdfs_directory,
         }) => compile_main(
             search_terms,
-            artist,
-            title,
-            all,
+            *artist,
+            *title,
+            *all,
             scores_directory,
             pdfs_directory,
         ),
@@ -86,7 +89,7 @@ fn main() {
             path,
             key,
             set,
-        }) => config_main(edit, path, key, set),
+        }) => config_main(*edit, *path, key, set),
         Some(Command::Create {
             title,
             subtitle,
@@ -109,8 +112,8 @@ fn main() {
 
             create_main(
                 settings,
-                edit,
-                &false,
+                *edit,
+                false,
                 scores_directory,
                 pdfs_directory,
             );
@@ -125,10 +128,10 @@ fn main() {
         }) => {
             edit_main(
                 search_terms,
-                artist,
-                title,
-                all,
-                &false,
+                *artist,
+                *title,
+                *all,
+                false,
                 scores_directory,
                 pdfs_directory,
             );
@@ -140,7 +143,7 @@ fn main() {
             all,
             scores_directory,
         }) => {
-            info_main(search_term, artist, title, all, scores_directory);
+            info_main(search_term, *artist, *title, *all, scores_directory);
         }
         Some(Command::Lilypond { version, command }) => {
             lilypond_main(version, command);
@@ -156,10 +159,10 @@ fn main() {
         }) => {
             list_main(
                 search_terms,
-                outdated,
-                compiled,
-                artist,
-                title,
+                *outdated,
+                *compiled,
+                *artist,
+                *title,
                 scores_directory,
                 pdfs_directory,
             );
@@ -175,9 +178,9 @@ fn main() {
         }) => {
             open_main(
                 search_terms,
-                artist,
-                title,
-                all,
+                *artist,
+                *title,
+                *all,
                 file_type,
                 scores_directory,
                 pdfs_directory,
@@ -187,7 +190,7 @@ fn main() {
         Some(Command::Helpers { command }) => helpers_main(command),
         Some(Command::Sketch {}) => sketch_main(),
         _ => {
-            println!("Please choose a command.")
+            println!("Please choose a command.");
         }
     }
 }

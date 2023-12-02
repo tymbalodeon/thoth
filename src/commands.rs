@@ -17,6 +17,7 @@ pub mod templates;
 pub mod update_path;
 pub mod update_version;
 
+use std::borrow::ToOwned;
 use std::fmt::{Display, Formatter, Result};
 use std::io::{stdin, stdout, Write};
 
@@ -355,42 +356,38 @@ pub fn add_value_to_string_if_some(
 }
 
 pub fn get_composer_from_arg(composer: &Option<String>) -> String {
-    if let Some(path) = composer {
-        tilde(&path).to_string()
-    } else {
-        Config::get_composer()
-    }
+    composer
+        .as_ref()
+        .map_or_else(Config::get_composer, |path| tilde(&path).to_string())
 }
 
 pub fn get_template_from_arg(template: &Option<Template>) -> Template {
-    if let Some(template) = template {
-        template.to_owned()
-    } else {
-        Config::get_template()
-    }
+    template
+        .as_ref()
+        .map_or_else(Config::get_template, ToOwned::to_owned)
 }
 
 pub fn get_scores_directory_from_arg(
     scores_directory: &Option<String>,
 ) -> String {
-    if let Some(path) = scores_directory {
-        tilde(&path).to_string()
-    } else {
-        Config::get_scores_directory()
-    }
+    scores_directory
+        .as_ref()
+        .map_or_else(Config::get_scores_directory, |path| {
+            tilde(&path).to_string()
+        })
 }
 
 pub fn get_pdfs_directory_from_arg(pdfs_directory: &Option<String>) -> String {
-    if let Some(path) = pdfs_directory {
-        tilde(&path).to_string()
-    } else {
-        Config::get_pdfs_directory()
-    }
+    pdfs_directory
+        .as_ref()
+        .map_or_else(Config::get_pdfs_directory, |path| {
+            tilde(&path).to_string()
+        })
 }
 
 pub fn received_confirmation(message: &str) -> bool {
     println!("{message}");
-    stdout().flush().unwrap();
+    stdout().flush().expect("Failed to flush stdout .");
     let mut response = String::new();
     let stdin = stdin();
     stdin

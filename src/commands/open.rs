@@ -16,9 +16,9 @@ pub fn open_file(file_path: &Path) {
 
 pub fn open_main(
     search_terms: &Vec<String>,
-    search_artist: &bool,
-    search_title: &bool,
-    use_all_matches: &bool,
+    search_artist: bool,
+    search_title: bool,
+    use_all_matches: bool,
     file_type: &Option<ScoreFileType>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,

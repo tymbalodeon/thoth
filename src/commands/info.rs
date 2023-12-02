@@ -171,9 +171,9 @@ fn display_score_info(score: &String) {
 
 pub fn info_main(
     search_term: &String,
-    search_artist: &bool,
-    search_title: &bool,
-    use_all_matches: &bool,
+    search_artist: bool,
+    search_title: bool,
+    use_all_matches: bool,
     scores_directory: &Option<String>,
 ) {
     let matching_scores = get_matching_scores(

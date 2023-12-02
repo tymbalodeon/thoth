@@ -10,11 +10,9 @@ use super::scores::{get_found_ly_files, get_selected_items};
 use crate::commands::received_confirmation;
 
 fn get_new_version(version: &Option<String>) -> String {
-    if let Some(new_version) = version {
-        new_version.to_owned()
-    } else {
-        get_global_version()
-    }
+    version
+        .as_ref()
+        .map_or_else(get_global_version, ToOwned::to_owned)
 }
 
 fn is_outdated(version: &str, new_version: &str) -> bool {
@@ -26,13 +24,35 @@ fn update_version(
     version: &Option<String>,
     new_version: &String,
 ) {
-    let output_file =
-        format!("/tmp/{}", file.file_name().unwrap().to_str().unwrap());
-    let mut output = File::create(&output_file).unwrap();
+    let output_file = format!(
+        "/tmp/{}",
+        file.file_name()
+            .unwrap_or_else(|| panic!(
+                "{}",
+                format!("Failed to get file name for {}", &file.display())
+            ))
+            .to_str()
+            .expect("Failed to parse file name as &str.")
+    );
+    let mut output = File::create(&output_file).unwrap_or_else(|err| {
+        panic!("{}", format!("Failed to create file {output_file} ({err})"))
+    });
     let mut changed = false;
 
-    for line in BufReader::new(File::open(&file).unwrap()).lines() {
-        let mut line = line.unwrap();
+    for line in BufReader::new(File::open(&file).unwrap_or_else(|err| {
+        panic!(
+            "{}",
+            format!("Failed to open file {} ({})", &file.display(), err)
+        )
+    }))
+    .lines()
+    {
+        let mut line = line.unwrap_or_else(|err| {
+            panic!(
+                "{}",
+                format!("Failed to read {} ({})", &file.display(), err)
+            )
+        });
         let version_regex = "\\version ";
 
         if line.contains(version_regex) {
@@ -61,12 +81,12 @@ fn update_version(
     }
 }
 
-pub fn update_version_main(
+pub fn command(
     search_terms: &Vec<String>,
     version: &Option<String>,
-    search_artist: &bool,
-    search_title: &bool,
-    use_all_matches: &bool,
+    search_artist: bool,
+    search_title: bool,
+    use_all_matches: bool,
     scores_directory: &Option<String>,
 ) {
     if search_terms.is_empty()
@@ -87,7 +107,7 @@ pub fn update_version_main(
 
     if !use_all_matches && matching_files.len() > 1 {
         if let Ok(selected_items) = get_selected_items(matching_files, true) {
-            for item in selected_items.iter() {
+            for item in &selected_items {
                 let path = item.output().to_string();
                 let path = PathBuf::from(path);
                 update_version(path, version, &new_version);

@@ -53,8 +53,8 @@ fn convert_path_to_string(path: &DirEntry) -> String {
 
 pub fn get_matching_scores(
     search_terms: &Vec<String>,
-    search_artist: &bool,
-    search_title: &bool,
+    search_artist: bool,
+    search_title: bool,
     scores_directory: &Option<String>,
 ) -> Vec<PathBuf> {
     let scores_directory = get_scores_directory_from_arg(scores_directory);
@@ -93,8 +93,8 @@ pub fn get_matching_scores(
                                 && !search_title
                                 && (artist.contains(term)
                                     || title.contains(term))
-                                || (*search_artist && artist.contains(term))
-                                || (*search_title && title.contains(term))
+                                || (search_artist && artist.contains(term))
+                                || (search_title && title.contains(term))
                             {
                                 is_match = true;
                                 break;
@@ -124,8 +124,8 @@ pub fn get_score_ly_file(score: &String) -> Option<String> {
 
 pub fn get_found_ly_files(
     search_terms: &Vec<String>,
-    search_artist: &bool,
-    search_title: &bool,
+    search_artist: bool,
+    search_title: bool,
     scores_directory: &Option<String>,
 ) -> Vec<PathBuf> {
     let found_scores = get_matching_scores(
@@ -146,8 +146,8 @@ pub fn get_found_ly_files(
 
 pub fn get_found_pdfs(
     search_terms: &Vec<String>,
-    search_artist: &bool,
-    search_title: &bool,
+    search_artist: bool,
+    search_title: bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) -> Vec<PathBuf> {

@@ -97,7 +97,7 @@ pub fn get_file_system_name(text: &str) -> String {
 pub fn create_score(
     settings: &ScoreFileSettings,
     scores_directory: &Option<String>,
-    is_sketch: &bool,
+    is_sketch: bool,
 ) -> Vec<String> {
     let title = &settings.title;
     let subtitle = &settings.subtitle;
@@ -107,7 +107,7 @@ pub fn create_score(
     let instrument = &settings.instrument;
     let file_system_title = get_file_system_name(title);
 
-    let parent = if *is_sketch {
+    let parent = if is_sketch {
         TEMPORARY_DIRECTORY.to_string()
     } else {
         let scores_directory = get_scores_directory_from_arg(scores_directory);
@@ -166,8 +166,8 @@ pub fn print_score_info(
 
 pub fn create_main(
     settings: ScoreFileSettings,
-    edit: &bool,
-    is_sketch: &bool,
+    edit: bool,
+    is_sketch: bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -198,7 +198,7 @@ pub fn create_main(
         title, subtitle, composer, arranger, instrument, template,
     );
 
-    if *edit {
+    if edit {
         println!("Opening for editing...");
     }
 
@@ -206,15 +206,15 @@ pub fn create_main(
         println!("{file}");
     }
 
-    if *edit {
-        if *is_sketch {
+    if edit {
+        if is_sketch {
             edit_file(get_temporary_ly_file(), is_sketch, &None, &None);
         } else {
             edit_main(
                 &get_file_system_name(title),
-                &false,
-                &false,
-                &true,
+                false,
+                false,
+                true,
                 is_sketch,
                 scores_directory,
                 pdfs_directory,

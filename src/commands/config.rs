@@ -2,14 +2,14 @@ use crate::commands::ConfigKey;
 use crate::config::Config;
 
 pub fn config_main(
-    edit: &bool,
-    path: &bool,
+    edit: bool,
+    path: bool,
     key: &Option<ConfigKey>,
     set: &Option<String>,
 ) {
-    if *edit {
+    if edit {
         Config::edit();
-    } else if *path {
+    } else if path {
         Config::display_path();
     } else if let Some(key) = key {
         if let Some(value) = set {

@@ -9,7 +9,8 @@
 clippy:
     #!/usr/bin/env zsh
     cargo clippy -- \
-        -W clippy::pedantic
+        -W clippy::pedantic \
+        -A clippy::too_many_lines \
         -W clippy::nursery \
         -W clippy::unwrap_used
 

@@ -111,9 +111,9 @@ pub fn compile_input_file(
 
 pub fn compile_main(
     search_terms: &Vec<String>,
-    search_artist: &bool,
-    search_title: &bool,
-    use_all_matches: &bool,
+    search_artist: bool,
+    search_title: bool,
+    use_all_matches: bool,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
