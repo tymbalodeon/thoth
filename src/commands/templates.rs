@@ -44,23 +44,26 @@ pub struct TemplateFile {
 }
 
 fn get_lilypond_version() -> String {
+    let err = "Failed to run lilypond command.";
     let output = String::from_utf8(
         Command::new("lilypond")
             .arg("--version")
             .output()
-            .unwrap()
+            .expect(err)
             .stdout,
     )
-    .unwrap();
+    .expect(err);
 
-    let pattern = Regex::new(r"\d\.\d{2}\.\d").unwrap();
+    let pattern = Regex::new(r"\d\.\d{2}\.\d")
+        .expect("Failed to create lilypond version regex.");
+    let err = "Failed to find lilypond version.";
 
     let found = pattern
         .captures_iter(&output)
         .next()
-        .unwrap()
+        .expect(err)
         .get(0)
-        .unwrap()
+        .expect(err)
         .as_str()
         .to_owned();
 
@@ -89,20 +92,21 @@ fn get_header(
 }
 
 fn format_filename(filename: &Option<String>, title: &str) -> String {
-    let filename = if let Some(filename) = filename {
-        format!("{filename}.ily")
-    } else {
-        let title = get_file_system_name(title);
-        format!("{title}.ly")
-    };
+    let filename = filename.as_ref().map_or_else(
+        || {
+            let title = get_file_system_name(title);
+            format!("{title}.ly")
+        },
+        |filename| format!("{filename}.ily"),
+    );
 
     let lines = "-".repeat(filename.len());
 
     format!("% {lines}\n% {filename}\n% {lines}\n\n")
 }
 
-fn print_templates(templates: Vec<TemplateFile>, title: &str) {
-    let mut lines: String = Default::default();
+fn print_templates(templates: &[TemplateFile], title: &str) {
+    let mut lines = String::default();
 
     for (index, template) in templates.iter().enumerate() {
         if index > 0 {
@@ -120,7 +124,7 @@ fn print_templates(templates: Vec<TemplateFile>, title: &str) {
         .colored_output(false)
         .paging_mode(PagingMode::QuitIfOneScreen)
         .print()
-        .unwrap();
+        .expect("Failed to print template.");
 }
 
 fn show_template(template: &Template) {
@@ -134,31 +138,31 @@ fn show_template(template: &Template) {
         Template::Form => {
             let templates =
                 get_form_templates(title, subtitle, composer, arranger);
-            print_templates(templates, title);
+            print_templates(&templates, title);
         }
         Template::Lead => {
             let templates = get_lead_templates(
                 title, subtitle, composer, arranger, instrument,
             );
-            print_templates(templates, title);
+            print_templates(&templates, title);
         }
         Template::Piano => {
             let templates =
                 get_piano_template(title, subtitle, composer, arranger);
-            print_templates(templates, title);
+            print_templates(&templates, title);
         }
         Template::Single => {
             let templates = get_single_template(
                 title, subtitle, composer, arranger, instrument,
             );
-            print_templates(templates, title);
+            print_templates(&templates, title);
         }
     }
 }
 
 pub fn main(command: &Option<TemplateCommand>) {
     if command.is_some() {
-        match command.as_ref().unwrap() {
+        match command.as_ref().expect("Failed to get command.") {
             TemplateCommand::Show { template } => show_template(template),
         }
 
@@ -191,7 +195,7 @@ pub fn main(command: &Option<TemplateCommand>) {
 
     let rows = rows
         .iter()
-        .map(|row| row.iter().map(|value| value.to_string()).collect())
+        .map(|row| row.iter().map(ToString::to_string).collect())
         .collect();
 
     print_table(titles, rows);
