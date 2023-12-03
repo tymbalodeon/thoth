@@ -167,6 +167,7 @@ pub fn main(
     settings: &ScoreFileSettings,
     edit: bool,
     is_sketch: bool,
+    lilypond_version: &Option<String>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -207,7 +208,13 @@ pub fn main(
 
     if edit {
         if is_sketch {
-            edit_file(&get_temporary_ly_file(), is_sketch, &None, &None);
+            edit_file(
+                &get_temporary_ly_file(),
+                is_sketch,
+                lilypond_version,
+                &None,
+                &None,
+            );
         } else {
             edit::main(
                 &get_file_system_name(title),
@@ -215,6 +222,7 @@ pub fn main(
                 false,
                 true,
                 is_sketch,
+                lilypond_version,
                 scores_directory,
                 pdfs_directory,
             );

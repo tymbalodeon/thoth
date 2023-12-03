@@ -69,15 +69,19 @@ fn main() {
             artist,
             title,
             all,
+            lilypond_version,
             scores_directory,
             pdfs_directory,
+            force,
         }) => compile::main(
             search_terms,
             *artist,
             *title,
             *all,
+            lilypond_version,
             scores_directory,
             pdfs_directory,
+            *force,
         ),
         Some(Command::Config {
             edit,
@@ -93,6 +97,7 @@ fn main() {
             instrument,
             template,
             edit,
+            lilypond_version,
             scores_directory,
             pdfs_directory,
         }) => {
@@ -109,6 +114,7 @@ fn main() {
                 &settings,
                 *edit,
                 false,
+                lilypond_version,
                 scores_directory,
                 pdfs_directory,
             );
@@ -118,6 +124,7 @@ fn main() {
             artist,
             title,
             all,
+            lilypond_version,
             scores_directory,
             pdfs_directory,
         }) => {
@@ -127,6 +134,7 @@ fn main() {
                 *title,
                 *all,
                 false,
+                lilypond_version,
                 scores_directory,
                 pdfs_directory,
             );
@@ -183,7 +191,9 @@ fn main() {
         }
         Some(Command::Templates { command }) => templates::main(command),
         Some(Command::Helpers { command }) => helpers::main(command),
-        Some(Command::Sketch {}) => sketch::main(),
+        Some(Command::Sketch { lilypond_version }) => {
+            sketch::main(lilypond_version);
+        }
         _ => {
             println!("Please choose a command.");
         }

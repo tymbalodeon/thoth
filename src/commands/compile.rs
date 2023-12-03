@@ -10,7 +10,7 @@ use glob::glob;
 use super::get_pdfs_directory_from_arg;
 use super::get_scores_directory_from_arg;
 use super::lilypond::global::get_global_version;
-use super::lilypond::install::{get_install_path, install};
+use super::lilypond::install::{get_install_path, install, parse_version};
 use super::lilypond::is_valid_version;
 use super::scores::get_score_ly_file;
 use super::scores::get_selected_items;
@@ -57,10 +57,47 @@ fn get_binary(version: String) -> Option<String> {
     }
 }
 
+fn get_lilypond_version_from_file(file: &str) -> String {
+    let mut version = String::new();
+
+    for line in
+        BufReader::new(File::open(file).expect("Failed to open file.")).lines()
+    {
+        let line = line.expect("Failed to read line in file.");
+
+        if line.contains("\\version") {
+            version = line.replace("\\version ", "").replace('"', "");
+            break;
+        }
+    }
+
+    version
+}
+
+fn get_lilypond_version(
+    file: &str,
+    lilypond_version: &Option<String>,
+) -> String {
+    if let Some(version) = lilypond_version {
+        let version = parse_version(version);
+
+        if is_valid_version(&version) {
+            return version;
+        }
+
+        println!("Unrecognized lilypond version: \"{version}\"");
+        println!("Attempting to use veresion specified in the input file...");
+    }
+
+    get_lilypond_version_from_file(file)
+}
+
 pub fn compile_input_file(
     input_file: &PathBuf,
+    lilypond_version: &Option<String>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
+    force: bool,
 ) {
     let pdfs_directory = &get_pdfs_directory_from_arg(pdfs_directory);
     let scores_directory = &get_scores_directory_from_arg(scores_directory);
@@ -77,24 +114,12 @@ pub fn compile_input_file(
             .expect("Failed to read glob pattern")
             .flatten()
         {
-            if is_compiled(input_file, &entry) {
+            if !force && is_compiled(input_file, &entry) {
                 return;
             }
         }
 
-        let mut version = String::new();
-
-        for line in
-            BufReader::new(File::open(file).expect("Failed to open file."))
-                .lines()
-        {
-            let line = line.expect("Failed to read line in file.");
-
-            if line.contains("\\version") {
-                version = line.replace("\\version ", "").replace('"', "");
-                break;
-            }
-        }
+        let version = get_lilypond_version(file, lilypond_version);
 
         let command = get_binary(version).map_or_else(
             || "lilypond".to_string(),
@@ -135,8 +160,10 @@ pub fn main(
     search_artist: bool,
     search_title: bool,
     use_all_matches: bool,
+    lilypond_version: &Option<String>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
+    force: bool,
 ) {
     {
         let pdfs_directory = get_pdfs_directory_from_arg(pdfs_directory);
@@ -159,8 +186,10 @@ pub fn main(
                 if let Some(input_file) = get_score_ly_file(&score) {
                     compile_input_file(
                         &PathBuf::from(input_file),
+                        lilypond_version,
                         scores_directory,
                         pdfs_directory,
+                        force,
                     );
                 }
             }
@@ -175,8 +204,10 @@ pub fn main(
             if let Some(input_file) = get_score_ly_file(&score) {
                 compile_input_file(
                     &PathBuf::from(input_file),
+                    lilypond_version,
                     scores_directory,
                     pdfs_directory,
+                    force,
                 );
             }
         }

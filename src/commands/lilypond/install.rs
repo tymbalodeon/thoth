@@ -9,6 +9,7 @@ use serde::Deserialize;
 use shellexpand::tilde;
 use tar::Archive;
 
+use super::global::get_global_version;
 use super::GITLAB_URL;
 use crate::commands::{
     lilypond::{
@@ -33,7 +34,7 @@ fn get_latest_version_by_stability(stability: &VersionStability) -> String {
     .to_string()
 }
 
-pub fn get_latest_version(version: &str) -> Option<String> {
+pub fn get_dynamic_version(version: &str) -> Option<String> {
     match version {
         "latest-stable" => {
             Some(get_latest_version_by_stability(&VersionStability::Stable))
@@ -41,12 +42,14 @@ pub fn get_latest_version(version: &str) -> Option<String> {
         "latest-unstable" => {
             Some(get_latest_version_by_stability(&VersionStability::Unstable))
         }
+
+        "global" => Some(get_global_version()),
         _ => None,
     }
 }
 
 pub fn parse_version(version: &str) -> String {
-    get_latest_version(version)
+    get_dynamic_version(version)
         .map_or_else(|| version.to_string(), |version| version)
 }
 

@@ -1,4 +1,3 @@
-
 use std::convert::Infallible;
 use std::fs::create_dir_all;
 use std::fs::remove_dir_all;
@@ -53,8 +52,7 @@ fn get_watched_files(file: &String) -> Vec<String> {
     );
     let mut watched_files = get_ily_files(&score_ily_files_pattern);
     let scores_directory = Config::get_scores_directory();
-    let helper_ily_files_pattern =
-        format!("{scores_directory}/helpers/*.ily");
+    let helper_ily_files_pattern = format!("{scores_directory}/helpers/*.ily");
     let mut helper_ily_files = get_ily_files(&helper_ily_files_pattern);
 
     watched_files.append(&mut helper_ily_files);
@@ -210,6 +208,7 @@ pub fn open_file(file: &PathBuf) {
 pub fn edit_file(
     lilypond_file: &str,
     is_sketch: bool,
+    lilypond_version: &Option<String>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -221,7 +220,13 @@ pub fn edit_file(
         pdfs_directory.to_owned()
     };
 
-    compile_input_file(&score_path, scores_directory, &pdfs_directory);
+    compile_input_file(
+        &score_path,
+        lilypond_version,
+        scores_directory,
+        &pdfs_directory,
+        false,
+    );
 
     let err = "Failed to get score pdf file.";
     let pdf_file = get_score_file(
@@ -250,6 +255,7 @@ pub fn main(
     search_title: bool,
     use_all_matches: bool,
     is_sketch: bool,
+    lilypond_version: &Option<String>,
     scores_directory: &Option<String>,
     pdfs_directory: &Option<String>,
 ) {
@@ -271,6 +277,7 @@ pub fn main(
                     edit_file(
                         &ly_file,
                         is_sketch,
+                        lilypond_version,
                         scores_directory,
                         pdfs_directory,
                     );
@@ -286,6 +293,7 @@ pub fn main(
                 edit_file(
                     &ly_file,
                     is_sketch,
+                    lilypond_version,
                     scores_directory,
                     pdfs_directory,
                 );

@@ -146,11 +146,18 @@ pub enum Command {
         #[arg(long)]
         all: bool,
 
+        /// Compile using the specified lilypond version
+        #[arg(long)]
+        lilypond_version: Option<String>,
+
         #[arg(long)]
         scores_directory: Option<String>,
 
         #[arg(long)]
         pdfs_directory: Option<String>,
+
+        #[arg(long)]
+        force: bool,
     },
 
     /// Display config
@@ -192,6 +199,10 @@ pub enum Command {
         #[arg(long)]
         edit: bool,
 
+        /// Compile using the specified lilypond version
+        #[arg(long)]
+        lilypond_version: Option<String>,
+
         #[arg(long)]
         scores_directory: Option<String>,
 
@@ -214,6 +225,10 @@ pub enum Command {
         /// Use all matching scores without prompting
         #[arg(long)]
         all: bool,
+
+        /// Compile using the specified lilypond version
+        #[arg(long)]
+        lilypond_version: Option<String>,
 
         #[arg(long)]
         scores_directory: Option<String>,
@@ -315,7 +330,11 @@ pub enum Command {
     },
 
     /// Open temporary sketch file
-    Sketch,
+    Sketch {
+        /// Compile using the specified lilypond version
+        #[arg(long)]
+        lilypond_version: Option<String>,
+    },
 
     /// Update lilypond version for score(s)
     UpdateVersion {
