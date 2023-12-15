@@ -55,7 +55,7 @@ clippy:
 
 # Run the application, with any provided <args>.
 @run *args:
-    cargo run -- {{args}} {{ if args == "" { "|| exit 0" } else { "" } }}
+    cargo run -- {{ args }} 
 
 # Add a dependency.
 @add +dependencies:
