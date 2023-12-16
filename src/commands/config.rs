@@ -18,6 +18,12 @@ pub fn main(
             },
             |value| Config::set_value(key, value.to_string()),
         );
+    } else if let Some(set) = set {
+        if let Some(key) = key {
+            Config::set_value(key, set.to_string());
+        } else {
+            println!("Please specify the key to set.");
+        }
     } else {
         Config::display();
     }
