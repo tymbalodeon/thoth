@@ -16,6 +16,7 @@ _help:
     )
 
 alias source := src
+
 # Display the source code for a recipe
 src recipe *args="_":
     #!/usr/bin/env nu
@@ -23,7 +24,7 @@ src recipe *args="_":
     # Display the source code for a recipe. If no args are provided, display
     # the raw `just` code, otherwise display the code with the args provided
     # to `just` applied. Pass `""` as args to see the code when no args are
-    # provided to a recipe.
+    # provided to a recipe, and to see the code with `just` variables expanded.
     def src [
         recipe: string # The recipe command
         ...args: string # Arguments to the recipe
@@ -36,6 +37,24 @@ src recipe *args="_":
     }
 
     src {{ recipe }} `{{ args }}`
+
+# Search available `just` commands
+[no-exit-message]
+find *regex:
+    #!/usr/bin/env nu
+
+    # Search available `just` commands interactively, or by <regex>
+    def find [
+        regex?: string # Regex pattern to match
+    ] {
+        if ($regex | is-empty) {
+            just --list | fzf
+        } else {
+            just | grep --color=always --extended-regexp $regex
+        }
+    }
+
+    find {{ regex }}
 
 # Check code for issues, optionally using "clippy".
 @check:
