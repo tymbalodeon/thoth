@@ -56,6 +56,37 @@ find *regex:
 
     find {{ regex }}
 
+# Manage project Rust version
+rust *args:
+    #!/usr/bin/env nu
+
+    # Manage project Rust version
+    def rust [
+        --installed # Show installed Rust versions
+        --path # Show the path of the current Rust
+        --use: string # Specify a new Rust version to use
+        --version # (default) Show the current Rust version
+    ] {
+        if $installed {
+            rustup toolchain list
+            exit
+        } else if $path {
+            rustup which rustc
+            exit
+        } else if $version or ($use | is-empty) {
+            rustc --version
+            exit
+        }
+
+        let file = "rust-toolchain.toml"
+
+        open $file
+        | update toolchain.channel $use
+        | save --force $file
+    }
+
+    rust {{ args }}
+
 # Check code for issues, optionally using "clippy".
 @check:
     cargo check
