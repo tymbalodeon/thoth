@@ -121,11 +121,33 @@ remove *args:
 
     remove {{ args }}
 
-# Check code for issues, optionally using "clippy".
+# Update dependencies
+update *args:
+    #!/usr/bin/env nu
+
+    # Update dependencies
+    def update [] {
+        cargo update
+    }
+
+    update {{ args }}
+
+# Show application dependencies
+dependencies *args:
+    #!/usr/bin/env nu
+
+    # Show application dependencies
+    def dependencies [] {
+        cargo tree --depth 1
+    }
+
+    dependencies {{ args }}
+
+# Check code for issues
 @check:
     cargo check
 
-# Check code for issues using "clippy".
+# Check code for issues using "clippy"
 clippy:
     #!/usr/bin/env zsh
     cargo clippy -- \
@@ -141,15 +163,30 @@ clippy:
 @run *args:
     cargo run -- {{ args }} 
 
-# Install the application.
-@install:
-    cargo install --path .
+# Build the application
+build *args:
+    #!/usr/bin/env nu
 
-# Update the dependencies.
-@update:
-    cargo update
+    # Build the application
+    def build [
+        --release # Build in release mode, with optimizations
+    ] {
+        if $release {
+            cargo build --release
+        } else {
+            cargo build
+        }
+     }
 
-# List the dependencies.
-@dependencies:
-    cargo tree --depth 1
+    build {{ args }}
 
+# Install the application
+install *args: (build args)
+    #!/usr/bin/env nu
+
+    # Install the application
+    def install [] {
+        cargo install --path .
+    }
+
+    install {{ args }}
