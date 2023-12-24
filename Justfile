@@ -87,6 +87,40 @@ rust *args:
 
     rust {{ args }}
 
+# Add dependencies
+add *args:
+    #!/usr/bin/env nu
+
+    # Add dependencies
+    def add [
+        ...dependencies: string, # Dependencies to add
+        --features: list # Features to enable ("[<dependency>/<feature> ...]")
+    ]: {
+        let features = (
+            $features
+            | each { |feature| $"-F ($feature)" }
+        )
+
+        cargo add $dependencies $features
+    }
+
+    add {{ args }}
+
+# Remove dependencies
+remove *args:
+    #!/usr/bin/env nu
+
+    # Remove dependencies
+    def remove [
+        ...dependencies: string # Dependencies to remove
+    ] {
+        for dependency in $dependencies {
+            cargo remove $dependency
+        }
+    }
+
+    remove {{ args }}
+
 # Check code for issues, optionally using "clippy".
 @check:
     cargo check
@@ -106,14 +140,6 @@ clippy:
 # Run the application, with any provided <args>.
 @run *args:
     cargo run -- {{ args }} 
-
-# Add a dependency.
-@add +dependencies:
-    cargo add {{dependencies}}
-
-# Remove a dependency.
-@remove +dependencies:
-    cargo remove {{dependencies}}
 
 # Install the application.
 @install:
