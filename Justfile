@@ -181,7 +181,7 @@ build *args:
     build {{ args }}
 
 # Install the application
-install *args: (build args)
+install *args:
     #!/usr/bin/env nu
 
     # Install the application
