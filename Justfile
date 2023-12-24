@@ -94,7 +94,7 @@ add *args:
     # Add dependencies
     def add [
         ...dependencies: string, # Dependencies to add
-        --features: list # Features to enable ("[<dependency>/<feature> ...]")
+        --features: list<string> # Features to enable ("[<dependency>/<feature> ...]")
     ]: {
         let features = (
             $features
