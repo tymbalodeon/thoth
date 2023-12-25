@@ -180,6 +180,17 @@ build *args:
 
     build {{ args }}
 
+# Remove generated files
+clean *args:
+    #!/usr/bin/env nu
+
+    # Remove generated files
+    def clean [] {
+        cargo clean
+    }
+
+    clean {{ args }}
+
 # Install the application
 install *args:
     #!/usr/bin/env nu
