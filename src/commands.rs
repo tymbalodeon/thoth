@@ -27,6 +27,7 @@ use convert_case::{Case::Kebab, Casing};
 use serde::Deserialize;
 use shellexpand::tilde;
 
+use crate::activate::Shell;
 use crate::commands::helpers::Helper;
 use crate::commands::templates::Template;
 use crate::config::Config;
@@ -102,10 +103,13 @@ pub enum HelperCommand {
 #[derive(Subcommand)]
 pub enum Command {
     #[command(hide = true)]
-    Activate,
+    Activate { shell: Shell },
 
     #[command(hide = true)]
-    UpdatePath { version: Option<String> },
+    UpdatePath {
+        shell: Shell,
+        version: Option<String>,
+    },
 
     /// Remove pdf(s)
     Clean {

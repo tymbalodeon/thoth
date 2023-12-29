@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 use std::{env, path::Path};
 
+use super::activate::Shell;
 use super::lilypond::global::get_global_version;
 use super::lilypond::install::get_install_path;
 
@@ -24,7 +25,7 @@ fn get_new_version(version: &Option<String>) -> String {
         .map_or_else(get_global_version, ToString::to_string)
 }
 
-pub fn main(version: &Option<String>) {
+pub fn main(shell: &Shell, version: &Option<String>) {
     let install_path = get_install_path();
     let new_version = get_new_version(version);
     let global_version_path =
