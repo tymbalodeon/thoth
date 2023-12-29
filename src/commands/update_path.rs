@@ -30,12 +30,23 @@ pub fn main(shell: &Shell, version: &Option<String>) {
     let new_version = get_new_version(version);
     let global_version_path =
         format!("{}/lilypond-{}/bin", &install_path, &new_version);
+
     let path = env::var("PATH").expect("Failed to read PATH.");
 
     if !Path::new(&global_version_path).exists()
         || path.contains(&global_version_path)
     {
         return;
+    }
+
+    match shell {
+        Shell::Nu => {
+            io::stdout()
+                .write_all(global_version_path.as_bytes())
+                .expect("Failed to write global version path to stdout.");
+            return;
+        }
+        _ => (),
     }
 
     let mut new_path = String::new();

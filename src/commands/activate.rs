@@ -10,14 +10,52 @@ pub enum Shell {
 
 pub fn main(shell: &Shell) {
     match shell {
-        Shell::Nu => println!(),
+        Shell::Nu => println!(
+            "
+def --env thoth-hook [] {{
+  if (command -v thoth | complete | get exit_code | into bool) {{
+    return
+  }}
+
+  let lilypond_path = (thoth update-path nu | split row \":\" | first)  
+
+  if ($lilypond_path | is-empty) {{
+    return
+  }}
+
+  $env.PATH = (
+    $env.PATH 
+    | split row \":\" 
+    | filter {{ |path| not (\"lilypond\" in $path) }}
+  )
+
+  $env.PATH = ($env.PATH | prepend $lilypond_path)
+}}
+
+export-env {{
+  $env.config = (
+    $env.config 
+    | upsert hooks {{
+      pre_prompt: (
+        $env.config.hooks.pre_prompt ++ [
+          {{ || thoth-hook }}
+        ]
+      )
+      env_change: {{
+        PWD: (
+          $env.config.hooks.env_change.PWD ++ [
+            {{ || thoth-hook }}
+          ]
+        )
+      }}
+  }})
+}}",
+        ),
         Shell::Zsh => {
-            println!(
-                "{}",
-                formatdoc!(
-                    "
+            println!("{}", formatdoc!(
+                "
 _thoth_update_path() {{
-    eval PATH=\"$(\"${{HOME}}\"/.cargo/bin/thoth update-path)\"
+    export PATH=\"$(\"${{HOME}}\"/.cargo/bin/thoth update-path zsh)\"
 }}
 
 typeset -ag precmd_functions;
@@ -31,8 +69,7 @@ typeset -ag chpwd_functions;
 if [[ -z \"${{chpwd_functions[(r)_thoth_update_path]+1}}\" ]]; then
   chpwd_functions=( _thoth_update_path ${{chpwd_functions[@]}} )
 fi"
-                )
-            );
+            ));
         }
     }
 }
