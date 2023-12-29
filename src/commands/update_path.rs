@@ -43,8 +43,7 @@ pub fn main(version: &Option<String>) {
     new_path.push_str(&clear_lilypond(path));
     new_path = new_path.replace(' ', "\\ ");
 
-    let path_command = format!("PATH={new_path}");
     io::stdout()
-        .write_all(path_command.as_bytes())
+        .write_all(new_path.as_bytes())
         .expect("Failed to write updated PATH to stdout.");
 }
