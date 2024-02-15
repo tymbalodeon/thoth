@@ -1,4 +1,3 @@
-use std::convert::Infallible;
 use std::fs::create_dir_all;
 use std::fs::remove_dir_all;
 use std::fs::rename;
@@ -10,16 +9,8 @@ use std::process::Command;
 use chrono::offset::Local;
 use glob::glob;
 use inquire::Confirm;
-use miette::{IntoDiagnostic, Result};
-use watchexec::{
-    action::{Action, Outcome},
-    command::Command as WatchexecCommand,
-    config::{InitConfig, RuntimeConfig},
-    error::ReconfigError,
-    event::Event,
-    ErrorHook, Watchexec,
-};
-use watchexec_signals::Signal;
+use miette::IntoDiagnostic;
+use watchexec::Watchexec;
 
 use super::compile::compile_input_file;
 use super::scores::get_selected_items;
@@ -68,7 +59,7 @@ fn exit_sketch(save: bool) {
         let buf_reader = BufReader::new(file);
         let lines: Vec<String> = buf_reader
             .lines()
-            .collect::<Result<_, _>>()
+            .collect::<eyre::Result<_, _>>()
             .expect("Failed to read file.");
         let config = Config::from_config_file();
         let mut composer = config.composer;
@@ -112,15 +103,7 @@ fn exit_sketch(save: bool) {
 }
 
 #[tokio::main]
-pub async fn watch(file: &Path, is_sketch: bool) -> Result<()> {
-    let mut init_config = InitConfig::default();
-
-    init_config.on_error(|error: ErrorHook| async move {
-        eprintln!("Watchexec Runtime Error: {}", error.error);
-        Ok::<(), Infallible>(())
-    });
-
-    let mut runtime_config = RuntimeConfig::default();
+pub async fn watch(file: &Path, is_sketch: bool) -> miette::Result<()> {
     let file = file
         .to_str()
         .expect("Faild to parse file name.")
@@ -134,20 +117,17 @@ pub async fn watch(file: &Path, is_sketch: bool) -> Result<()> {
     };
 
     let watched_files = get_watched_files(&file);
-    runtime_config.pathset(watched_files);
 
-    runtime_config.command(WatchexecCommand::Exec {
-        prog: "lilypond".to_string(),
-        args: vec![
-            "--include".to_string(),
-            config.scores_directory,
-            "--output".to_string(),
-            pdfs_directory,
-            file,
-        ],
-    });
-
-    let watchexec = Watchexec::new(init_config, runtime_config.clone())?;
+    // runtime_config.command(WatchexecCommand::Exec {
+    //     prog: "lilypond".to_string(),
+    //     args: vec![
+    //         "--include".to_string(),
+    //         config.scores_directory,
+    //         "--output".to_string(),
+    //         pdfs_directory,
+    //         file,
+    //     ],
+    // });
 
     let interrupt_action = if is_sketch {
         |action: Action| {
@@ -170,27 +150,26 @@ pub async fn watch(file: &Path, is_sketch: bool) -> Result<()> {
         }
     };
 
-    runtime_config.on_action(move |action: Action| async move {
-        let signals = action
-            .events
-            .iter()
-            .flat_map(Event::signals)
-            .collect::<Vec<_>>();
-
-        if signals.iter().any(|signal| signal == &Signal::Interrupt) {
-            interrupt_action(action);
-        } else if action.events.iter().flat_map(Event::paths).next().is_some()
-        {
-            action.outcome(Outcome::if_running(
-                Outcome::both(Outcome::Stop, Outcome::Start),
-                Outcome::Start,
-            ));
+    let watchexec = Watchexec::new(|mut action| {
+        for event in action.events.iter() {
+            if event.signals().any(|signal| signal == &Signal::Interrupt) {
+                interrupt_action(action);
+            } else if event.paths().next().is_some() {
+                action.outcome(Outcome::if_running(
+                    Outcome::both(Outcome::Stop, Outcome::Start),
+                    Outcome::Start,
+                ));
+            }
         }
 
-        Ok::<(), ReconfigError>(())
-    });
+        if action.signals().any(|sig| sig == Signal::Interrupt) {
+            action.quit();
+        }
 
-    watchexec.reconfigure(runtime_config)?;
+        action
+    })?;
+
+    watchexec.config.pathset(watched_files);
     watchexec.main().await.into_diagnostic()??;
 
     Ok(())
