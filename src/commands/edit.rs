@@ -11,6 +11,7 @@ use glob::glob;
 use inquire::Confirm;
 use miette::IntoDiagnostic;
 use watchexec::Watchexec;
+use watchexec_signals::Signal;
 
 use super::compile::compile_input_file;
 use super::scores::get_selected_items;
@@ -103,7 +104,7 @@ fn exit_sketch(save: bool) {
 }
 
 #[tokio::main]
-pub async fn watch(file: &Path, is_sketch: bool) -> miette::Result<()> {
+pub async fn watch(file: &Path, is_sketch: bool) -> eyre::Result<()> {
     let file = file
         .to_str()
         .expect("Faild to parse file name.")
@@ -129,40 +130,41 @@ pub async fn watch(file: &Path, is_sketch: bool) -> miette::Result<()> {
     //     ],
     // });
 
-    let interrupt_action = if is_sketch {
-        |action: Action| {
-            print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
+    // let interrupt_action = if is_sketch {
+    //     |action: Action| {
+    //         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
 
-            let response = Confirm::new("Do you want to save the sketch?")
-                .with_default(false)
-                .prompt();
+    //         let response = Confirm::new("Do you want to save the sketch?")
+    //             .with_default(false)
+    //             .prompt();
 
-            match response {
-                Ok(true) => exit_sketch(true),
-                Ok(false) => exit_sketch(false),
-                Err(message) => println!("{message}"),
-            }
-            action.outcome(Outcome::Exit);
-        }
-    } else {
-        |action: Action| {
-            action.outcome(Outcome::Exit);
-        }
-    };
+    //         match response {
+    //             Ok(true) => exit_sketch(true),
+    //             Ok(false) => exit_sketch(false),
+    //             Err(message) => println!("{message}"),
+    //         }
+    //         action.outcome(Outcome::Exit);
+    //     }
+    // } else {
+    //     |action: Action| {
+    //         action.outcome(Outcome::Exit);
+    //     }
+    // };
 
     let watchexec = Watchexec::new(|mut action| {
         for event in action.events.iter() {
-            if event.signals().any(|signal| signal == &Signal::Interrupt) {
-                interrupt_action(action);
-            } else if event.paths().next().is_some() {
-                action.outcome(Outcome::if_running(
-                    Outcome::both(Outcome::Stop, Outcome::Start),
-                    Outcome::Start,
-                ));
-            }
+            eprintln!("EVENT: {event:?}");
+            // if event.signals().any(|signal| signal == &Signal::Interrupt) {
+            //     interrupt_action(action);
+            // } else if event.paths().next().is_some() {
+            //     action.outcome(Outcome::if_running(
+            //         Outcome::both(Outcome::Stop, Outcome::Start),
+            //         Outcome::Start,
+            //     ));
+            // }
         }
 
-        if action.signals().any(|sig| sig == Signal::Interrupt) {
+        if action.signals().any(|signal| signal == Signal::Interrupt) {
             action.quit();
         }
 
@@ -170,7 +172,7 @@ pub async fn watch(file: &Path, is_sketch: bool) -> miette::Result<()> {
     })?;
 
     watchexec.config.pathset(watched_files);
-    watchexec.main().await.into_diagnostic()??;
+    watchexec.main().await?;
 
     Ok(())
 }

@@ -50,8 +50,9 @@
 
           darwinPackages = [
             zlib.dev
-            darwin.apple_sdk_11_0.frameworks.CoreFoundation
-            darwin.apple_sdk_11_0.frameworks.SystemConfiguration
+            darwin.apple_sdk.frameworks.CoreFoundation
+            darwin.apple_sdk.frameworks.CoreServices
+            darwin.apple_sdk.frameworks.SystemConfiguration
             darwin.IOKit
           ];
         in
@@ -87,8 +88,9 @@
 
               darwinPackages = [
                 zlib.dev
-                darwin.apple_sdk_11_0.frameworks.CoreFoundation
-                darwin.apple_sdk_11_0.frameworks.SystemConfiguration
+                darwin.apple_sdk.frameworks.CoreFoundation
+                darwin.apple_sdk.frameworks.CoreServices
+                darwin.apple_sdk.frameworks.SystemConfiguration
                 darwin.IOKit
               ];
             in

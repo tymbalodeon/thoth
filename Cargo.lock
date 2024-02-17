@@ -3018,6 +3018,7 @@ dependencies = [
  "users",
  "walkdir",
  "watchexec",
+ "watchexec-signals",
 ]
 
 [[package]]
