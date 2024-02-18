@@ -61,17 +61,14 @@ fn load_config_file() -> ConfigFile {
         create_config_file();
     }
 
-    let config = read_to_string(config_path_name)
-        .map_or_else(|_| String::new(), |config_path| config_path);
+    let config =
+        read_to_string(config_path_name).unwrap_or_else(|_| String::new());
 
-    from_str(&config).map_or_else(
-        |_| {
-            create_config_file();
+    from_str(&config).unwrap_or_else(|_| {
+        create_config_file();
 
-            ConfigFile::default()
-        },
-        |config_file| config_file,
-    )
+        ConfigFile::default()
+    })
 }
 
 fn get_default_scores_directory() -> String {

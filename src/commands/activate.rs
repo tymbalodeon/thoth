@@ -52,8 +52,10 @@ export-env {{
 }}",
         ),
         Shell::Zsh => {
-            println!("{}", formatdoc!(
-                "
+            println!(
+                "{}",
+                formatdoc!(
+                    "
 _thoth_update_path() {{
     export PATH=\"$(\"${{HOME}}\"/.cargo/bin/thoth update-path zsh)\"
 }}
@@ -69,7 +71,8 @@ typeset -ag chpwd_functions;
 if [[ -z \"${{chpwd_functions[(r)_thoth_update_path]+1}}\" ]]; then
   chpwd_functions=( _thoth_update_path ${{chpwd_functions[@]}} )
 fi"
-            ));
+                )
+            );
         }
     }
 }
