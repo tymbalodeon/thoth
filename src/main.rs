@@ -34,7 +34,7 @@ fn main() {
     match &Cli::parse().command {
         Some(Command::Activate { shell }) => activate::main(shell),
         Some(Command::UpdatePath { shell, version }) => {
-            update_path::main(shell, version)
+            update_path::main(shell, version);
         }
         Some(Command::UpdateVersion {
             search_terms,

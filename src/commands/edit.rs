@@ -154,7 +154,7 @@ pub async fn watch(file: &Path, _is_sketch: bool) -> eyre::Result<()> {
                     }
 
                     None => {
-                        eprintln!("Error: Failed to locate parent folder.")
+                        eprintln!("Error: Failed to locate parent folder.");
                     }
                 }
             }

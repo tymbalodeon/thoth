@@ -150,7 +150,7 @@ dependencies *args:
 # Check code for issues using "clippy"
 clippy:
     #!/usr/bin/env zsh
-    cargo clippy -- \
+    cargo clippy --fix --allow-dirty --allow-staged -- \
         -W clippy::pedantic \
         -A clippy::too_many_lines \
         -A clippy::fn_params_excessive_bools  \
