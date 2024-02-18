@@ -7,9 +7,8 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use chrono::offset::Local;
+use color_eyre::eyre;
 use glob::glob;
-use inquire::Confirm;
-use miette::IntoDiagnostic;
 use watchexec::Watchexec;
 use watchexec_signals::Signal;
 
@@ -104,64 +103,61 @@ fn exit_sketch(save: bool) {
 }
 
 #[tokio::main]
-pub async fn watch(file: &Path, is_sketch: bool) -> eyre::Result<()> {
+pub async fn watch(file: &Path, _is_sketch: bool) -> eyre::Result<()> {
+    color_eyre::install()?;
+
     let file = file
         .to_str()
         .expect("Faild to parse file name.")
         .to_string();
-    let config = Config::from_config_file();
-
-    let pdfs_directory = if is_sketch {
-        TEMPORARY_DIRECTORY.to_string()
-    } else {
-        config.pdfs_directory
-    };
 
     let watched_files = get_watched_files(&file);
 
-    // runtime_config.command(WatchexecCommand::Exec {
-    //     prog: "lilypond".to_string(),
-    //     args: vec![
-    //         "--include".to_string(),
-    //         config.scores_directory,
-    //         "--output".to_string(),
-    //         pdfs_directory,
-    //         file,
-    //     ],
-    // });
-
-    // let interrupt_action = if is_sketch {
-    //     |action: Action| {
-    //         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
-
-    //         let response = Confirm::new("Do you want to save the sketch?")
-    //             .with_default(false)
-    //             .prompt();
-
-    //         match response {
-    //             Ok(true) => exit_sketch(true),
-    //             Ok(false) => exit_sketch(false),
-    //             Err(message) => println!("{message}"),
-    //         }
-    //         action.outcome(Outcome::Exit);
-    //     }
-    // } else {
-    //     |action: Action| {
-    //         action.outcome(Outcome::Exit);
-    //     }
-    // };
-
     let watchexec = Watchexec::new(|mut action| {
+        let config = Config::from_config_file();
+
         for event in action.events.iter() {
-            eprintln!("EVENT: {event:?}");
-            // if event.signals().any(|signal| signal == &Signal::Interrupt) {
-            //     interrupt_action(action);
-            // } else if event.paths().next().is_some() {
-            //     action.outcome(Outcome::if_running(
-            //         Outcome::both(Outcome::Stop, Outcome::Start),
-            //         Outcome::Start,
-            //     ));
-            // }
+            for path in event.paths() {
+                match path.0.parent() {
+                    Some(directory) => {
+                        let stuff = glob(&format!(
+                            "{}/*.ly",
+                            directory.to_str().unwrap()
+                        ));
+
+                        for entry in stuff.expect("").flatten() {
+                            let lilypond_file =
+                                entry.to_str().unwrap().to_string();
+                            let scores_directory =
+                                config.scores_directory.clone();
+                            let pdfs_directory = config.pdfs_directory.clone();
+
+                            let output = Command::new("lilypond")
+                                .args([
+                                    "--include".to_string(),
+                                    scores_directory,
+                                    "--output".to_string(),
+                                    pdfs_directory,
+                                    lilypond_file,
+                                ])
+                                .output()
+                                .unwrap();
+
+                            let out =
+                                String::from_utf8(output.stdout).unwrap();
+                            let err =
+                                String::from_utf8(output.stderr).unwrap();
+
+                            println!("{out}");
+                            eprintln!("{err}");
+                        }
+                    }
+
+                    None => {
+                        eprintln!("Error: Failed to locate parent folder.")
+                    }
+                }
+            }
         }
 
         if action.signals().any(|signal| signal == Signal::Interrupt) {
@@ -172,7 +168,7 @@ pub async fn watch(file: &Path, is_sketch: bool) -> eyre::Result<()> {
     })?;
 
     watchexec.config.pathset(watched_files);
-    watchexec.main().await?;
+    let _ = watchexec.main().await?;
 
     Ok(())
 }

@@ -46,7 +46,7 @@
         with pkgs;
         let
           craneLib = crane.lib.${system};
-          allPackages = [ libiconv ];
+          allPackages = [ libiconv lilypond-unstable ];
 
           darwinPackages = [
             zlib.dev
@@ -84,6 +84,7 @@
                 python311Packages.pre-commit-hooks
                 nixpkgs-fmt
                 libiconv
+                lilypond-unstable
               ];
 
               darwinPackages = [
