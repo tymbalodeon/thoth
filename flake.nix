@@ -108,6 +108,7 @@
             python311Packages.pre-commit-hooks
             nixpkgs-fmt
             nil
+            lilypond-unstable
           ];
         in
         {
