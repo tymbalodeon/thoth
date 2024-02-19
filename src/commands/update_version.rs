@@ -71,7 +71,7 @@ fn update_version(
         }
 
         line = format!("{line}\n");
-        output.write(line.as_bytes()).ok();
+        output.write_all(line.as_bytes()).ok();
     }
 
     if changed {

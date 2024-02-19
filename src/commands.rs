@@ -17,7 +17,6 @@ pub mod templates;
 pub mod update_path;
 pub mod update_version;
 
-use std::borrow::ToOwned;
 use std::fmt::{Display, Formatter, Result};
 use std::io::{stdin, stdout, Write};
 
