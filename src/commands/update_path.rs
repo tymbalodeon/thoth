@@ -46,7 +46,7 @@ pub fn main(shell: &Shell, version: &Option<String>) {
                 .expect("Failed to write global version path to stdout.");
             return;
         }
-        _ => (),
+        Shell::Zsh => (),
     }
 
     let mut new_path = String::new();

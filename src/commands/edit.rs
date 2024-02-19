@@ -119,16 +119,11 @@ pub async fn watch(file: &Path, _is_sketch: bool) -> eyre::Result<()> {
 
         let events = action.events.iter().filter(|event| {
             event.tags.iter().any(|tag| match tag {
-                Tag::FileEventKind(file_event_kind) => match file_event_kind {
-                    FileEventKind::Modify(modify_kind) => match modify_kind {
-                        ModifyKind::Data(data_change) => match data_change {
-                            DataChange::Content => true,
-                            _ => false,
-                        },
-                        _ => false,
-                    },
-                    _ => false,
-                },
+                Tag::FileEventKind(FileEventKind::Modify(
+                    ModifyKind::Data(data_change),
+                )) => {
+                    matches!(data_change, DataChange::Content)
+                }
                 _ => false,
             })
         });
@@ -137,39 +132,62 @@ pub async fn watch(file: &Path, _is_sketch: bool) -> eyre::Result<()> {
             for path in event.paths() {
                 match path.0.parent() {
                     Some(directory) => {
-                        let stuff = glob(&format!(
-                            "{}/*.ly",
-                            directory.to_str().unwrap()
-                        ));
+                        let Some(directory) = directory.to_str() else {
+                            eprintln!(
+                                "Error: Failed to get watched directory."
+                            );
+
+                            continue;
+                        };
+
+                        let stuff = glob(&format!("{directory}/*.ly"));
 
                         for entry in stuff.expect("").flatten() {
-                            let lilypond_file =
-                                entry.to_str().unwrap().to_string();
+                            let Some(lilypond_file) = entry.to_str() else {
+                                eprintln!(
+                                    "Error: Failed to get lilypond file."
+                                );
+
+                                continue;
+                            };
+
                             let scores_directory =
                                 config.scores_directory.clone();
                             let pdfs_directory = config.pdfs_directory.clone();
 
-                            let output = Command::new("lilypond")
+                            match Command::new("lilypond")
                                 .args([
                                     "--include".to_string(),
                                     scores_directory,
                                     "--output".to_string(),
                                     pdfs_directory,
-                                    lilypond_file,
+                                    lilypond_file.to_string(),
                                 ])
                                 .output()
-                                .unwrap();
+                            {
+                                Ok(output) => {
+                                    let error_message = "Error: Failed to get output of lilypond command";
 
-                            let out =
-                                String::from_utf8(output.stdout).unwrap();
-                            let err =
-                                String::from_utf8(output.stderr).unwrap();
+                                    if let Ok(stdout) =
+                                        String::from_utf8(output.stdout)
+                                    {
+                                        println!("{stdout}");
+                                    } else {
+                                        eprintln!("{error_message}");
+                                    }
 
-                            println!("{out}");
-                            eprintln!("{err}");
+                                    if let Ok(stderr) =
+                                        String::from_utf8(output.stderr)
+                                    {
+                                        eprintln!("{stderr}");
+                                    } else {
+                                        eprintln!("{error_message}");
+                                    }
+                                }
+                                Err(message) => eprintln!("{message}"),
+                            };
                         }
                     }
-
                     None => {
                         eprintln!("Error: Failed to locate parent folder.");
                     }
