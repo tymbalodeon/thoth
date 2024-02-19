@@ -29,10 +29,10 @@ src recipe *args="_":
         recipe: string # The recipe command
         ...args: string # Arguments to the recipe
     ] {
-        if "_" in $args {
+        if "_" in ...$args {
             just --show $recipe
         } else {
-            just --dry-run $recipe $args
+            just --dry-run $recipe ...$args
         }
     }
 
@@ -159,7 +159,21 @@ dependencies *args:
         -W clippy::unwrap_used
 
 # Run the application, with any provided <args>.
-@run *args:
+run *args:
+    #!/usr/bin/env nu
+
+    # LILYPOND IS BROKEN IN NIXPKGS
+    # REMOVE THIS WHEN FIXED!
+    $env.FONTCONFIG_FILE = (
+        nix-build -E '
+            let 
+              pkgs = import <nixpkgs> { }; 
+            in pkgs.makeFontsConf { 
+              fontDirectories = [ pkgs.freefont_ttf ]; 
+            }
+        ' 
+    )
+
     cargo run -- {{ args }} 
 
 # Build the application
