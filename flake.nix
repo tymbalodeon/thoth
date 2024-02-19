@@ -110,6 +110,11 @@
             nil
             lilypond-unstable
           ];
+
+          FONTCONFIG_FILE = makeFontsConf
+            {
+              fontDirectories = [ pkgs.freefont_ttf ];
+            };
         in
         {
           default = pkgs.mkShell {
@@ -120,6 +125,8 @@
             );
 
             env = {
+              inherit FONTCONFIG_FILE;
+
               RUST_BACKTRACE = "1";
             };
           };
