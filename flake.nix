@@ -68,9 +68,13 @@
             src = craneLib.cleanCargoSource (craneLib.path ./.);
 
             buildInputs = buildPackages ++ (
-              if system == "x86_64-darwin"
+              if stdenv.isDarwin
               then darwinBuildPackages
-              else linuxBuildPackages
+              else (
+                if stdenv.isLinux
+                then linuxBuildPackages
+                else []
+              )
             );
           };
         });
@@ -119,9 +123,13 @@
         {
           default = pkgs.mkShell {
             packages = buildPackages ++ devPackages ++ (
-              if system == "x86_64-darwin"
+              if stdenv.isDarwin
               then darwinBuildPackages
-              else linuxBuildPackages
+              else (
+                if stdenv.isLinux
+                then linuxBuildPackages
+                else []
+              )
             );
 
             env = {
