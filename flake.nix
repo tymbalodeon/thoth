@@ -70,11 +70,12 @@
             buildInputs = buildPackages ++ (
               if stdenv.isDarwin
               then darwinBuildPackages
-              else (
-                if stdenv.isLinux
-                then linuxBuildPackages
-                else []
-              )
+              else
+                (
+                  if stdenv.isLinux
+                  then linuxBuildPackages
+                  else [ ]
+                )
             );
           };
         });
@@ -125,11 +126,12 @@
             packages = buildPackages ++ devPackages ++ (
               if stdenv.isDarwin
               then darwinBuildPackages
-              else (
-                if stdenv.isLinux
-                then linuxBuildPackages
-                else []
-              )
+              else
+                (
+                  if stdenv.isLinux
+                  then linuxBuildPackages
+                  else [ ]
+                )
             );
 
             env = {
