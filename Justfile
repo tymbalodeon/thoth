@@ -200,3 +200,7 @@ install *args:
     }
 
     install {{ args }}
+
+# Open a pre-configured development environment
+@dev:
+    zellij --layout layout.kdl

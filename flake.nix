@@ -14,132 +14,156 @@
     };
   };
 
-  outputs = { self, nixpkgs, schemas, rust-overlay, crane }:
-    let
-      overlays = [
-        rust-overlay.overlays.default
-        (final: prev: {
-          rustToolchain = final.rust-bin.nightly.latest.default;
-        })
-      ];
+  outputs = {
+    self,
+    nixpkgs,
+    schemas,
+    rust-overlay,
+    crane,
+  }: let
+    overlays = [
+      rust-overlay.overlays.default
+      (final: prev: {
+        rustToolchain = final.rust-bin.nightly.latest.default;
+      })
+    ];
 
-      supportedSystems = [
-        "x86_64-linux"
-        "aarch64-darwin"
-        "x86_64-darwin"
-        "aarch64-linux"
-      ];
+    supportedSystems = [
+      "x86_64-linux"
+      "aarch64-darwin"
+      "x86_64-darwin"
+      "aarch64-linux"
+    ];
 
-      forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (
-        system: f {
-          inherit system;
+    forEachSupportedSystem = f:
+      nixpkgs.lib.genAttrs supportedSystems (
+        system:
+          f {
+            inherit system;
 
-          pkgs = import nixpkgs { inherit overlays system; };
-        }
+            pkgs = import nixpkgs {inherit overlays system;};
+          }
       );
-    in
-    {
-      inherit schemas;
+  in {
+    inherit schemas;
 
-      packages = forEachSupportedSystem ({ pkgs, system }:
-        with pkgs;
-        let
-          craneLib = crane.lib.${system};
+    packages = forEachSupportedSystem ({
+      pkgs,
+      system,
+    }:
+      with pkgs; let
+        craneLib = crane.lib.${system};
 
-          buildPackages = [
-            libiconv
-          ];
+        buildPackages = [
+          libiconv
+        ];
 
-          darwinBuildPackages = [
-            zlib.dev
-            darwin.apple_sdk.frameworks.CoreFoundation
-            darwin.apple_sdk.frameworks.CoreServices
-            darwin.apple_sdk.frameworks.SystemConfiguration
-            darwin.IOKit
-          ];
+        darwinBuildPackages = [
+          zlib.dev
+          darwin.apple_sdk.frameworks.CoreFoundation
+          darwin.apple_sdk.frameworks.CoreServices
+          darwin.apple_sdk.frameworks.SystemConfiguration
+          darwin.IOKit
+        ];
 
-          linuxBuildPackages = [
-            pkg-config
-            openssl
-          ];
-        in
-        {
-          default = craneLib.buildPackage {
-            src = craneLib.cleanCargoSource (craneLib.path ./.);
+        linuxBuildPackages = [
+          pkg-config
+          openssl
+        ];
+      in {
+        default = craneLib.buildPackage {
+          src = craneLib.cleanCargoSource (craneLib.path ./.);
 
-            buildInputs = buildPackages ++ (
+          buildInputs =
+            buildPackages
+            ++ (
               if stdenv.isDarwin
               then darwinBuildPackages
               else
                 (
                   if stdenv.isLinux
                   then linuxBuildPackages
-                  else [ ]
+                  else []
                 )
             );
+        };
+      });
+
+    devShells = forEachSupportedSystem ({
+      pkgs,
+      system,
+    }:
+      with pkgs; let
+        buildPackages = [
+          libiconv
+        ];
+
+        darwinBuildPackages = [
+          zlib.dev
+          darwin.apple_sdk.frameworks.CoreFoundation
+          darwin.apple_sdk.frameworks.CoreServices
+          darwin.apple_sdk.frameworks.SystemConfiguration
+          darwin.IOKit
+        ];
+
+        linuxBuildPackages = [
+          pkg-config
+          openssl
+        ];
+
+        devPackages = [
+          cargo-bloat
+          cargo-edit
+          cargo-outdated
+          cargo-udeps
+          cargo-watch
+          fzf
+          git
+          gh
+          git-cliff
+          gitleaks
+          just
+          lilypond-unstable
+          lychee
+          nil
+          nixpkgs-fmt
+          nushell
+          onefetch
+          pre-commit
+          python312Packages.pre-commit-hooks
+          rust-analyzer
+          rustToolchain
+          tokei
+          zellij
+        ];
+
+        FONTCONFIG_FILE =
+          makeFontsConf
+          {
+            fontDirectories = [pkgs.freefont_ttf];
           };
-        });
-
-      devShells = forEachSupportedSystem ({ pkgs, system }:
-        with pkgs;
-        let
-          buildPackages = [
-            libiconv
-          ];
-
-          darwinBuildPackages = [
-            zlib.dev
-            darwin.apple_sdk.frameworks.CoreFoundation
-            darwin.apple_sdk.frameworks.CoreServices
-            darwin.apple_sdk.frameworks.SystemConfiguration
-            darwin.IOKit
-          ];
-
-          linuxBuildPackages = [
-            pkg-config
-            openssl
-          ];
-
-          devPackages = [
-            rustToolchain
-            cargo-bloat
-            cargo-edit
-            cargo-outdated
-            cargo-udeps
-            cargo-watch
-            rust-analyzer
-            git
-            just
-            python311Packages.pre-commit-hooks
-            nixpkgs-fmt
-            nil
-            lilypond-unstable
-          ];
-
-          FONTCONFIG_FILE = makeFontsConf
-            {
-              fontDirectories = [ pkgs.freefont_ttf ];
-            };
-        in
-        {
-          default = pkgs.mkShell {
-            packages = buildPackages ++ devPackages ++ (
+      in {
+        default = pkgs.mkShell {
+          packages =
+            buildPackages
+            ++ devPackages
+            ++ (
               if stdenv.isDarwin
               then darwinBuildPackages
               else
                 (
                   if stdenv.isLinux
                   then linuxBuildPackages
-                  else [ ]
+                  else []
                 )
             );
 
-            env = {
-              inherit FONTCONFIG_FILE;
+          env = {
+            inherit FONTCONFIG_FILE;
 
-              RUST_BACKTRACE = "1";
-            };
+            RUST_BACKTRACE = "1";
           };
-        });
-    };
+        };
+      });
+  };
 }
