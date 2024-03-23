@@ -23,7 +23,7 @@ owo-colors = "3.5.0"
 regex = "1.7.3"
 reqwest = { version = "0.11.22", features = ["json", "blocking"] }
 sea-orm = { version = "0.12.15", features = ["sqlx-sqlite", "runtime-tokio-native-tls", "runtime-async-std-native-tls"] }
-sea-orm-migration = "0.12.15"
+sea-orm-migration = { version = "0.12.15", features = ["runtime-async-std-native-tls", "sqlx-sqlite"] }
 serde = { version = "1.0.156", features = ["derive"] }
 serde_json = "1.0.108"
 shellexpand = "3.0.0"
