@@ -5,7 +5,7 @@ use shellexpand::tilde;
 
 use crate::migrator::Migrator;
 
-const DATABASE_PATH: &str = "~/.config/thoth/db.sqlite";
+const DATABASE_PATH: &str = "~/.local/share/thoth/db.sqlite";
 
 async fn run() -> Result<(), DbErr> {
     let db =
