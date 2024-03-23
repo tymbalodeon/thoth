@@ -16,6 +16,7 @@ use commands::lilypond;
 use commands::list;
 use commands::open;
 use commands::sketch;
+use commands::sqlite;
 use commands::templates;
 use commands::update_path;
 use commands::update_version;
@@ -196,6 +197,10 @@ fn main() {
         Some(Command::Sketch { lilypond_version }) => {
             sketch::main(lilypond_version);
         }
+        Some(Command::Sqlite) => match sqlite::main() {
+            Ok(_) => (),
+            Err(message) => println!("{message}"),
+        },
         _ => {
             println!("Please choose a command.");
         }

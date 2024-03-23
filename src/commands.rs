@@ -12,6 +12,7 @@ pub mod open;
 mod patterns;
 mod scores;
 pub mod sketch;
+pub mod sqlite;
 pub mod table;
 pub mod templates;
 pub mod update_path;
@@ -338,6 +339,9 @@ pub enum Command {
         #[arg(long)]
         lilypond_version: Option<String>,
     },
+
+    /// Test SQLite
+    Sqlite,
 
     /// Update lilypond version for score(s)
     UpdateVersion {

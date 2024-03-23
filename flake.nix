@@ -124,6 +124,7 @@
           gitleaks
           just
           lilypond-unstable
+          sqlite
           lychee
           nil
           nixpkgs-fmt
