@@ -101,7 +101,7 @@ add *args:
             | each { |feature| $"-F ($feature)" }
         )
 
-        cargo add ...$dependencies ...$features
+        cargo add ...$dependencies $features
     }
 
     add {{ args }}

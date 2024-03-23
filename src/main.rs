@@ -1,6 +1,8 @@
 mod commands;
 mod config;
 
+pub mod migrator;
+
 use std::println;
 
 use clap::Parser;
