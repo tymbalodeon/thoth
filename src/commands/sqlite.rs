@@ -1,48 +1,19 @@
-use rusqlite::{Connection, Result};
+use futures::executor::block_on;
+use sea_orm::{Database, DbErr};
+use shellexpand::tilde;
 
-#[derive(Debug)]
-struct Score {
-    title: String,
-    composer: String,
-}
+const DATABASE_PATH: &str = "~/.config/thoth/db.sqlite";
 
-pub fn main() -> Result<()> {
-    let connection = Connection::open_in_memory()?;
-
-    connection.execute(
-        "CREATE TABLE score (
-            title TEXT NOT NULL,
-            composer TEXT NOT NULL
-        )",
-        (),
-    )?;
-
-    let score = Score {
-        title: "Piano Piece".to_string(),
-        composer: "Ben Rosen".to_string(),
-    };
-
-    connection.execute(
-        "INSERT INTO score (title, composer) VALUES (?1, ?2)",
-        (&score.title, &score.composer),
-    )?;
-
-    let mut statement =
-        connection.prepare("SELECT title, composer FROM score")?;
-
-    let scores = statement.query_map([], |row| {
-        Ok(Score {
-            title: row.get(0)?,
-            composer: row.get(1)?,
-        })
-    })?;
-
-    for score in scores {
-        match score {
-            Ok(score) => println!("Found score {:?}", score),
-            Err(message) => println!("{message}"),
-        }
-    }
+async fn run() -> Result<(), DbErr> {
+    let _ =
+        Database::connect(format!("sqlite:{}?mode=rwc", tilde(DATABASE_PATH)))
+            .await?;
 
     Ok(())
+}
+
+pub fn main() {
+    if let Err(err) = block_on(run()) {
+        panic!("{}", err);
+    }
 }
