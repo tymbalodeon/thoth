@@ -1,5 +1,7 @@
 mod commands;
 mod config;
+mod models;
+mod schema;
 
 use std::println;
 
@@ -21,7 +23,6 @@ use commands::templates;
 use commands::update_path;
 use commands::update_version;
 use commands::Command;
-use futures::executor::block_on;
 
 #[derive(Parser)]
 #[command(about, long_about = None)]
@@ -198,7 +199,7 @@ fn main() {
         Some(Command::Sketch { lilypond_version }) => {
             sketch::main(lilypond_version);
         }
-        Some(Command::Sqlite) => block_on(sqlite::main()),
+        Some(Command::Sqlite) => sqlite::main(),
         _ => {
             println!("Please choose a command.");
         }

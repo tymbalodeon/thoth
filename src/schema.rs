@@ -1,9 +1,7 @@
-// @generated automatically by Diesel CLI.
-
 diesel::table! {
     scores (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         title -> Text,
-        composer -> Nullable<Text>,
+        composer -> Text,
     }
 }
