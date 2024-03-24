@@ -204,3 +204,18 @@ install *args:
 # Open a pre-configured development environment
 @dev:
     zellij --layout layout.kdl
+
+
+migrate *args:
+    #!/usr/bin/env nu
+
+    with-env { 
+        DATABASE_URL: ($env.HOME | path join ".local/share/thoth/db.sqlite")
+    } {
+        if {{ args }} == "redo" {
+            diesel migration redo
+        } else {
+            diesel migration run
+        }
+    }
+

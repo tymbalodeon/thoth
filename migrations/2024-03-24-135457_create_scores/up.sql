@@ -1,0 +1,5 @@
+CREATE TABLE scores (
+    id INTEGER PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    composer VARCHAR NONT NULL
+)

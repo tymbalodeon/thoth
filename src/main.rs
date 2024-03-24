@@ -1,7 +1,5 @@
 mod commands;
 mod config;
-pub mod entities;
-pub mod migrator;
 
 use std::println;
 
