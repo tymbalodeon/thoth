@@ -160,7 +160,7 @@ dependencies *args:
 
 # Run the application, with any provided <args>.
 @run *args:
-    cargo run -- {{ args }} 
+    cargo run -- {{ args }}
 
 # Build the application
 build *args:
@@ -219,3 +219,5 @@ migrate *args:
         }
     }
 
+db:
+    open ~/.local/share/thoth/db.sqlite | get scores

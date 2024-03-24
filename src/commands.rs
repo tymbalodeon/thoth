@@ -341,7 +341,10 @@ pub enum Command {
     },
 
     /// Test SQLite
-    Sqlite,
+    Sqlite {
+        title: Option<String>,
+        composer: Option<String>,
+    },
 
     /// Update lilypond version for score(s)
     UpdateVersion {
