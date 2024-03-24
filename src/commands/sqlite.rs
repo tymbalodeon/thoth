@@ -26,7 +26,11 @@ fn insert_score(
     use crate::schema::scores;
 
     diesel::insert_into(scores::table)
-        .values(&NewScore { title, composer })
+        .values(&NewScore {
+            title: Some(title),
+            composer: Some(composer),
+            ..NewScore::default()
+        })
         .returning(Score::as_returning())
         .get_result(connection)
         .expect("Error saving new post");
@@ -43,7 +47,11 @@ fn show_scores(connection: &mut SqliteConnection) {
     println!("Displaying {} scores", results.len());
 
     for score in results {
-        println!("Title: {}, Composer: {}", score.title, score.composer);
+        println!(
+            "Title: {:?}, Composer: {:?}",
+            score.title.unwrap(),
+            score.composer.unwrap()
+        );
     }
 }
 
