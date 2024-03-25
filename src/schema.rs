@@ -1,11 +1,9 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    files (id) {
+    included_files (id) {
         id -> Nullable<Integer>,
-        file_type -> Text,
         path -> Text,
-        score_id -> Integer,
     }
 }
 
@@ -36,11 +34,11 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(files -> scores (score_id));
+diesel::joinable!(score_included_files -> included_files (included_file));
 diesel::joinable!(score_included_files -> scores (score_file));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    files,
+    included_files,
     score_included_files,
     scores,
 );

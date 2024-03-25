@@ -26,7 +26,7 @@ pub struct NewScore<'a> {
 #[diesel(table_name = scores)]
 #[diesel(check_for_backend(Sqlite))]
 pub struct Score {
-    pub id: i32,
+    pub id: u8,
     pub dedication: Option<String>,
     pub title: Option<String>,
     pub subtitle: Option<String>,
@@ -41,5 +41,4 @@ pub struct Score {
     pub piece: Option<String>,
     pub opus: Option<String>,
     pub ly_file_path: String,
-    // pub ily_file: Option<String>,
 }
