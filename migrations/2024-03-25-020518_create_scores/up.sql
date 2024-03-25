@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS scores (
     copyright TEXT,
     piece TEXT,
     opus TEXT,
-    ly_file_path TEXT NOT NULL
+    ly_file_path TEXT NOT NULL UNIQUE
 )
