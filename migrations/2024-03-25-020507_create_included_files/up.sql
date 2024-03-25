@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS included_files (
+    id INTEGER PRIMARY KEY,
+    path TEXT NOT NULL UNIQUE
+)

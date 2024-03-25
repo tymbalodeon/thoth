@@ -11,21 +11,22 @@ diesel::table! {
 
 diesel::table! {
     scores (id) {
-        id -> Integer,
-        piece -> Nullable<Text>,
+        id -> Nullable<Integer>,
+        dedication -> Nullable<Text>,
+        title -> Nullable<Text>,
         subtitle -> Nullable<Text>,
         subsubtitle -> Nullable<Text>,
+        instrument -> Nullable<Text>,
+        poet -> Nullable<Text>,
+        composer -> Nullable<Text>,
+        meter -> Nullable<Text>,
         arranger -> Nullable<Text>,
         tagline -> Nullable<Text>,
-        lyricist -> Nullable<Text>,
-        instrument -> Nullable<Text>,
-        dedication -> Nullable<Text>,
-        poet -> Nullable<Text>,
-        opus -> Nullable<Text>,
-        meter -> Nullable<Text>,
         copyright -> Nullable<Text>,
-        title -> Nullable<Text>,
-        composer -> Nullable<Text>,
+        piece -> Nullable<Text>,
+        opus -> Nullable<Text>,
+        ly_file_path -> Text,
+        ily_file -> Nullable<Binary>,
     }
 }
 

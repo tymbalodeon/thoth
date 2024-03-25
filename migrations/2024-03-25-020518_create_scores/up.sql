@@ -1,4 +1,4 @@
-CREATE TABLE scores (
+CREATE TABLE IF NOT EXISTS scores (
     id INTEGER PRIMARY KEY,
     dedication TEXT,
     title TEXT,
@@ -12,5 +12,7 @@ CREATE TABLE scores (
     tagline TEXT,
     copyright TEXT,
     piece TEXT,
-    opus TEXT
-);
+    opus TEXT,
+    ly_file_path TEXT NOT NULL,
+    ily_file REFERENCES included_files
+)
