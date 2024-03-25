@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS scores (
-    id INTEGER PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY,
     dedication TEXT,
     title TEXT,
     subtitle TEXT,

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS linked_files (
-    id INTEGER PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY,
     score_id INTEGER NOT NULL,
     included_file_id INTEGER,
     FOREIGN KEY (score_id) REFERENCES scores (id),

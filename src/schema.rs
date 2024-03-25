@@ -2,14 +2,14 @@
 
 diesel::table! {
     included_files (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         path -> Text,
     }
 }
 
 diesel::table! {
     linked_files (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         score_id -> Integer,
         included_file_id -> Nullable<Integer>,
     }
@@ -17,7 +17,7 @@ diesel::table! {
 
 diesel::table! {
     scores (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         dedication -> Nullable<Text>,
         title -> Nullable<Text>,
         subtitle -> Nullable<Text>,
