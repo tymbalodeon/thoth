@@ -17,9 +17,9 @@ pub struct NewScore<'a> {
     pub arranger: Option<&'a str>,
     pub tagline: Option<&'a str>,
     pub copyright: Option<&'a str>,
-    pub lyricist: Option<&'a str>,
     pub piece: Option<&'a str>,
     pub opus: Option<&'a str>,
+    pub ly_file_path: &'a str,
 }
 
 #[derive(Queryable, Selectable)]
@@ -38,7 +38,8 @@ pub struct Score {
     pub arranger: Option<String>,
     pub tagline: Option<String>,
     pub copyright: Option<String>,
-    pub lyricist: Option<String>,
     pub piece: Option<String>,
     pub opus: Option<String>,
+    pub ly_file_path: String,
+    // pub ily_file: Option<String>,
 }

@@ -10,6 +10,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    score_included_files (score_file, included_file) {
+        score_file -> Binary,
+        included_file -> Nullable<Binary>,
+    }
+}
+
+diesel::table! {
     scores (id) {
         id -> Nullable<Integer>,
         dedication -> Nullable<Text>,
@@ -26,10 +33,14 @@ diesel::table! {
         piece -> Nullable<Text>,
         opus -> Nullable<Text>,
         ly_file_path -> Text,
-        ily_file -> Nullable<Binary>,
     }
 }
 
 diesel::joinable!(files -> scores (score_id));
+diesel::joinable!(score_included_files -> scores (score_file));
 
-diesel::allow_tables_to_appear_in_same_query!(files, scores,);
+diesel::allow_tables_to_appear_in_same_query!(
+    files,
+    score_included_files,
+    scores,
+);

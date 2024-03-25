@@ -13,6 +13,5 @@ CREATE TABLE IF NOT EXISTS scores (
     copyright TEXT,
     piece TEXT,
     opus TEXT,
-    ly_file_path TEXT NOT NULL,
-    ily_file REFERENCES included_files
+    ly_file_path TEXT NOT NULL
 )
