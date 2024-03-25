@@ -206,13 +206,23 @@ install *args:
     zellij --layout layout.kdl
 
 
+make-migration name:
+    #!/usr/bin/env nu
+
+    # TODO use justfile env instead
+    with-env { 
+        DATABASE_URL: ($env.HOME | path join ".local/share/thoth/db.sqlite")
+    } {
+        diesel migration generate {{ name }}
+    }
+
 migrate *args:
     #!/usr/bin/env nu
 
     with-env { 
         DATABASE_URL: ($env.HOME | path join ".local/share/thoth/db.sqlite")
     } {
-        if {{ args }} == "redo" {
+        if "{{ args }}" == "redo" {
             diesel migration redo
         } else {
             diesel migration run
@@ -221,3 +231,8 @@ migrate *args:
 
 db:
     open ~/.local/share/thoth/db.sqlite | get scores
+
+@format-sql:
+    sqlfluff format --dialect sqlite migrations/**/*.sql
+    sqlfluff fix --dialect sqlite migrations/**/*.sql
+    sqlfluff lint --dialect sqlite migrations/**/*.sql

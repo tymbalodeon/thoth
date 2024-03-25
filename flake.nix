@@ -124,6 +124,7 @@
           gitleaks
           just
           lilypond-unstable
+          sqlfluff
           sqlite
           lychee
           nil
