@@ -199,8 +199,8 @@ fn main() {
         Some(Command::Sketch { lilypond_version }) => {
             sketch::main(lilypond_version);
         }
-        Some(Command::Sqlite { title, composer }) => {
-            sqlite::main(title, composer);
+        Some(Command::Sqlite { import }) => {
+            sqlite::main(import);
         }
         _ => {
             println!("Please choose a command.");

@@ -1,9 +1,11 @@
 use diesel::{
-    Connection, QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection,
+    insert_into, Connection, QueryDsl, RunQueryDsl, SelectableHelper,
+    SqliteConnection,
 };
 use diesel_migrations::{
     embed_migrations, EmbeddedMigrations, MigrationHarness,
 };
+use rust_search::SearchBuilder;
 use shellexpand::tilde;
 
 use crate::models::{NewScore, Score};
@@ -20,20 +22,18 @@ fn run_migrations(
 
 fn insert_score(
     connection: &mut SqliteConnection,
-    title: &String,
-    composer: &String,
-) {
+    ly_file_path: &String,
+) -> Score {
     use crate::schema::scores;
 
-    diesel::insert_into(scores::table)
+    insert_into(scores::table)
         .values(&NewScore {
-            title: Some(title),
-            composer: Some(composer),
+            ly_file_path,
             ..NewScore::default()
         })
         .returning(Score::as_returning())
         .get_result(connection)
-        .expect("Error saving new post");
+        .expect("Error saving new post")
 }
 
 fn show_scores(connection: &mut SqliteConnection) {
@@ -47,15 +47,11 @@ fn show_scores(connection: &mut SqliteConnection) {
     println!("Displaying {} scores", results.len());
 
     for score in results {
-        println!(
-            "Title: {:?}, Composer: {:?}",
-            score.title.unwrap(),
-            score.composer.unwrap()
-        );
+        println!("Score: {score:?}\n");
     }
 }
 
-pub fn main(title: &Option<String>, composer: &Option<String>) {
+pub fn main(import: &bool) {
     let database_url = tilde("~/.local/share/thoth/db.sqlite");
 
     let connection = &mut SqliteConnection::establish(&database_url)
@@ -63,12 +59,17 @@ pub fn main(title: &Option<String>, composer: &Option<String>) {
 
     run_migrations(connection);
 
-    if title.is_some() && composer.is_some() {
-        insert_score(
-            connection,
-            title.as_ref().unwrap(),
-            composer.as_ref().unwrap(),
-        );
+    if *import {
+        let search: Vec<String> = SearchBuilder::default()
+            .location("~")
+            .ext("ly")
+            .build()
+            .collect();
+
+        for path in search {
+            let score = insert_score(connection, &path);
+            println!("{score:?}");
+        }
     }
 
     show_scores(connection);

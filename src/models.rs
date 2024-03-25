@@ -52,7 +52,7 @@ pub struct NewScore<'a> {
     pub ly_file_path: &'a str,
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Debug, Queryable, Selectable)]
 #[diesel(table_name = scores)]
 #[diesel(check_for_backend(Sqlite))]
 pub struct Score {
