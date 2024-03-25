@@ -1,7 +1,37 @@
 use diesel::prelude::*;
 use diesel::sqlite::Sqlite;
 
-use crate::schema::scores;
+use crate::schema::{file_links, included_files, scores};
+
+#[derive(Default, Insertable)]
+#[diesel(table_name = included_files)]
+pub struct NewIncludedFile<'a> {
+    pub path: &'a str,
+}
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = included_files)]
+#[diesel(check_for_backend(Sqlite))]
+pub struct IncludedFile {
+    pub id: i32,
+    pub path: String,
+}
+
+#[derive(Default, Insertable)]
+#[diesel(table_name = file_links)]
+pub struct NewFileLink {
+    pub score_id: i32,
+    pub included_file_id: i32,
+}
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = file_links)]
+#[diesel(check_for_backend(Sqlite))]
+pub struct FileLink {
+    pub id: i32,
+    pub score_id: i32,
+    pub included_file_id: i32,
+}
 
 #[derive(Default, Insertable)]
 #[diesel(table_name = scores)]
