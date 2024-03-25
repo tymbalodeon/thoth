@@ -1,3 +1,5 @@
+use std::fs::read_to_string;
+
 use diesel::{
     insert_into, Connection, QueryDsl, RunQueryDsl, SelectableHelper,
     SqliteConnection,
@@ -5,6 +7,7 @@ use diesel::{
 use diesel_migrations::{
     embed_migrations, EmbeddedMigrations, MigrationHarness,
 };
+use regex::Regex;
 use rust_search::SearchBuilder;
 use shellexpand::tilde;
 
@@ -23,12 +26,16 @@ fn run_migrations(
 fn insert_score(
     connection: &mut SqliteConnection,
     ly_file_path: &String,
+    title: Option<String>,
+    composer: Option<String>,
 ) -> Score {
     use crate::schema::scores;
 
     insert_into(scores::table)
         .values(&NewScore {
-            ly_file_path,
+            ly_file_path: ly_file_path.to_string(),
+            title,
+            composer,
             ..NewScore::default()
         })
         .returning(Score::as_returning())
@@ -51,6 +58,49 @@ fn show_scores(connection: &mut SqliteConnection) {
     }
 }
 
+fn get_title(path: &str) -> Option<String> {
+    let regex = Regex::new(r"title\s*=\s*.*").unwrap();
+
+    if let Ok(contents) = read_to_string(path) {
+        if let Some(result) = regex.find(&contents) {
+            Some(
+                result
+                    .as_str()
+                    .split("=")
+                    .last()
+                    .unwrap()
+                    .trim()
+                    .replace('"', ""),
+            )
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
+
+fn get_composer(path: &str) -> Option<String> {
+    let regex = Regex::new(r"composer\s*=\s*.*").unwrap();
+
+    if let Ok(contents) = read_to_string(path) {
+        if let Some(result) = regex.find(&contents) {
+            Some(
+                result
+                    .as_str()
+                    .split("=")
+                    .last()
+                    .unwrap()
+                    .trim()
+                    .replace('"', ""),
+            )
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
 pub fn main(import: &bool) {
     let database_url = tilde("~/.local/share/thoth/db.sqlite");
 
@@ -67,7 +117,10 @@ pub fn main(import: &bool) {
             .collect();
 
         for path in search {
-            let score = insert_score(connection, &path);
+            let title = get_title(&path);
+            let composer = get_composer(&path);
+            let score = insert_score(connection, &path, title, composer);
+
             println!("{score:?}");
         }
     }
