@@ -200,7 +200,7 @@ fn main() {
             sketch::main(lilypond_version);
         }
         Some(Command::Sqlite { import }) => {
-            sqlite::main(import);
+            sqlite::main(*import);
         }
         _ => {
             println!("Please choose a command.");

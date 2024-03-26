@@ -79,21 +79,17 @@ fn get_title(path: &str) -> Option<String> {
 fn get_composer(path: &str) -> Option<String> {
     let regex = Regex::new(r"composer\s*=\s*.*").unwrap();
 
-    if let Ok(contents) = read_to_string(path) {
-        regex.find(&contents).map(|result| {
+    read_to_string(path).map_or(None, |contents| {
+        regex.find(&contents).and_then(|result| {
             result
                 .as_str()
                 .split('=')
-                .last()
-                .unwrap()
-                .trim()
-                .replace('"', "")
+                .last().map(|thing| thing.trim().replace('"', ""))
         })
-    } else {
-        None
-    }
+    })
 }
-pub fn main(import: &bool) {
+
+pub fn main(import: bool) {
     let database_url = tilde("~/.local/share/thoth/db.sqlite");
 
     let connection = &mut SqliteConnection::establish(&database_url)
@@ -101,7 +97,7 @@ pub fn main(import: &bool) {
 
     run_migrations(connection);
 
-    if *import {
+    if import {
         let search: Vec<String> = SearchBuilder::default()
             .location("~")
             .ext("ly")
