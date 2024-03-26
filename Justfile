@@ -137,8 +137,8 @@ migrate *args:
     }
 
 # Connect to the database via an interactive shell
-db-shell:
-    sqlite3 ~/.local/share/thoth/db.sqlite
+@db-shell:
+    sqlite3 $env.DATABASE_URL
 
 @sqlfluff:
     sqlfluff format migrations/**/*.sql
