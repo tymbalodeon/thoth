@@ -118,9 +118,32 @@ dependencies *args:
 
     dependencies {{ args }}
 
-# Run pre-commit checks
-@check:
-    pre-commit run --all
+# Open a pre-configured development environment
+@dev:
+    zellij --layout layout.kdl
+
+# Generate blank migration files
+@make-migration name:
+    diesel migration generate {{ name }}
+
+# Run migrations
+migrate *args:
+    #!/usr/bin/env nu
+
+    if "{{ args }}" == "redo" {
+        diesel migration redo
+    } else {
+        diesel migration run
+    }
+
+# Connect to the database via an interactive shell
+db-shell:
+    sqlite3 ~/.local/share/thoth/db.sqlite
+
+@sqlfluff:
+    sqlfluff format migrations/**/*.sql
+    sqlfluff fix migrations/**/*.sql
+    sqlfluff lint migrations/**/*.sql
 
 # Run clippy
 @clippy:
@@ -132,6 +155,41 @@ dependencies *args:
         -A clippy::too_many_arguments \
         -W clippy::nursery \
         -W clippy::unwrap_used
+
+# Run pre-commit checks
+check *args:
+    #!/usr/bin/env nu
+
+    def check [
+        ...checks # Specific checks to run
+        --list # List available checks
+    ] {
+        if $list {
+            echo (
+                cat .pre-commit-config.yaml
+                | grep id
+                | lines
+                | each {
+                    |line|
+
+                    $line | split row ":" | last | str trim
+                } | str join "\n"
+
+            )
+
+            return
+        }
+
+        if ($checks | is-empty) {
+            pre-commit run --all
+        } else {
+            for check in $checks {
+                pre-commit run --all-files $check
+            }
+        }
+    }
+
+    check {{ args }}
 
 # Run the application, with any provided <args>.
 @run *args:
@@ -175,30 +233,3 @@ install *args:
     }
 
     install {{ args }}
-
-# Open a pre-configured development environment
-@dev:
-    zellij --layout layout.kdl
-
-
-# Generate blank migration files
-@make-migration name:
-    diesel migration generate {{ name }}
-
-# Run migrations
-migrate *args:
-    #!/usr/bin/env nu
-
-    if "{{ args }}" == "redo" {
-        diesel migration redo
-    } else {
-        diesel migration run
-    }
-
-db:
-    open ~/.local/share/thoth/db.sqlite
-
-@format-sql:
-    sqlfluff format --dialect sqlite migrations/**/*.sql
-    sqlfluff fix --dialect sqlite migrations/**/*.sql
-    sqlfluff lint --dialect sqlite migrations/**/*.sql
