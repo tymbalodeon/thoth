@@ -1,4 +1,5 @@
 set shell := ["nu", "-c"]
+
 export DATABASE_URL := `$env.HOME | path join ".local/share/thoth/db.sqlite"`
 
 _help:
@@ -30,7 +31,7 @@ src recipe *args="_":
         recipe: string # The recipe command
         ...args: string # Arguments to the recipe
     ] {
-        if "_" in ...$args {
+        if "_" in $args {
             just --show $recipe
         } else {
             just --dry-run $recipe ...$args
@@ -57,36 +58,9 @@ find *regex:
 
     find {{ regex }}
 
-# Manage project Rust version
-rust *args:
-    #!/usr/bin/env nu
-
-    # Manage project Rust version
-    def rust [
-        --installed # Show installed Rust versions
-        --path # Show the path of the current Rust
-        --use: string # Specify a new Rust version to use
-        --version # (default) Show the current Rust version
-    ] {
-        if $installed {
-            rustup toolchain list
-            exit
-        } else if $path {
-            rustup which rustc
-            exit
-        } else if $version or ($use | is-empty) {
-            rustc --version
-            exit
-        }
-
-        let file = "rust-toolchain.toml"
-
-        open $file
-        | update toolchain.channel $use
-        | save --force $file
-    }
-
-    rust {{ args }}
+# Set up dev environment when changing to the directory
+@direnv:
+    echo "use flake" | save --force .envrc; direnv allow
 
 # Add dependencies
 add *args:

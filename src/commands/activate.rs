@@ -17,15 +17,15 @@ def --env thoth-hook [] {{
     return
   }}
 
-  let lilypond_path = (thoth update-path nu | split row \":\" | first)  
+  let lilypond_path = (thoth update-path nu | split row \":\" | first)
 
   if ($lilypond_path | is-empty) {{
     return
   }}
 
   $env.PATH = (
-    $env.PATH 
-    | split row \":\" 
+    $env.PATH
+    | split row \":\"
     | filter {{ |path| not (\"lilypond\" in $path) }}
   )
 
@@ -34,7 +34,7 @@ def --env thoth-hook [] {{
 
 export-env {{
   $env.config = (
-    $env.config 
+    $env.config
     | upsert hooks {{
       pre_prompt: (
         $env.config.hooks.pre_prompt ++ [

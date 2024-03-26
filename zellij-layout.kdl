@@ -1,6 +1,6 @@
 layout {
     pane {
-        command "hx" 
+        command "hx"
         args "src/main.rs"
     }
 

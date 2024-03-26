@@ -62,19 +62,15 @@ fn get_title(path: &str) -> Option<String> {
     let regex = Regex::new(r"title\s*=\s*.*").unwrap();
 
     if let Ok(contents) = read_to_string(path) {
-        if let Some(result) = regex.find(&contents) {
-            Some(
-                result
-                    .as_str()
-                    .split("=")
-                    .last()
-                    .unwrap()
-                    .trim()
-                    .replace('"', ""),
-            )
-        } else {
-            None
-        }
+        regex.find(&contents).map(|result| {
+            result
+                .as_str()
+                .split('=')
+                .last()
+                .unwrap()
+                .trim()
+                .replace('"', "")
+        })
     } else {
         None
     }
@@ -84,19 +80,15 @@ fn get_composer(path: &str) -> Option<String> {
     let regex = Regex::new(r"composer\s*=\s*.*").unwrap();
 
     if let Ok(contents) = read_to_string(path) {
-        if let Some(result) = regex.find(&contents) {
-            Some(
-                result
-                    .as_str()
-                    .split("=")
-                    .last()
-                    .unwrap()
-                    .trim()
-                    .replace('"', ""),
-            )
-        } else {
-            None
-        }
+        regex.find(&contents).map(|result| {
+            result
+                .as_str()
+                .split('=')
+                .last()
+                .unwrap()
+                .trim()
+                .replace('"', "")
+        })
     } else {
         None
     }
