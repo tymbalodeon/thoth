@@ -1,5 +1,3 @@
-use std::fs::read_to_string;
-
 use diesel::{
     insert_into, Connection, QueryDsl, RunQueryDsl, SelectableHelper,
     SqliteConnection,
@@ -7,7 +5,6 @@ use diesel::{
 use diesel_migrations::{
     embed_migrations, EmbeddedMigrations, MigrationHarness,
 };
-use regex::Regex;
 use rust_search::SearchBuilder;
 use shellexpand::tilde;
 
@@ -25,19 +22,12 @@ fn run_migrations(
 
 fn insert_score(
     connection: &mut SqliteConnection,
-    ly_file_path: &String,
-    title: Option<String>,
-    composer: Option<String>,
+    new_score: NewScore,
 ) -> Score {
     use crate::schema::scores;
 
     insert_into(scores::table)
-        .values(&NewScore {
-            ly_file_path: ly_file_path.to_string(),
-            title,
-            composer,
-            ..NewScore::default()
-        })
+        .values(new_score)
         .returning(Score::as_returning())
         .get_result(connection)
         .expect("Error saving new post")
@@ -48,6 +38,7 @@ fn show_scores(connection: &mut SqliteConnection) {
 
     let results = scores
         .select(Score::as_select())
+        .limit(100)
         .load(connection)
         .expect("Error loading scores");
 
@@ -56,37 +47,6 @@ fn show_scores(connection: &mut SqliteConnection) {
     for score in results {
         println!("Score: {score:?}\n");
     }
-}
-
-fn get_title(path: &str) -> Option<String> {
-    let regex = Regex::new(r"title\s*=\s*.*").unwrap();
-
-    if let Ok(contents) = read_to_string(path) {
-        regex.find(&contents).map(|result| {
-            result
-                .as_str()
-                .split('=')
-                .last()
-                .unwrap()
-                .trim()
-                .replace('"', "")
-        })
-    } else {
-        None
-    }
-}
-
-fn get_composer(path: &str) -> Option<String> {
-    let regex = Regex::new(r"composer\s*=\s*.*").unwrap();
-
-    read_to_string(path).map_or(None, |contents| {
-        regex.find(&contents).and_then(|result| {
-            result
-                .as_str()
-                .split('=')
-                .last().map(|thing| thing.trim().replace('"', ""))
-        })
-    })
 }
 
 pub fn main(import: bool) {
@@ -105,9 +65,7 @@ pub fn main(import: bool) {
             .collect();
 
         for path in search {
-            let title = get_title(&path);
-            let composer = get_composer(&path);
-            let score = insert_score(connection, &path, title, composer);
+            let score = insert_score(connection, NewScore::from_file(&path));
 
             println!("{score:?}");
         }
