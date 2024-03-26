@@ -73,21 +73,21 @@ impl NewScore {
     }
 
     pub fn from_file(path: &str) -> Self {
-        let get_header = Self::get_lilypond_header_value;
+        let get_header_value = Self::get_lilypond_header_value;
 
-        let dedication = get_header(path, "dedication");
-        let title = get_header(path, "title");
-        let subtitle = get_header(path, "subtitle");
-        let subsubtitle = get_header(path, "subsubtitle");
-        let instrument = get_header(path, "instrument");
-        let poet = get_header(path, "poet");
-        let composer = get_header(path, "composer");
-        let meter = get_header(path, "meter");
-        let arranger = get_header(path, "arranger");
-        let tagline = get_header(path, "tagline");
-        let copyright = get_header(path, "copyright");
-        let piece = get_header(path, "piece");
-        let opus = get_header(path, "opus");
+        let dedication = get_header_value(path, "dedication");
+        let title = get_header_value(path, "title");
+        let subtitle = get_header_value(path, "subtitle");
+        let subsubtitle = get_header_value(path, "subsubtitle");
+        let instrument = get_header_value(path, "instrument");
+        let poet = get_header_value(path, "poet");
+        let composer = get_header_value(path, "composer");
+        let meter = get_header_value(path, "meter");
+        let arranger = get_header_value(path, "arranger");
+        let tagline = get_header_value(path, "tagline");
+        let copyright = get_header_value(path, "copyright");
+        let piece = get_header_value(path, "piece");
+        let opus = get_header_value(path, "opus");
 
         Self {
             dedication,
