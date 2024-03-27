@@ -4,7 +4,10 @@ use diesel::prelude::*;
 use diesel::sqlite::Sqlite;
 use regex::Regex;
 
-use crate::schema::{file_links, included_files, scores};
+use crate::{
+    commands::table,
+    schema::{file_links, included_files, scores},
+};
 
 #[derive(Default, Insertable)]
 #[diesel(table_name = included_files)]
@@ -127,4 +130,58 @@ pub struct Score {
     pub piece: Option<String>,
     pub opus: Option<String>,
     pub ly_file_path: String,
+}
+
+impl Score {
+    fn get_option_display(option: &Option<String>) -> String {
+        match option {
+            Some(value) => value.to_string(),
+            None => "".to_string(),
+        }
+    }
+
+    pub fn display(&self) {
+        let values = vec![
+            vec!["ly File Path".to_string(), (&self.ly_file_path).to_string()],
+            vec![
+                "Dedication".to_string(),
+                Score::get_option_display(&self.dedication),
+            ],
+            vec!["Title".to_string(), Score::get_option_display(&self.title)],
+            vec![
+                "Subtitle".to_string(),
+                Score::get_option_display(&self.subtitle),
+            ],
+            vec![
+                "Subsubtitle".to_string(),
+                Score::get_option_display(&self.subsubtitle),
+            ],
+            vec![
+                "Instrument".to_string(),
+                Score::get_option_display(&self.instrument),
+            ],
+            vec!["Poet".to_string(), Score::get_option_display(&self.poet)],
+            vec![
+                "Composer".to_string(),
+                Score::get_option_display(&self.composer),
+            ],
+            vec!["Meter".to_string(), Score::get_option_display(&self.meter)],
+            vec![
+                "Arranger".to_string(),
+                Score::get_option_display(&self.arranger),
+            ],
+            vec![
+                "Tagline".to_string(),
+                Score::get_option_display(&self.tagline),
+            ],
+            vec![
+                "Copyright".to_string(),
+                Score::get_option_display(&self.copyright),
+            ],
+            vec!["Piece".to_string(), Score::get_option_display(&self.piece)],
+            vec!["Opus".to_string(), Score::get_option_display(&self.opus)],
+        ];
+
+        table::print(&[], values);
+    }
 }

@@ -45,7 +45,7 @@ fn show_scores(connection: &mut SqliteConnection) {
     println!("Displaying {} scores", results.len());
 
     for score in results {
-        println!("Score: {score:?}\n");
+        score.display();
     }
 }
 
