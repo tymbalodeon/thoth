@@ -1,3 +1,5 @@
+use std::{fs::read_to_string, path::PathBuf};
+
 use diesel::{
     insert_into, Connection, QueryDsl, RunQueryDsl, SelectableHelper,
     SqliteConnection,
@@ -5,6 +7,7 @@ use diesel::{
 use diesel_migrations::{
     embed_migrations, EmbeddedMigrations, MigrationHarness,
 };
+use kdl::KdlDocument;
 use rust_search::SearchBuilder;
 use shellexpand::tilde;
 
@@ -65,11 +68,21 @@ pub fn main(import: bool) {
             .collect();
 
         for path in search {
-            let score = insert_score(connection, NewScore::from_file(&path));
+            let kdl_file =
+                PathBuf::from(&path).parent().unwrap().join("thoth.kdl");
+            if kdl_file.exists() {
+                let kdl: KdlDocument =
+                    read_to_string(kdl_file).unwrap().parse().unwrap();
+                let title = kdl.get_arg("title").unwrap();
+                let composer = kdl.get_arg("composer").unwrap();
+                let arranger = kdl.get_arg("arranger").unwrap();
+                println!("{title} {composer} {arranger}");
+            }
+            // let score = insert_score(connection, NewScore::from_file(&path));
 
-            println!("{score:?}");
+            // println!("{score:?}");
         }
     }
 
-    show_scores(connection);
+    // show_scores(connection);
 }
