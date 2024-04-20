@@ -136,50 +136,50 @@ impl Score {
     fn get_option_display(option: &Option<String>) -> String {
         match option {
             Some(value) => value.to_string(),
-            None => "".to_string(),
+            None => String::new(),
         }
     }
 
     pub fn display(&self) {
         let values = vec![
-            vec!["ly File Path".to_string(), (&self.ly_file_path).to_string()],
+            vec!["ly File Path".to_string(), self.ly_file_path.to_string()],
             vec![
                 "Dedication".to_string(),
-                Score::get_option_display(&self.dedication),
+                Self::get_option_display(&self.dedication),
             ],
-            vec!["Title".to_string(), Score::get_option_display(&self.title)],
+            vec!["Title".to_string(), Self::get_option_display(&self.title)],
             vec![
                 "Subtitle".to_string(),
-                Score::get_option_display(&self.subtitle),
+                Self::get_option_display(&self.subtitle),
             ],
             vec![
                 "Subsubtitle".to_string(),
-                Score::get_option_display(&self.subsubtitle),
+                Self::get_option_display(&self.subsubtitle),
             ],
             vec![
                 "Instrument".to_string(),
-                Score::get_option_display(&self.instrument),
+                Self::get_option_display(&self.instrument),
             ],
-            vec!["Poet".to_string(), Score::get_option_display(&self.poet)],
+            vec!["Poet".to_string(), Self::get_option_display(&self.poet)],
             vec![
                 "Composer".to_string(),
-                Score::get_option_display(&self.composer),
+                Self::get_option_display(&self.composer),
             ],
-            vec!["Meter".to_string(), Score::get_option_display(&self.meter)],
+            vec!["Meter".to_string(), Self::get_option_display(&self.meter)],
             vec![
                 "Arranger".to_string(),
-                Score::get_option_display(&self.arranger),
+                Self::get_option_display(&self.arranger),
             ],
             vec![
                 "Tagline".to_string(),
-                Score::get_option_display(&self.tagline),
+                Self::get_option_display(&self.tagline),
             ],
             vec![
                 "Copyright".to_string(),
-                Score::get_option_display(&self.copyright),
+                Self::get_option_display(&self.copyright),
             ],
-            vec!["Piece".to_string(), Score::get_option_display(&self.piece)],
-            vec!["Opus".to_string(), Score::get_option_display(&self.opus)],
+            vec!["Piece".to_string(), Self::get_option_display(&self.piece)],
+            vec!["Opus".to_string(), Self::get_option_display(&self.opus)],
         ];
 
         table::print(&[], values);

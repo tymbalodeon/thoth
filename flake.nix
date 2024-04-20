@@ -140,7 +140,7 @@
         ];
 
         FONTCONFIG_FILE =
-          makeFontsConf
+          pkgs.makeFontsConf
           {
             fontDirectories = [pkgs.freefont_ttf];
           };
